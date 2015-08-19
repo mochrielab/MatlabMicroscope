@@ -1,9 +1,7 @@
-function [ obj ] = Capture( obj, hobj, event )
+function [ img ] = Capture( obj, hobj, event )
 % capture of an image already exist in live
 
-if obj.is_live_running || obj.is_movie_running || obj.is_zstack_runnning
-    img=getimage(obj.imageaxis_handle);
-else
+if strcmp(obj.status,'standing') 
     obj.mm.setExposure(obj.exposure);    
     axes(obj.imageaxis_handle);
     obj.mm.snapImage();
@@ -24,6 +22,8 @@ else
     cla %clear current axis
     imagesc(img);colormap gray;axis image;axis off
     drawnow;
+else
+    img=getimage(obj.imageaxis_handle);
 end
 
 % save data

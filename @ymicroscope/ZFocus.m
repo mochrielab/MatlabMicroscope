@@ -1,43 +1,63 @@
 function [ obj ] = ZFocus( obj, hobj,event )
-% autofocus z direction
-if obj.is_live_running || obj.is_movie_running || obj.is_zstack_runnning || obj.is_focusing
-    msgbox('Can not start because other process running');
-else
-    set(hobj,'String','Finding Focal Plane')
+% do a zscan
+if obj.exposure >= 1000/obj.framerate
+    msgbox('error: exposure is longer than the frame interval')
+elseif strcmp(obj.status,'standing')
+    obj.status = 'Autofocusing';
+    set(hobj,'String','Autofocusing')
+    pause(.01)
 
-    % initialize
-    obj.nidaq.Rate=obj.framerate; %Hz
-    obj.nidaq.IsContinuous=0; % continuous writing
-    obj.mm.setExposure(obj.exposure);
-    obj.mm.setCircularBufferMemoryFootprint(4000);
-    obj.mm.clearCircularBuffer();
-    intervalMs=1e3/obj.nidaq.Rate;%
-    stacks=(-(obj.numstacks-1)/2:(obj.numstacks-1)/2)*obj.stepsize;
-    cameralabel=obj.mm.getCameraDevice;
-
-    width = obj.mm.getImageWidth();
-    height = obj.mm.getImageHeight();
-
+    % set scanning parameters
+    stacks =(-(obj.numstacks-1)/2:(obj.numstacks-1)/2)*obj.stepsize; % stack position
+    width = obj.mm.getImageWidth(); % image width
+    height = obj.mm.getImageHeight(); % image height
     numstacks=length(stacks);
+
+    % initialize ni daq
+    rate_multiplier = 2;
+    obj.nidaq.Rate=obj.framerate * rate_multiplier; % set data acuisition rate
+    obj.nidaq.IsContinuous=0; % continuous writing
+
+    % prepare data to send
+    zdata=stacks*obj.volts_per_pix+obj.dataoffset; % data to send
+    numdata = length(zdata); % length and data
+    zdata = reshape(ones(rate_multiplier,1)*zdata,...
+        rate_multiplier*numdata,1); % data for z scan at clock rate
+    camtrigger = reshape([1;zeros(rate_multiplier-1,1)]*ones(1,numdata),...
+        rate_multiplier*numdata,1); % trigger for camera
+    obj.nidaq.queueOutputData([zdata,camtrigger])
+
+    % log piezo position
+    piezopos = zeros(size(zdata));
+    counter = 0;
+    data_pointer = libpointer('doublePtr',piezopos);
+    counter_pointer = libpointer('doublePtr',counter);
+    lh = addlistener(obj.nidaq,'DataAvailable',... % remember to delete pointer
+        @(src,event)Nidaq_Data_log(src,event,data_pointer,counter_pointer));
+        
+    % camera setting (take 4 seconds!)
+    andorCam = 'Andor sCMOS Camera';
+    obj.mm.setProperty(andorCam, 'TriggerMode', 'External'); % set exposure to external
+    obj.mm.setExposure(obj.exposure); % set exposure time, ????? work or not
+    obj.mm.clearCircularBuffer(); % clear the buffer for image storage
+    
+    %image type
     if obj.mm.getBytesPerPixel == 2
         pixelType = 'uint16';
     else
         pixelType = 'uint8';
     end
     
-    % prepare data to send
-    data2=stacks*obj.volts_per_pix+obj.dataoffset;
-    data2=reshape(data2,length(data2),1);
-    queueOutputData(obj.nidaq,data2)
-    
     % prepare data acquisition
-    obj.mm.prepareSequenceAcquisition(cameralabel);
     obj.mm.initializeCircularBuffer();
-    
-    obj.nidaq.startBackground;
-    obj.mm.startSequenceAcquisition(cameralabel,numstacks,intervalMs,1);
+    obj.mm.prepareSequenceAcquisition(andorCam);
+
+    % start acquisition
+    obj.mm.startContinuousSequenceAcquisition(0);
+    obj.nidaq.startBackground;    
+
     % live in background
-    while obj.mm.isSequenceRunning
+    while obj.nidaq.IsRunning 
         img=obj.mm.getLastImage();
         img = typecast(img, pixelType);      % pixels must be interpreted as unsigned integers
         img = reshape(img, [width, height]); % image should be interpreted as a 2D array
@@ -47,9 +67,22 @@ else
         drawnow;
     end
     
-    % grab frame
+    % warning for buffer overflow
+    if obj.mm.isBufferOverflowed 
+        warning('camera buffer over flowed, try set larger memory for the camera');
+    end
     display(['number of images in buffer: ',...
         num2str(obj.mm.getRemainingImageCount())]);
+
+    % ending acquisition
+    obj.nidaq.outputSingleScan([obj.dataoffset,0]); % reset starting position
+    obj.nidaq.stop;
+    delete(lh);
+    obj.mm.stopSequenceAcquisition;
+
+    %set(hobj,'String','prepare Saving')
+    pause(.01)
+    % grab frame (take 0.7 second)
     istack=0;
     img3=uint16(zeros(height,width,numstacks));
     while obj.mm.getRemainingImageCount()>0
@@ -58,15 +91,12 @@ else
         img = reshape(imgtmp, [width, height]);
         img3(:,:,istack)=img';
     end
-    set(hobj,'String','Zstack Saving')
+    %set(hobj,'String','Zstack Saving')
+    pause(.01)
     
-    % ending program
-    obj.nidaq.stop;
-    obj.mm.stopSequenceAcquisition();
-    
-%% auto-focusing
+    %% auto-focusing
     % Sum of Squares of Gradients of Each Image using Sobel method
-    Nframes = size(img3,3);
+    Nframes = size(img3,3);  
     
     SumSqGrad = ImgGrad(Nframes,img3); %function that will find the sum
     %of the square of the gradients of each stack image
@@ -99,12 +129,21 @@ else
         msgbox('Data offset was greater than 10V!');
     else
         obj.dataoffset=data2;
-        obj.nidaq.outputSingleScan(obj.dataoffset);
+        obj.nidaq.outputSingleScan([obj.dataoffset,0]); % ** 07/21/15
+
     end
     
     %reset dataoffset to 1
 %     obj.dataoffset = 1;
 %%
     set(hobj,'String','Focus');
+        
+    obj.status = 'standing';
+     
+else
+    msgbox(['error: microscope is ',obj.status]);
 end
+
 end
+
+

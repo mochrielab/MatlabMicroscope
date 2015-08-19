@@ -1,0 +1,7 @@
+7/21/2015
+1. added status, deleted isrunning_*
+2. add change of status check
+3. add exposure check for z scan
+4. movie modified
+unfinished parts: movie z focus commented out
+movie exposure check, 

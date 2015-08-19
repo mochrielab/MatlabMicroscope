@@ -1,9 +1,10 @@
-function [ obj ] = Zscan( obj, hobj,event )
+function [ img3 ] = Zscan( obj, hobj,event )
 % do a zscan
-if obj.is_live_running || obj.is_movie_running || obj.is_zstack_runnning
-    msgbox('Cannot start because other process running');
-else
-    obj.is_zstack_runnning = 1;
+magic_number = 4.4;
+if obj.exposure + magic_number >= 1000/obj.framerate
+    msgbox('error: exposure is longer than the frame interval')
+elseif strcmp(obj.status,'standing')
+    obj.status = 'zstack_running';
     set(hobj,'String','Zstack Running')
     pause(.01)
 
@@ -127,8 +128,11 @@ else
     set(hobj,'String','Zstack')
     toc
     
-    obj.is_zstack_runnning = 0;
+    obj.status = 'standing';
+else
+    msgbox(['error: microscope is ',obj.status]);
 end
+
 end
 
 

@@ -12,16 +12,6 @@ classdef ymicroscope < handle
         datasavepath='C:\microscope_pics';
         datasavepath2 = 'C:\microscope_log';
         
-        % text file headers
-        header1 = 'Date';
-        header2 = 'Time';
-        header3 = 'Illum. Mode';
-        header4 = 'Exposure (ms)';
-        header5 = 'Display Size';
-        header6 = 'Frame Rate (Hz)';
-        header7 = 'No. of Stacks';
-        header8 = 'Z Step Size (px)';
-        
         % constants
         % piezo conversion
         um_per_volts=200/10;
@@ -38,8 +28,12 @@ classdef ymicroscope < handle
         
         % microscope parameters
         exposure_brightfield=40; %(ms)
-        exposure_fluorescent=100; %(ms)
+        exposure_fluorescent=50; %(ms)
         framerate=10; %(fps )
+        illumination_mode='brightfield';
+        movie_mode = 'zstack_plain';
+        movieinterval = 0;
+        moviecycles = 2;
         
         % ROI setting
         img_width = 2560; %image width (number of pixels)
@@ -47,12 +41,8 @@ classdef ymicroscope < handle
         display_size = '2160 x 2560';
 
         % microscope status
-        is_live_running=0
-        is_zstack_runnning=0
-        is_movie_running=0
-        is_focusing = 0
-        illumination_mode='brightfield';
-
+        status = 'standing'
+    
     end
     
     properties (Dependent)
@@ -130,8 +120,7 @@ classdef ymicroscope < handle
             elseif strcmp(obj.illumination_mode,'Fluorescent')
                 exposure=obj.exposure_fluorescent;
             else
-                exposure=[];
-                warning('Exposure N/A');
+                exposure=0;
             end
         end
         
@@ -159,6 +148,7 @@ classdef ymicroscope < handle
             value=obj.um_per_pix/obj.um_per_volts;
         end
         
+        % set z off set
         function set.dataoffset(obj,dataoffset)
             if dataoffset<=0
                 obj.dataoffset=0;
@@ -171,12 +161,15 @@ classdef ymicroscope < handle
             end
         end
         
-        % functions
-        obj = Capture(obj,hobj,event);
+        % main functions
+        img = Capture(obj,hobj,event);
         obj = Live(obj,hobj,event);
         obj = SetupUI(obj);
-        obj = Zscan(obj,hobj,event);
+        img3 = Zscan(obj,hobj,event);
         obj = Movie(obj,hobj,event);
+        obj = ZFocus(obj,hobj,event);
+        obj = DAQpkg(obj,hobj,event);
+
     end
     
 end

@@ -3,6 +3,7 @@ function [ obj ] = SetupUI( obj )
 
 %%
 close all;
+obj.status='standing';
 % figure
 figure_handle=figure('Position',[0 50 1920 950]);
 obj.figure_handle=figure_handle;
@@ -40,17 +41,19 @@ zstack_handle=uicontrol('Parent',controlpanel_handle,'Style','pushbutton',...
 % movie button
 movie_handle=uicontrol('Parent',controlpanel_handle,'Style','pushbutton',...
     'Unit','Pixels','Position',[690 340 200 60],...
-    'String','Movie','Fontsize',20,...
+    'String','Start Movie','Fontsize',20,...
     'Callback',@(hobj,event)obj.Movie(hobj,event));
-
-%%% Added 06/04/15
-%% live button
+% focus button
 focus_handle=uicontrol('Parent',controlpanel_handle,'Style','pushbutton',...
     'Unit','Pixels','Position',[465 245 200 60],...
     'String','Focus','Fontsize',20,...
     'Callback',@(hobj,event)obj.ZFocus(hobj,event));
+% DAQpkg button
+ImgSeq_handle=uicontrol('Parent',controlpanel_handle,'Style','pushbutton',...
+    'Unit','Pixels','Position',[690 245 200 60],...
+    'String','ImgSeq','Fontsize',20,...
+    'Callback',@(hobj,event)obj.DAQpkg(hobj,event));
 %% set illumination mode
-%%% Modified 05/29/15 - text to appear in the pop-up menu %%%
 illumination_handle=uicontrol('Parent',controlpanel_handle,'Style','popupmenu',...
     'Unit','Pixels','Position',[15 270 200 20],'Value',1,...
     'String',{'None','Brightfield - W','Brightfield - R','Fluorescent'},'Fontsize',10,...
@@ -58,6 +61,14 @@ illumination_handle=uicontrol('Parent',controlpanel_handle,'Style','popupmenu',.
 uicontrol('Parent',controlpanel_handle,'Style','text',...
     'Unit','Pixels','Position',[15 290 200 20],...
     'String','Illumination Mode','Fontsize',10);
+%% set movie mode
+illumination_handle=uicontrol('Parent',controlpanel_handle,'Style','popupmenu',...
+    'Unit','Pixels','Position',[15 190 200 20],'Value',1,...
+    'String',{'zstack_plain'},...
+    'Fontsize',10,'Callback',@(hobj,event)set_movie_mode(hobj,event,obj));
+uicontrol('Parent',controlpanel_handle,'Style','text',...
+    'Unit','Pixels','Position',[15 210 200 20],...
+    'String','Movie Mode','Fontsize',10);
 %% set display mode ROI
 %%% Added 06/03/15 - text to appear in the pop-up menu %%%
 ROI_handle=uicontrol('Parent',controlpanel_handle,'Style','popupmenu',...
@@ -117,7 +128,6 @@ uicontrol('Parent',parampanel_handle,'Unit','Pixels',...
     'Position',[445 360 200 20],'Style','text','String',...
     'zstep size (pix)');
 
-%%% Addition 06/04/15 %%%
 % framerate
 framerate_handle=...
     uicontrol('Parent',parampanel_handle,'Unit','Pixels',...
@@ -127,8 +137,26 @@ framerate_handle=...
 uicontrol('Parent',parampanel_handle,'Unit','Pixels',...
     'Position',[445 410 200 20],'Style','text','String',...
     'Frame Rate (Hz)');
-%%% end of addition %%%
 
+% movie interval
+movieinterval_handle=...
+    uicontrol('Parent',parampanel_handle,'Unit','Pixels',...
+    'Position',[660 390 200 20],'Style','edit',...
+    'String',num2str(obj.movieinterval),...
+    'Callback',@(hobj,event)set_movieinterval(hobj,event,obj));
+uicontrol('Parent',parampanel_handle,'Unit','Pixels',...
+    'Position',[660 410 200 20],'Style','text','String',...
+    'Movie Interval (mins)');
+
+% movie repeat
+moviecycles_handle=...
+    uicontrol('Parent',parampanel_handle,'Unit','Pixels',...
+    'Position',[660 340 200 20],'Style','edit',...
+    'String',num2str(obj.moviecycles),...
+    'Callback',@(hobj,event)set_moviecycles(hobj,event,obj));
+uicontrol('Parent',parampanel_handle,'Unit','Pixels',...
+    'Position',[660 360 200 20],'Style','text','String',...
+    'Movie Cycles');
 end
 
 % call back functions
@@ -176,7 +204,7 @@ end
 function set_stepsize(hobj,event,obj)
 input=str2double(get(hobj,'string'));
 if ~isnan(input)
-    if input<=0
+    if input<0
     else
         obj.stepsize=input;
     end
@@ -184,11 +212,30 @@ end
 set(hobj,'String',num2str(obj.stepsize));
 end
 
-%%% Modified 05/29/15 - additional option available to choose brightfield
-%%% color %%%
+function set_movieinterval(hobj,event,obj)
+input=str2double(get(hobj,'string'));
+if ~isnan(input)
+    if input<=0
+    else
+        obj.movieinterval=input;
+    end
+end
+set(hobj,'String',num2str(obj.movieinterval));
+end
+
+function set_moviecycles(hobj,event,obj)
+input=str2double(get(hobj,'string'));
+if ~isnan(input)
+    if input<=0
+    else
+        obj.moviecycles=input;
+    end
+end
+set(hobj,'String',num2str(obj.moviecycles));
+end
+
 function set_illumination_mode(hobj,event,obj)
-%%% Modified 05/30/15 - additional option available to choose brightfield
-%%% color %%%
+
 input=get(hobj,'value');
 if input==1 %No light sources are on
     obj.illumination_mode='None'; %no illumination modes selected
@@ -214,11 +261,24 @@ elseif input==4
 end
 end
 
+function set_movie_mode(hobj,event,obj)
+
+input=get(hobj,'value');
+switch input
+    case 1
+        obj.movie_mode = 'zstack_plain';
+    otherwise
+        msgbox('error movie option')
+end
+end
+
 %%% Added 06/03/15 - setting region of interest
 function set_ROI(hobj,event,obj)
 input=get(hobj,'value');
 if input==1 %Default 2160 x 2560 pixels
     obj.display_size = '2160 x 2560';
+    obj.img_width = 2560;
+    obj.img_height = 2160;
     obj.mm.clearROI();
 elseif input==2 %1024 x 1344 pixels
     obj.display_size = '1024 x 1344';

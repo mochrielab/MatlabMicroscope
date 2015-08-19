@@ -9,4 +9,4 @@ display('finished loading java path');
 obj=ymicroscope();
 % run
 obj.SetupUI;
-%%
+%%  
