@@ -54,26 +54,29 @@ ImgSeq_handle=uicontrol('Parent',controlpanel_handle,'Style','pushbutton',...
     'String','ImgSeq','Fontsize',20,...
     'Callback',@(hobj,event)obj.DAQpkg(hobj,event));
 %% set illumination mode
+illumination_options={'None','Brightfield - W','Brightfield - R','Fluorescent'};
 illumination_handle=uicontrol('Parent',controlpanel_handle,'Style','popupmenu',...
-    'Unit','Pixels','Position',[15 270 200 20],'Value',1,...
-    'String',{'None','Brightfield - W','Brightfield - R','Fluorescent'},'Fontsize',10,...
+    'Unit','Pixels','Position',[15 270 200 20],'Value',find(strcmp(illumination_options,obj.illumination_mode)),...
+    'String',illumination_options,'Fontsize',10,...
     'Callback',@(hobj,event)set_illumination_mode(hobj,event,obj));
 uicontrol('Parent',controlpanel_handle,'Style','text',...
     'Unit','Pixels','Position',[15 290 200 20],...
     'String','Illumination Mode','Fontsize',10);
 %% set movie mode
+moviemode_options={'zstack_plain','zstack_singlefile'};
 illumination_handle=uicontrol('Parent',controlpanel_handle,'Style','popupmenu',...
-    'Unit','Pixels','Position',[15 190 200 20],'Value',1,...
-    'String',{'zstack_plain'},...
+    'Unit','Pixels','Position',[15 190 200 20],'Value',find(strcmp(obj.movie_mode,moviemode_options)),...
+    'String',moviemode_options,...
     'Fontsize',10,'Callback',@(hobj,event)set_movie_mode(hobj,event,obj));
 uicontrol('Parent',controlpanel_handle,'Style','text',...
     'Unit','Pixels','Position',[15 210 200 20],...
     'String','Movie Mode','Fontsize',10);
 %% set display mode ROI
 %%% Added 06/03/15 - text to appear in the pop-up menu %%%
+ROI_options={'2160 x 2560','1024 x 1344','512 x 512','256 x 256'};
 ROI_handle=uicontrol('Parent',controlpanel_handle,'Style','popupmenu',...
-    'Unit','Pixels','Position',[240 270 200 20],'Value',1,...
-    'String',{'2160 x 2560','1024 x 1344','512 x 512','256 x 256'},'Fontsize',10,...
+    'Unit','Pixels','Position',[240 270 200 20],'Value',find(strcmp(ROI_options,obj.display_size)),...
+    'String',ROI_options,'Fontsize',10,...
     'Callback',@(hobj,event)set_ROI(hobj,event,obj));
 uicontrol('Parent',controlpanel_handle,'Style','text',...
     'Unit','Pixels','Position',[240 290 200 20],...
@@ -102,8 +105,8 @@ uicontrol('Parent',parampanel_handle,'Unit','Pixels',...
 zoffset_handle=...
     uicontrol('Parent',parampanel_handle,'Unit','Pixels',...
     'Position',[15 340 200 20],'Style','edit',...
-    'String',num2str(obj.dataoffset),...
-    'Callback',@(hobj,event)set_dataoffset(hobj,event,obj));
+    'String',num2str(obj.zoffset),...
+    'Callback',@(hobj,event)set_zoffset(hobj,event,obj));
 uicontrol('Parent',parampanel_handle,'Unit','Pixels',...
     'Position',[15 360 200 20],'Style','text','String',...
     'z offset (Volts)');
@@ -139,21 +142,21 @@ uicontrol('Parent',parampanel_handle,'Unit','Pixels',...
     'Frame Rate (Hz)');
 
 % movie interval
-movieinterval_handle=...
+movie_interval_handle=...
     uicontrol('Parent',parampanel_handle,'Unit','Pixels',...
     'Position',[660 390 200 20],'Style','edit',...
-    'String',num2str(obj.movieinterval),...
-    'Callback',@(hobj,event)set_movieinterval(hobj,event,obj));
+    'String',num2str(obj.movie_interval),...
+    'Callback',@(hobj,event)set_movie_interval(hobj,event,obj));
 uicontrol('Parent',parampanel_handle,'Unit','Pixels',...
     'Position',[660 410 200 20],'Style','text','String',...
     'Movie Interval (mins)');
 
 % movie repeat
-moviecycles_handle=...
+movie_cycles_handle=...
     uicontrol('Parent',parampanel_handle,'Unit','Pixels',...
     'Position',[660 340 200 20],'Style','edit',...
-    'String',num2str(obj.moviecycles),...
-    'Callback',@(hobj,event)set_moviecycles(hobj,event,obj));
+    'String',num2str(obj.movie_cycles),...
+    'Callback',@(hobj,event)set_movie_cycles(hobj,event,obj));
 uicontrol('Parent',parampanel_handle,'Unit','Pixels',...
     'Position',[660 360 200 20],'Style','text','String',...
     'Movie Cycles');
@@ -177,17 +180,17 @@ set(hobj,'String',num2str(obj.exposure_brightfield));
 
 end
 
-function set_dataoffset(hobj,event,obj)
+function set_zoffset(hobj,event,obj)
 input=str2double(get(hobj,'string'));
 if ~isnan(input)
     if input<0
     elseif input>10
     else
-        obj.dataoffset=input;
+        obj.zoffset=input;
     end
 end
-set(hobj,'String',num2str(obj.dataoffset));
-obj.nidaq.outputSingleScan(obj.dataoffset);
+set(hobj,'String',num2str(obj.zoffset));
+obj.nidaq.outputSingleScan(obj.zoffset);
 end
 
 function set_numstacks(hobj,event,obj)
@@ -212,26 +215,26 @@ end
 set(hobj,'String',num2str(obj.stepsize));
 end
 
-function set_movieinterval(hobj,event,obj)
+function set_movie_interval(hobj,event,obj)
 input=str2double(get(hobj,'string'));
 if ~isnan(input)
     if input<=0
     else
-        obj.movieinterval=input;
+        obj.movie_interval=input;
     end
 end
-set(hobj,'String',num2str(obj.movieinterval));
+set(hobj,'String',num2str(obj.movie_interval));
 end
 
-function set_moviecycles(hobj,event,obj)
+function set_movie_cycles(hobj,event,obj)
 input=str2double(get(hobj,'string'));
 if ~isnan(input)
     if input<=0
     else
-        obj.moviecycles=input;
+        obj.movie_cycles=input;
     end
 end
-set(hobj,'String',num2str(obj.moviecycles));
+set(hobj,'String',num2str(obj.movie_cycles));
 end
 
 function set_illumination_mode(hobj,event,obj)
@@ -241,23 +244,18 @@ if input==1 %No light sources are on
     obj.illumination_mode='None'; %no illumination modes selected
     fprintf(obj.sola,'%s',char([hex2dec('4F') hex2dec('7F') hex2dec('50')])); % Disable all channels
     obj.nidaq2.outputSingleScan([0 0]);
-    %obj.nidaq.outputSingleScan([0 0 0]);
 elseif input==2
     obj.illumination_mode='Brightfield - W'; %ßselect white LED
     fprintf(obj.sola,'%s',char([hex2dec('4F') hex2dec('7F') hex2dec('50')])); % Disable all channels
     obj.nidaq2.outputSingleScan([1 0]);
-    %obj.nidaq.outputSingleScan([0 1 0]);
 elseif input==3
     obj.illumination_mode='Brightfield - R'; % select red LED
     fprintf(obj.sola,'%s',char([hex2dec('4F') hex2dec('7F') hex2dec('50')])); % Disable all channels
     obj.nidaq2.outputSingleScan([0 1]);
-    %obj.nidaq.outputSingleScan([0 0 1]);
 elseif input==4
     obj.illumination_mode='Fluorescent';
     fprintf(obj.sola,'%s',char([hex2dec('4F') hex2dec('7D') hex2dec('50')])); % Enable all channels
-    obj.nidaq2.outputSingleScan([0 0]);
-    %obj.nidaq.outputSingleScan([0 0 0]);
-    
+    obj.nidaq2.outputSingleScan([0 0]);    
 end
 end
 
@@ -267,6 +265,8 @@ input=get(hobj,'value');
 switch input
     case 1
         obj.movie_mode = 'zstack_plain';
+    case 2
+        obj.movie_mode = 'zstack_singlefile';
     otherwise
         msgbox('error movie option')
 end

@@ -20,7 +20,7 @@ classdef ymicroscope < handle
         % scanning parameters
         numstacks=61;
         stepsize=1;
-        dataoffset = 1;
+        zoffset = 1;
         
         % ui handles
         figure_handle
@@ -30,10 +30,10 @@ classdef ymicroscope < handle
         exposure_brightfield=40; %(ms)
         exposure_fluorescent=50; %(ms)
         framerate=10; %(fps )
-        illumination_mode='brightfield';
+        illumination_mode='None';
         movie_mode = 'zstack_plain';
-        movieinterval = 0;
-        moviecycles = 2;
+        movie_interval = 0;
+        movie_cycles = 2;
         
         % ROI setting
         img_width = 2560; %image width (number of pixels)
@@ -48,8 +48,6 @@ classdef ymicroscope < handle
     properties (Dependent)
         volts_per_pix;
         exposure
-        ROIwidth %region of interest width
-        ROIheight %region of interest height
     end
     
     methods
@@ -124,40 +122,20 @@ classdef ymicroscope < handle
             end
         end
         
-        function ROIwidth=get.ROIwidth(obj)
-            if sum(strcmp(obj.display_size,{'2160 x 2560','1024 x 1344',...
-                    '512 x 512','256 x 256'})) > 0
-                ROIwidth=obj.img_width;    
-            else
-                ROIwidth=[];
-                warning('Image Width N/A');
-            end
-        end
-        
-        function ROIheight=get.ROIheight(obj)
-            if sum(strcmp(obj.display_size,{'2160 x 2560','1024 x 1344',...
-                    '512 x 512','256 x 256'})) > 0
-                ROIheight=obj.img_height;
-            else
-                ROIheight=[];
-                warning('Image Height N/A');
-            end
-        end
-        
         function value=get.volts_per_pix(obj)
             value=obj.um_per_pix/obj.um_per_volts;
         end
         
         % set z off set
-        function set.dataoffset(obj,dataoffset)
-            if dataoffset<=0
-                obj.dataoffset=0;
-                warning('dataoffset goes below zero');
-            elseif dataoffset>=10
-                obj.dataoffset=10;          
-                warning('dataoffset goes above ten');
+        function set.zoffset(obj,zoffset)
+            if zoffset<=0
+                obj.zoffset=0;
+                warning('zoffset goes below zero');
+            elseif zoffset>=10
+                obj.zoffset=10;          
+                warning('zoffset goes above ten');
             else
-            obj.dataoffset=dataoffset;
+            obj.zoffset=zoffset;
             end
         end
         

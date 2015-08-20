@@ -73,7 +73,7 @@ if strcmp(obj.status,'standing') && strcmp(get(hobj,'String'),'ImgSeq')
                 obj.nidaq.IsContinuous=0; % continuous writing
                 
                 % prepare data to send
-                zdata=Nimgs*obj.volts_per_pix+obj.dataoffset; % data to send
+                zdata=Nimgs*obj.volts_per_pix+obj.zoffset; % data to send
                 numdata = length(zdata); % length and data
                 zdata = reshape(ones(rate_multiplier,1)*zdata,...
                     rate_multiplier*numdata,1); % data for z scan at clock rate
@@ -130,7 +130,7 @@ if strcmp(obj.status,'standing') && strcmp(get(hobj,'String'),'ImgSeq')
                     num2str(obj.mm.getRemainingImageCount())]);
                 
                 % ending acquisition
-                obj.nidaq.outputSingleScan([obj.dataoffset,0]); % reset starting position
+                obj.nidaq.outputSingleScan([obj.zoffset,0]); % reset starting position
                 obj.nidaq.stop;
                 delete(lh);
                 obj.mm.stopSequenceAcquisition;
@@ -227,7 +227,7 @@ if strcmp(obj.status,'standing') && strcmp(get(hobj,'String'),'ImgSeq')
                 obj.nidaq.IsContinuous=0; % continuous writing
                 
                 % prepare data to send
-                zdata=Nimgs*obj.volts_per_pix+obj.dataoffset; % data to send
+                zdata=Nimgs*obj.volts_per_pix+obj.zoffset; % data to send
                 numdata = length(zdata); % length and data
                 zdata = reshape(ones(rate_multiplier,1)*zdata,...
                     rate_multiplier*numdata,1); % data for z scan at clock rate
@@ -284,7 +284,7 @@ if strcmp(obj.status,'standing') && strcmp(get(hobj,'String'),'ImgSeq')
                     num2str(obj.mm.getRemainingImageCount())]);
                 
                 % ending acquisition
-                obj.nidaq.outputSingleScan([obj.dataoffset,0]); % reset starting position
+                obj.nidaq.outputSingleScan([obj.zoffset,0]); % reset starting position
                 obj.nidaq.stop;
                 delete(lh);
                 obj.mm.stopSequenceAcquisition;
@@ -372,7 +372,7 @@ if strcmp(obj.status,'standing') && strcmp(get(hobj,'String'),'ImgSeq')
                 obj.nidaq.IsContinuous=0; % continuous writing
                 
                 % prepare data to send
-                zdata=Nimgs*obj.volts_per_pix+obj.dataoffset; % data to send
+                zdata=Nimgs*obj.volts_per_pix+obj.zoffset; % data to send
                 numdata = length(zdata); % length and data
                 zdata = reshape(ones(rate_multiplier,1)*zdata,...
                     rate_multiplier*numdata,1); % data for z scan at clock rate
@@ -429,7 +429,7 @@ if strcmp(obj.status,'standing') && strcmp(get(hobj,'String'),'ImgSeq')
                     num2str(obj.mm.getRemainingImageCount())]);
                 
                 % ending acquisition
-                obj.nidaq.outputSingleScan([obj.dataoffset,0]); % reset starting position
+                obj.nidaq.outputSingleScan([obj.zoffset,0]); % reset starting position
                 obj.nidaq.stop;
                 delete(lh);
                 obj.mm.stopSequenceAcquisition;
@@ -514,7 +514,7 @@ if strcmp(obj.status,'standing') && strcmp(get(hobj,'String'),'ImgSeq')
                 obj.nidaq.IsContinuous=0; % continuous writing
                 
                 % prepare data to send
-                zdata=stacks*obj.volts_per_pix+obj.dataoffset; % data to send
+                zdata=stacks*obj.volts_per_pix+obj.zoffset; % data to send
                 numdata = length(zdata); % length and data
                 zdata = reshape(ones(rate_multiplier,1)*zdata,...
                     rate_multiplier*numdata,1); % data for z scan at clock rate
@@ -575,7 +575,7 @@ if strcmp(obj.status,'standing') && strcmp(get(hobj,'String'),'ImgSeq')
                     num2str(obj.mm.getRemainingImageCount())]);
                 
                 % ending acquisition
-                obj.nidaq.outputSingleScan([obj.dataoffset,0]); % reset starting position
+                obj.nidaq.outputSingleScan([obj.zoffset,0]); % reset starting position
                 obj.nidaq.stop;
                 delete(lh);
                 obj.mm.stopSequenceAcquisition;
@@ -659,7 +659,7 @@ if strcmp(obj.status,'standing') && strcmp(get(hobj,'String'),'ImgSeq')
                 obj.nidaq.IsContinuous=0; % continuous writing
                 
                 % prepare data to send
-                zdata=stacks*obj.volts_per_pix+obj.dataoffset; % data to send
+                zdata=stacks*obj.volts_per_pix+obj.zoffset; % data to send
                 numdata = length(zdata); % length and data
                 zdata = reshape(ones(rate_multiplier,1)*zdata,...
                     rate_multiplier*numdata,1); % data for z scan at clock rate
@@ -717,7 +717,7 @@ if strcmp(obj.status,'standing') && strcmp(get(hobj,'String'),'ImgSeq')
                     num2str(obj.mm.getRemainingImageCount())]);
                 
                 % ending acquisition
-                obj.nidaq.outputSingleScan([obj.dataoffset,0]); % reset starting position
+                obj.nidaq.outputSingleScan([obj.zoffset,0]); % reset starting position
                 obj.nidaq.stop;
                 delete(lh);
                 obj.mm.stopSequenceAcquisition;

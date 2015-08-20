@@ -1,9 +1,9 @@
 function [MaxLoc] = LorentzPkFit(Nframes,SumSqGrad)
 x=(1:Nframes)';
 yOrig=SumSqGrad';
-figure;
-plot(x,yOrig,'.b'); %plots original data
-hold on;
+% figure;
+% plot(x,yOrig,'.b'); %plots original data
+% hold on;
 
 %% formulate initial guesses for parameters
 y0 = min(SumSqGrad); %guess for offset
@@ -15,8 +15,8 @@ initialCond=[y0,A,w,x0];
 %% use nlinfit to fit data with user-defined Lorentzian peak fnc
 paramFinal=nlinfit(x,yOrig,@NormLorentzian,initialCond);
 yEnd=NormLorentzian(paramFinal,x);
-plot(x,yEnd,'-g'); %plots the fit on top of the data read in
-legend('Orig','Fit');
+% plot(x,yEnd,'-g'); %plots the fit on top of the data read in
+% legend('Orig','Fit');
 
 %% Finding location of max value based off of fit
 LorentzMax = max(yEnd); %finds maximum of the fit    

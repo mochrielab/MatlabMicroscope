@@ -5,3 +5,13 @@
 4. movie modified
 unfinished parts: movie z focus commented out
 movie exposure check, 
+
+8/19/2015
+1. update the illumination mode and roi
+2. remove the movie saving size limit
+3. remove the headers within class defnition
+
+4. add status bar
+5. add quick setting save and load
+7. rename the dataoffset to zoffset 
+    rename couple variables including movie_interval, movie_cycles

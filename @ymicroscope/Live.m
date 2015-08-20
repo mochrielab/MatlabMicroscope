@@ -12,7 +12,7 @@ elseif strcmp(obj.status,'standing')
     set(hobj,'String','Stop Live');
     obj.status = 'live_running';
     % set camera to be triggered by the computer
-    obj.nidaq.outputSingleScan([obj.dataoffset, 0]);
+    obj.nidaq.outputSingleScan([obj.zoffset, 0]);
     andorCam = 'Andor sCMOS Camera';
     obj.mm.setProperty(andorCam, 'TriggerMode', 'Software (Recommended for Live Mode)'); % set exposure to external
     while strcmp(obj.status,'live_running')
