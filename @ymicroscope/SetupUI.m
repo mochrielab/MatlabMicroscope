@@ -218,7 +218,7 @@ end
 function set_movie_interval(hobj,event,obj)
 input=str2double(get(hobj,'string'));
 if ~isnan(input)
-    if input<=0
+    if input<0
     else
         obj.movie_interval=input;
     end
@@ -242,20 +242,28 @@ function set_illumination_mode(hobj,event,obj)
 input=get(hobj,'value');
 if input==1 %No light sources are on
     obj.illumination_mode='None'; %no illumination modes selected
-    fprintf(obj.sola,'%s',char([hex2dec('4F') hex2dec('7F') hex2dec('50')])); % Disable all channels
-    obj.nidaq2.outputSingleScan([0 0]);
+    if strcmp(obj.status,'live_running')
+        fprintf(obj.sola,'%s',char([hex2dec('4F') hex2dec('7F') hex2dec('50')])); % Disable all channels
+        obj.nidaq2.outputSingleScan([0 0]);
+    end
 elseif input==2
     obj.illumination_mode='Brightfield - W'; %ßselect white LED
-    fprintf(obj.sola,'%s',char([hex2dec('4F') hex2dec('7F') hex2dec('50')])); % Disable all channels
-    obj.nidaq2.outputSingleScan([1 0]);
+    if strcmp(obj.status,'live_running')
+        fprintf(obj.sola,'%s',char([hex2dec('4F') hex2dec('7F') hex2dec('50')])); % Disable all channels
+        obj.nidaq2.outputSingleScan([1 0]);
+    end
 elseif input==3
     obj.illumination_mode='Brightfield - R'; % select red LED
-    fprintf(obj.sola,'%s',char([hex2dec('4F') hex2dec('7F') hex2dec('50')])); % Disable all channels
-    obj.nidaq2.outputSingleScan([0 1]);
+    if strcmp(obj.status,'live_running')
+        fprintf(obj.sola,'%s',char([hex2dec('4F') hex2dec('7F') hex2dec('50')])); % Disable all channels
+        obj.nidaq2.outputSingleScan([0 1]);
+    end
 elseif input==4
     obj.illumination_mode='Fluorescent';
-    fprintf(obj.sola,'%s',char([hex2dec('4F') hex2dec('7D') hex2dec('50')])); % Enable all channels
-    obj.nidaq2.outputSingleScan([0 0]);    
+    if strcmp(obj.status,'live_running')
+        fprintf(obj.sola,'%s',char([hex2dec('4F') hex2dec('7D') hex2dec('50')])); % Enable all channels
+        obj.nidaq2.outputSingleScan([0 0]);
+    end
 end
 end
 

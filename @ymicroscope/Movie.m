@@ -30,14 +30,6 @@ if strcmp(obj.status,'standing') && strcmp(get(hobj,'String'),'Start Movie')
         camtrigger = reshape([0;1+zeros(rate_multiplier-1,1)]*ones(1,numdata),...
             rate_multiplier*numdata,1); % trigger for camera
         
-        % log piezo position
-        piezopos = zeros(size(zdata));
-        counter = 0;
-        data_pointer = libpointer('doublePtr',piezopos);
-        counter_pointer = libpointer('doublePtr',counter);
-        lh = addlistener(obj.nidaq,'DataAvailable',... % remember to delete pointer
-            @(src,event)Nidaq_Data_log(src,event,data_pointer,counter_pointer));
-        
         % camera setting (take 4 seconds!)
         andorCam = 'Andor sCMOS Camera';
         obj.mm.setProperty(andorCam, 'TriggerMode', 'External'); % set exposure to external
@@ -52,6 +44,9 @@ if strcmp(obj.status,'standing') && strcmp(get(hobj,'String'),'Start Movie')
         end
         
         for iloop=1:obj.movie_cycles
+            set(hobj,'String',['Stop Movie at ',num2str(iloop)]);
+            obj.SwitchLight('on');
+            pause(.01)
             if strcmp(obj.status,'standing')
                 break;
             end
@@ -86,8 +81,8 @@ if strcmp(obj.status,'standing') && strcmp(get(hobj,'String'),'Start Movie')
             % ending acquisition
             obj.nidaq.outputSingleScan([obj.zoffset,0]); % reset starting position
             obj.nidaq.stop;
-            delete(lh);
             obj.mm.stopSequenceAcquisition;
+            obj.SwitchLight('off');
             
             % grab frame (take 0.7 second)
             istack=0;
@@ -145,10 +140,12 @@ if strcmp(obj.status,'standing') && strcmp(get(hobj,'String'),'Start Movie')
     end
     
     % movie mod 2
-    for itmp=1:strcmp(obj.movie_mode,'zstack_singlefile')
+    for itmp=1:double(strcmp(obj.movie_mode,'zstack_singlefile'))
         %%
         obj.status = 'movie_running_zstack_singlefile';
+        set(hobj,'String','Taking Movie');
         pause(.01)
+        obj.SwitchLight('on');
         
         % set scanning parameters
         stacks =(-(obj.numstacks-1)/2:(obj.numstacks-1)/2)*obj.stepsize; % stack position
@@ -168,14 +165,6 @@ if strcmp(obj.status,'standing') && strcmp(get(hobj,'String'),'Start Movie')
             rate_multiplier*numdata,1); % data for z scan at clock rate
         camtrigger = reshape([0;1+zeros(rate_multiplier-1,1)]*ones(1,numdata),...
             rate_multiplier*numdata,1); % trigger for camera
-        
-        % log piezo position
-        piezopos = zeros(size(zdata));
-        counter = 0;
-        data_pointer = libpointer('doublePtr',piezopos);
-        counter_pointer = libpointer('doublePtr',counter);
-        lh = addlistener(obj.nidaq,'DataAvailable',... % remember to delete pointer
-            @(src,event)Nidaq_Data_log(src,event,data_pointer,counter_pointer));
         
         % camera setting (take 4 seconds!)
         andorCam = 'Andor sCMOS Camera';
@@ -229,11 +218,10 @@ if strcmp(obj.status,'standing') && strcmp(get(hobj,'String'),'Start Movie')
             % ending acquisition
             obj.nidaq.outputSingleScan([obj.zoffset,0]); % reset starting position
             obj.nidaq.stop;
-            delete(lh);
             obj.mm.stopSequenceAcquisition;
             
             % grab frame (take 0.7 second)
-
+            
             while obj.mm.getRemainingImageCount()>0
                 istack=istack+1;
                 imgtmp=obj.mm.popNextImage();
@@ -241,7 +229,6 @@ if strcmp(obj.status,'standing') && strcmp(get(hobj,'String'),'Start Movie')
                 img3(:,:,istack)=img';
             end
             
- 
             
             %% Autofocusing section
             %             Nframes = size(img3,3);
@@ -253,16 +240,22 @@ if strcmp(obj.status,'standing') && strcmp(get(hobj,'String'),'Start Movie')
             %             obj.zoffset=obj.zoffset+TotVolts;
             
             %% pause
-            for ipause =1:60*obj.movie_interval
-                if strcmp(obj.status,'standing')
-                    break
-                end
-                pause(1);
-            end
+% 
+%             for ipause =1:60*obj.movie_interval
+%                 if strcmp(obj.status,'standing')
+%                     break
+%                 end
+%                 pause(1);
+%             end
+
         end
         
+        obj.SwitchLight('off');
+
         % save data
         tic
+        set(hobj,'String','Saving Movie');
+        pause(.01);
         t=clock;
         datepath=fullfile(obj.datasavepath,...
             [num2str(t(2),'%02d'),'_',num2str(t(3),'%02d'),'_',num2str(t(1))]);
@@ -291,7 +284,8 @@ if strcmp(obj.status,'standing') && strcmp(get(hobj,'String'),'Start Movie')
         
     end
     
-elseif strcmp(obj.status,'movie_running_zstack_plain')
+elseif strcmp(obj.status,'movie_running_zstack_plain') || ...
+        strcmp(obj.status,'movie_running_zstack_singlefile')
     obj.status = 'standing';
     set(hobj,'String','Stopping')
 else

@@ -8,9 +8,11 @@ function [ obj ] = Live( obj, hobj, event )
 if strcmp(obj.status,'live_running')
     set(hobj,'String','Start Live');
     obj.status = 'standing';
+    obj.SwitchLight('off');
 elseif strcmp(obj.status,'standing')
     set(hobj,'String','Stop Live');
     obj.status = 'live_running';
+    obj.SwitchLight('on');
     % set camera to be triggered by the computer
     obj.nidaq.outputSingleScan([obj.zoffset, 0]);
     andorCam = 'Andor sCMOS Camera';

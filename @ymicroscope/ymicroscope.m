@@ -140,6 +140,9 @@ classdef ymicroscope < handle
         end
         
         % main functions
+        function obj = Reset(obj)
+            obj.status = 'standing';
+        end
         img = Capture(obj,hobj,event);
         obj = Live(obj,hobj,event);
         obj = SetupUI(obj);
@@ -147,6 +150,10 @@ classdef ymicroscope < handle
         obj = Movie(obj,hobj,event);
         obj = ZFocus(obj,hobj,event);
         obj = DAQpkg(obj,hobj,event);
+        obj = SwitchLight( obj, on_or_off )
+        
+        %delete later?
+%         obj = ImgSeq(obj,hobj,event);
 
     end
     

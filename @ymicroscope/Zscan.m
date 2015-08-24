@@ -7,6 +7,7 @@ if obj.exposure + magic_number >= 1000/obj.framerate
     msgbox('error: exposure is longer than the frame interval')
 elseif strcmp(obj.status,'standing')
     obj.status = 'zstack_running';
+    obj.SwitchLight('on');
     set(hobj,'String','Zstack Running')
     pause(.01)
 
@@ -99,6 +100,7 @@ elseif strcmp(obj.status,'standing')
     set(hobj,'String','Zstack Saving')
     pause(.01)
     
+    obj.SwitchLight('off');
     
     % save data
     tic

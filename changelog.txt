@@ -6,12 +6,30 @@
 unfinished parts: movie z focus commented out
 movie exposure check, 
 
+7-8/2015
+multiple undocumented changes...
+
 8/19/2015
 1. update the illumination mode and roi
 2. remove the movie saving size limit
 3. remove the headers within class defnition
-
 4. add status bar
 5. add quick setting save and load
 7. rename the dataoffset to zoffset 
     rename couple variables including movie_interval, movie_cycles
+8. add save all movie to a single file option
+
+8/21/2015
+1. add a function SwitchLight to turn on and off the illumination light
+2. deleted piezo logger in Movie.m
+3. completely overhaul for illumination to bleach less, including:
+    automated light management for Live, Capture, Zstack, Movie
+    during image acquisition the light will be auomatically managed and automatically    
+    shut off when finished, don't worry if the light won't turn on when you first click it
+    it will be on only during live, capure, Zstack and Movie.
+4. update and show status change while taking movies.
+
+call me if there is any bug!
+
+?/?
+refine singlefile movie taking for more precise timing

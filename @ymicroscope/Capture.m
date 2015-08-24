@@ -2,6 +2,7 @@ function [ img ] = Capture( obj, hobj, event )
 % capture of an image already exist in live
 
 if strcmp(obj.status,'standing') 
+    obj.SwitchLight('on');
     obj.mm.setExposure(obj.exposure);    
     axes(obj.imageaxis_handle);
     obj.mm.snapImage();
@@ -22,6 +23,7 @@ if strcmp(obj.status,'standing')
     cla %clear current axis
     imagesc(img);colormap gray;axis image;axis off
     drawnow;
+    obj.SwitchLight('off');
 else
     img=getimage(obj.imageaxis_handle);
 end

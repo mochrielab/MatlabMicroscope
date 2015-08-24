@@ -53,8 +53,9 @@ if strcmp(obj.status,'standing') && strcmp(get(hobj,'String'),'ImgSeq')
             
             expRate = 20; %exposure rate
             frameRate = 40; %frames per second acquisition
+%             N = 80; 
             
-            if expRate + 4.4 >= 1000/frameRate
+            if expRate + 0 >= 1000/frameRate
                 msgbox('error: exposure is longer than the frame interval')
             elseif strcmp(obj.status,'ImgSeq Running')
                 %             obj.status = '25ms_images';
@@ -181,7 +182,7 @@ if strcmp(obj.status,'standing') && strcmp(get(hobj,'String'),'ImgSeq')
                     num2str(t(4),'%02d'),'_',num2str(t(5),'%02d'),'_',...
                     num2str(round(t(6)),'%02d')])...
                     ,'IllumMode','Exposure','DispSize','FrameRate','NumbStacks'...
-                    ,'StepSize','img3');
+                    ,'StepSize','img3','-v7.3');
                 
                 fid=fopen([obj.datasavepath2,filesep,'ImgLog.txt'],'a+');
                 fprintf(fid, '%10s %15s %20s %20d %20s %20d %20d %20d \r\n',...
@@ -208,7 +209,7 @@ if strcmp(obj.status,'standing') && strcmp(get(hobj,'String'),'ImgSeq')
             expRate = 5;
             frameRate = 100;
             
-            if expRate + 4.4 >= 1000/frameRate
+            if expRate + 0 >= 1000/frameRate
                 msgbox('error: exposure is longer than the frame interval')
             elseif strcmp(obj.status,'ImgSeq Running')
                 %             obj.status = '10ms_images';
@@ -326,7 +327,7 @@ if strcmp(obj.status,'standing') && strcmp(get(hobj,'String'),'ImgSeq')
                     num2str(t(4),'%02d'),'_',num2str(t(5),'%02d'),'_',...
                     num2str(round(t(6)),'%02d')])...
                     ,'IllumMode','Exposure','DispSize','FrameRate','NumbStacks'...
-                    ,'StepSize','img3');
+                    ,'StepSize','img3','-v7.3');
                 
                 fid=fopen([obj.datasavepath2,filesep,'ImgLog.txt'],'a+');
                 fprintf(fid, '%10s %15s %20s %20d %20s %20d %20d %20d \r\n',...
@@ -352,8 +353,9 @@ if strcmp(obj.status,'standing') && strcmp(get(hobj,'String'),'ImgSeq')
             
             expRate = 50;
             frameRate = 10;
+%             N = 20;
             
-            if expRate + 4.4 >= 1000/frameRate
+            if expRate + 0 >= 1000/frameRate
                 msgbox('error: exposure is longer than the frame interval')
             elseif strcmp(obj.status,'ImgSeq Running')
                 %             obj.status = '100ms_images';
@@ -471,7 +473,7 @@ if strcmp(obj.status,'standing') && strcmp(get(hobj,'String'),'ImgSeq')
                     num2str(t(4),'%02d'),'_',num2str(t(5),'%02d'),'_',...
                     num2str(round(t(6)),'%02d')])...
                     ,'IllumMode','Exposure','DispSize','FrameRate','NumbStacks'...
-                    ,'StepSize','img3');
+                    ,'StepSize','img3','-v7.3');
                 
                 fid=fopen([obj.datasavepath2,filesep,'ImgLog.txt'],'a+');
                 fprintf(fid, '%10s %15s %20s %20d %20s %20d %20d %20d \r\n',...
@@ -616,7 +618,7 @@ if strcmp(obj.status,'standing') && strcmp(get(hobj,'String'),'ImgSeq')
                     num2str(t(4),'%02d'),'_',num2str(t(5),'%02d'),'_',...
                     num2str(round(t(6)),'%02d')])...
                     ,'IllumMode','Exposure','DispSize','FrameRate','NumbStacks'...
-                    ,'StepSize','img3');
+                    ,'StepSize','img3','-v7.3');
                 
                 fid=fopen([obj.datasavepath2,filesep,'ImgLog.txt'],'a+');
                 fprintf(fid, '%10s %15s %20s %20d %20s %20d %20d %20d \r\n',...
@@ -759,7 +761,7 @@ if strcmp(obj.status,'standing') && strcmp(get(hobj,'String'),'ImgSeq')
                     num2str(t(4),'%02d'),'_',num2str(t(5),'%02d'),'_',...
                     num2str(round(t(6)),'%02d')])...
                     ,'IllumMode','Exposure','DispSize','FrameRate','NumbStacks'...
-                    ,'StepSize','img3');
+                    ,'StepSize','img3','-v7.3');
                 
                 fid=fopen([obj.datasavepath2,filesep,'ImgLog.txt'],'a+');
                 fprintf(fid, '%10s %15s %20s %20d %20s %20d %20d %20d \r\n',...
