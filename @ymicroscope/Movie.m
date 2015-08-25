@@ -50,7 +50,7 @@ if strcmp(obj.status,'standing') && strcmp(get(hobj,'String'),'Start Movie')
             if strcmp(obj.status,'standing')
                 break;
             end
-            obj.nidaq.queueOutputData([zdata,camtrigger;zdata(end),0])
+            obj.nidaq.queueOutputData([zdata,camtrigger;obj.zoffset,0])
             
             % prepare data acquisition
             obj.mm.initializeCircularBuffer();
