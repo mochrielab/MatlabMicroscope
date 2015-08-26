@@ -50,7 +50,7 @@ if strcmp(obj.status,'standing') && strcmp(get(hobj,'String'),'Start Movie')
         obj.mm.clearCircularBuffer(); % clear the buffer for image storage
         
         for iloop=1:obj.movie_cycles
-            set(hobj,'String',['Stop Movie at ',num2str(iloop)]);
+            set(hobj,'String',['Stop at ',num2str(iloop)]);
             obj.SwitchLight('on');
             pause(.01)
             if strcmp(obj.status,'standing')
@@ -118,6 +118,11 @@ if strcmp(obj.status,'standing') && strcmp(get(hobj,'String'),'Start Movie')
         end
         % close the image saving
         imgtif.close();
+                
+        %save setting
+        setting=obj.GetSetting;
+        save([filename(1:end-3),'mat'],'setting');
+        
         set(hobj,'String','Start Movie')
         obj.status = 'standing';
     end
@@ -213,7 +218,8 @@ if strcmp(obj.status,'standing') && strcmp(get(hobj,'String'),'Start Movie')
         obj.nidaq.stop;
         obj.nidaq.outputSingleScan([obj.zoffset,0]); % reset starting position
         obj.mm.stopSequenceAcquisition;
-                            
+        obj.SwitchLight('off');
+     
         % warning for buffer overflow
         if obj.mm.isBufferOverflowed
             warning('camera buffer over flowed, try set larger memory for the camera');
@@ -227,12 +233,16 @@ if strcmp(obj.status,'standing') && strcmp(get(hobj,'String'),'Start Movie')
             imgtif.setTag(tagstruct);
             imgtif.write(img);
             imgtif.writeDirectory;
-        end
+        end     
+        
         display(['number of images collected: ',...
             num2str(istack)]);
         % close tiff file
         imgtif.close();
-        obj.SwitchLight('off');
+                
+        %save setting
+        setting=obj.GetSetting;
+        save([filename(1:end-3),'mat'],'setting');
         
         set(hobj,'String','Start Movie')
         obj.status = 'standing';

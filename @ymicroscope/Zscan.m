@@ -116,6 +116,10 @@ elseif strcmp(obj.status,'standing')
     imgtif.close();
     toc
     
+    %save setting
+    setting=obj.GetSetting;
+    save([filename(1:end-3),'mat'],'setting');
+    
     display(['number of images in collected: ',...
         num2str(istack)]);  
     

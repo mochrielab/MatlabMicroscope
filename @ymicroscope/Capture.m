@@ -39,5 +39,10 @@ end
     imgtif.setTag(tagstruct);
     imgtif.write(img);
     imgtif.close;
+    
+    %save setting
+    setting=obj.GetSetting;
+    save([filename(1:end-3),'mat'],'setting');
+    
     display('image captured')
 end

@@ -169,9 +169,10 @@ classdef ymicroscope < handle
         obj = Movie(obj,hobj,event);
         obj = ZFocus(obj,hobj,event);
         obj = DAQpkg(obj,hobj,event);
-        obj = SwitchLight( obj, on_or_off )
-        tagstruct = GetImageTag( obj, camlabel )
-        obj = SetSolaIntensity(obj)
+        obj = SwitchLight( obj, on_or_off );
+        tagstruct = GetImageTag( obj, camlabel );
+        obj = SetSolaIntensity(obj);
+        setting = GetSetting(obj);
         %delete later?
 %         obj = ImgSeq(obj,hobj,event);
 
