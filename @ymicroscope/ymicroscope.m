@@ -173,6 +173,7 @@ classdef ymicroscope < handle
         tagstruct = GetImageTag( obj, camlabel );
         obj = SetSolaIntensity(obj);
         setting = GetSetting(obj);
+        obj = SetSetting(obj,setting);
         %delete later?
 %         obj = ImgSeq(obj,hobj,event);
 
