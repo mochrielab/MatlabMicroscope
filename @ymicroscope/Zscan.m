@@ -15,8 +15,7 @@ elseif strcmp(obj.status,'standing')
     stacks =(-(obj.numstacks-1)/2:(obj.numstacks-1)/2)*obj.stepsize; % stack position
     width = obj.mm.getImageWidth(); % image width
     height = obj.mm.getImageHeight(); % image height
-    numstacks=length(stacks);
-
+    
     % initialize ni daq
     rate_multiplier = 2;
     obj.nidaq.Rate=obj.framerate * rate_multiplier; % set data acuisition rate
@@ -29,9 +28,11 @@ elseif strcmp(obj.status,'standing')
         rate_multiplier*numdata,1); % data for z scan at clock rate
     camtrigger = reshape([0;1+zeros(rate_multiplier-1,1)]*ones(1,numdata),...
         rate_multiplier*numdata,1); % trigger for camera
+%     camtrigger = reshape([1;zeros(rate_multiplier-1,1)]*ones(1,numdata),...
+%         rate_multiplier*numdata,1); % trigger for camera
     
-%     obj.nidaq.queueOutputData([zdata,camtrigger])
     obj.nidaq.queueOutputData([zdata,camtrigger;zdata(end),0])
+%     obj.nidaq.queueOutputData([zdata,camtrigger;zdata(end),1])
 
     % log piezo position
     piezopos = zeros(size(zdata));
@@ -47,13 +48,6 @@ elseif strcmp(obj.status,'standing')
     obj.mm.setExposure(obj.exposure); % set exposure time, ????? work or not
     obj.mm.clearCircularBuffer(); % clear the buffer for image storage
     
-    %image type
-    if obj.mm.getBytesPerPixel == 2
-        pixelType = 'uint16';
-    else
-        pixelType = 'uint8';
-    end
-    
     % prepare data acquisition
     obj.mm.initializeCircularBuffer();
     obj.mm.prepareSequenceAcquisition(andorCam);
@@ -62,68 +56,71 @@ elseif strcmp(obj.status,'standing')
     obj.mm.startContinuousSequenceAcquisition(0);
     obj.nidaq.startBackground;    
 
+    % save data header
+    t=clock;
+    istack=0;
+    datepath=fullfile(obj.datasavepath,...
+        [num2str(t(2),'%02d'),'_',num2str(t(3),'%02d'),'_',num2str(t(1))]);
+    if ~exist(datepath)
+        mkdir(datepath);
+    end
+    filename=fullfile(datepath,['zstack_',...
+        num2str(t(4),'%02d'),'_',num2str(t(5),'%02d'),'_',...
+        num2str(round(t(6)),'%02d'),'.tif']);
+    imgtif=Tiff(filename,'w8');
+    tagstruct = obj.GetImageTag('Andor Zyla 5.5');
+    
     % live in background
     while obj.nidaq.IsRunning 
         img=obj.mm.getLastImage();
-        img = typecast(img, pixelType);      % pixels must be interpreted as unsigned integers
         img = reshape(img, [width, height]); % image should be interpreted as a 2D array
-        img = transpose(img);                % make column-major order for MATLAB
         axes(obj.imageaxis_handle);cla;
         imagesc(img);colormap gray;axis image;axis off
+        if obj.mm.getRemainingImageCount()>0
+            istack=istack+1;
+            imgtmp=obj.mm.popNextImage();
+            img = reshape(imgtmp, [width, height]);
+            imgtif.setTag(tagstruct);
+            imgtif.write(img);
+            imgtif.writeDirectory;
+        end
         drawnow;
     end
-    
+    tic
+
     % warning for buffer overflow
     if obj.mm.isBufferOverflowed 
         warning('camera buffer over flowed, try set larger memory for the camera');
     end
-    display(['number of images in buffer: ',...
-        num2str(obj.mm.getRemainingImageCount())]);
 
     % ending acquisition
     obj.nidaq.outputSingleScan([obj.zoffset,0]); % reset starting position
     obj.nidaq.stop;
     delete(lh);
     obj.mm.stopSequenceAcquisition;
-
-    set(hobj,'String','prepare Saving')
+    obj.SwitchLight('off');
+%   display(['number of images in buffer: ',...
+%         num2str(obj.mm.getRemainingImageCount)]);
+    
+    % continue to save
+    set(hobj,'String','Zstack Saving')
     pause(.01)
-    % grab frame (take 0.7 second)
-    istack=0;
-    img3=uint16(zeros(height,width,numstacks));
     while obj.mm.getRemainingImageCount()>0
         istack=istack+1;
         imgtmp=obj.mm.popNextImage();
         img = reshape(imgtmp, [width, height]);
-        img3(:,:,istack)=img';
+%         img = transpose(img);                % make column-major order for MATLAB
+        imgtif.setTag(tagstruct);
+        imgtif.write(img);
+        imgtif.writeDirectory;   
     end
-    set(hobj,'String','Zstack Saving')
-    pause(.01)
+    imgtif.close();
+    toc
     
-    obj.SwitchLight('off');
     
-    % save data
-    tic
-    t=clock;
-    datepath=fullfile(obj.datasavepath,...
-        [num2str(t(2),'%02d'),'_',num2str(t(3),'%02d'),'_',num2str(t(1))]);
-    if ~exist(datepath)
-        mkdir(datepath);
-    end
-        
-    IllumMode = obj.illumination_mode;
-    Exposure = obj.exposure;
-    DispSize = obj.display_size;
-    FrameRate = obj.framerate;
-    NumbStacks = obj.numstacks;
-    StepSize = obj.stepsize;
+    display(['number of images in collected: ',...
+        num2str(istack)]);  
     
-    save(fullfile(datepath,['zstack_',...
-        num2str(t(4),'%02d'),'_',num2str(t(5),'%02d'),'_',...
-        num2str(round(t(6)),'%02d')])...
-        ,'IllumMode','Exposure','DispSize','FrameRate','NumbStacks'...
-        ,'StepSize','img3','-v7.3');
-
     set(hobj,'String','Zstack')    
     obj.status = 'standing';
 else

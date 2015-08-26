@@ -33,3 +33,16 @@ call me if there is any bug!
 
 ?/?
 refine singlefile movie taking for more precise timing
+
+8/25/2015 - version 2.6
+1. add SSD!!, totally reprogramed the way to save tiff files, improved at
+    least five fold in image saving speed
+    a. in zscan, it is saving while it is running
+2. add tiff tag files to automatically generate tiff tag
+3. add the way to change illuminations
+4, add the parameter saving protocols
+5. change the default camera dynamic range to 16 int, low noise high capacity
+6. fixed the snapimage bug, need to set trigger mode to software mode before imaging
+
+
+

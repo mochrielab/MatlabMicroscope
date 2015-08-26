@@ -24,14 +24,8 @@ elseif strcmp(obj.status,'standing')
             img = obj.mm.getImage();
             width = obj.mm.getImageWidth();
             height = obj.mm.getImageHeight();
-            if obj.mm.getBytesPerPixel == 2
-                pixelType = 'uint16';
-            else
-                pixelType = 'uint8';
-            end
-            img = typecast(img, pixelType);      % pixels must be interpreted as unsigned integers
+
             img = reshape(img, [width, height]); % image should be interpreted as a 2D array
-            img = transpose(img);                % make column-major order for MATLAB
             % plot
             axes(obj.imageaxis_handle);
             cla

@@ -9,8 +9,8 @@ classdef ymicroscope < handle
         sola % handle of com port 3, in control of sola illuminator
         
         % file system
-        datasavepath='C:\microscope_pics';
-        datasavepath2 = 'C:\microscope_log';
+        datasavepath='I:\microscope_pics';
+%         datasavepath2 = 'C:\microscope_log';
         
         % constants
         % piezo conversion
@@ -73,6 +73,10 @@ classdef ymicroscope < handle
             end
             % set buffer size for image storage: 16 GB
             obj.mm.setCircularBufferMemoryFootprint(16000); 
+            % set dynamic range of the camera to 16 bit
+            obj.mm.setProperty('Andor sCMOS Camera',...
+                'Sensitivity/DynamicRange',...
+                '16-bit (low noise & high well capacity)')
             disp('Camera connected!!!');
             % load ni daq
             % devices = daq.getDevices;
@@ -151,7 +155,7 @@ classdef ymicroscope < handle
         obj = ZFocus(obj,hobj,event);
         obj = DAQpkg(obj,hobj,event);
         obj = SwitchLight( obj, on_or_off )
-        
+        tagstruct = GetImageTag( obj, camlabel )
         %delete later?
 %         obj = ImgSeq(obj,hobj,event);
 
