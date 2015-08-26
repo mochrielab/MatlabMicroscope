@@ -174,6 +174,16 @@ movie_cycles_handle=...
 uicontrol('Parent',parampanel_handle,'Unit','Pixels',...
     'Position',[445 310 200 20],'Style','text','String',...
     'Movie Cycles');
+
+% framerate
+experimentname_handle=...
+    uicontrol('Parent',parampanel_handle,'Unit','Pixels',...
+    'Position',[660 390 200 20],'Style','edit',...
+    'String',num2str(obj.experiment_name),...
+    'Callback',@(hobj,event)set_experiment_name(hobj,event,obj));
+uicontrol('Parent',parampanel_handle,'Unit','Pixels',...
+    'Position',[660 410 200 20],'Style','text','String',...
+    'Experiment Name');
 end
 
 % call back functions
@@ -332,6 +342,14 @@ if ~isnan(str2double(get(hobj,'string')))
     obj.framerate=str2double(get(hobj,'string'));
 end
 set(hobj,'String',num2str(obj.framerate));
+
+end
+
+function set_experiment_name(hobj,event,obj)
+% if ~isnan(str2double(get(hobj,'string')))
+    obj.experiment_name=(get(hobj,'string'));
+% end
+set(hobj,'String',(obj.experiment_name));
 
 end
 

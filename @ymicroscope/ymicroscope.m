@@ -43,6 +43,9 @@ classdef ymicroscope < handle
 
         % microscope status
         status = 'standing'
+        
+        % experiment name
+        experiment_name = '';
     
     end
     
@@ -174,6 +177,7 @@ classdef ymicroscope < handle
         obj = SetSolaIntensity(obj);
         setting = GetSetting(obj);
         obj = SetSetting(obj,setting);
+        [ filename ] = GetFileHeader( obj, option )
         %delete later?
 %         obj = ImgSeq(obj,hobj,event);
 

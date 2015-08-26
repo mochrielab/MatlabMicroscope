@@ -57,16 +57,8 @@ elseif strcmp(obj.status,'standing')
     obj.nidaq.startBackground;    
 
     % save data header
-    t=clock;
     istack=0;
-    datepath=fullfile(obj.datasavepath,...
-        [num2str(t(2),'%02d'),'_',num2str(t(3),'%02d'),'_',num2str(t(1))]);
-    if ~exist(datepath)
-        mkdir(datepath);
-    end
-    filename=fullfile(datepath,['zstack_',...
-        num2str(t(4),'%02d'),'_',num2str(t(5),'%02d'),'_',...
-        num2str(round(t(6)),'%02d'),'.tif']);
+    filename=obj.GetFileHeader('zstack');
     imgtif=Tiff(filename,'w8');
     tagstruct = obj.GetImageTag('Andor Zyla 5.5');
     

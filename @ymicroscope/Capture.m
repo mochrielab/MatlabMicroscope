@@ -25,15 +25,7 @@ else
 end
 
 % save data
-    t=clock;
-    datepath=fullfile(obj.datasavepath,...
-        [num2str(t(2),'%02d'),'_',num2str(t(3),'%02d'),'_',num2str(t(1))]);
-    if ~exist(datepath)
-        mkdir(datepath);
-    end
-    filename=fullfile(datepath,['capture_',...
-        num2str(t(4),'%02d'),'_',num2str(t(5),'%02d'),'_',...
-        num2str(round(t(6)),'%02d'),'.tif']);
+    filename=obj.GetFileHeader('capture');
     imgtif=Tiff(filename,'a');
     tagstruct = obj.GetImageTag('Andor Zyla 5.5');
     imgtif.setTag(tagstruct);

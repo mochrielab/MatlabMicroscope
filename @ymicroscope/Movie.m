@@ -12,16 +12,8 @@ if strcmp(obj.status,'standing') && strcmp(get(hobj,'String'),'Start Movie')
         pause(.01)
         
         % prepare for save
-        t=clock;
         istack=0;
-        datepath=fullfile(obj.datasavepath,...
-            [num2str(t(2),'%02d'),'_',num2str(t(3),'%02d'),'_',num2str(t(1))]);
-        if ~exist(datepath)
-            mkdir(datepath);
-        end
-        filename=fullfile(datepath,['movie_',...
-            num2str(t(4),'%02d'),'_',num2str(t(5),'%02d'),'_',...
-            num2str(round(t(6)),'%02d'),'.tif']);
+        filename=obj.GetFileHeader('movie');
         imgtif=Tiff(filename,'w8');
         tagstruct = obj.GetImageTag('Andor Zyla 5.5');
         
@@ -135,16 +127,8 @@ if strcmp(obj.status,'standing') && strcmp(get(hobj,'String'),'Start Movie')
         pause(.01)
         
         % prepare for save
-        t=clock;
         istack=0;
-        datepath=fullfile(obj.datasavepath,...
-            [num2str(t(2),'%02d'),'_',num2str(t(3),'%02d'),'_',num2str(t(1))]);
-        if ~exist(datepath)
-            mkdir(datepath);
-        end
-        filename=fullfile(datepath,['movie_',...
-            num2str(t(4),'%02d'),'_',num2str(t(5),'%02d'),'_',...
-            num2str(round(t(6)),'%02d'),'.tif']);
+        filename=obj.GetFileHeader('movie');
         imgtif=Tiff(filename,'w8');
         tagstruct = obj.GetImageTag('Andor Zyla 5.5');
         
