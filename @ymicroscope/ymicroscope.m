@@ -29,6 +29,7 @@ classdef ymicroscope < handle
         % microscope parameters
         exposure_brightfield=40; %(ms)
         exposure_fluorescent=50; %(ms)
+        fluorescent_illumination_intensity=50; %(0-255)
         framerate=10; %(fps )
         illumination_mode='None';
         movie_mode = 'zstack_plain';
@@ -143,6 +144,20 @@ classdef ymicroscope < handle
             end
         end
         
+        % set sola illuminatin intensity
+        function set.fluorescent_illumination_intensity(obj,fluorescent_illumination_intensity)
+            if fluorescent_illumination_intensity<0
+                obj.fluorescent_illumination_intensity=0;
+                warning('zoffset goes below zero');
+            elseif fluorescent_illumination_intensity>255
+                obj.fluorescent_illumination_intensity=255;          
+                warning('zoffset goes above 255');
+            else
+            obj.fluorescent_illumination_intensity=fluorescent_illumination_intensity;
+            end
+            obj.SetSolaIntensity;
+        end
+        
         % main functions
         function obj = Reset(obj)
             obj.status = 'standing';
@@ -156,6 +171,7 @@ classdef ymicroscope < handle
         obj = DAQpkg(obj,hobj,event);
         obj = SwitchLight( obj, on_or_off )
         tagstruct = GetImageTag( obj, camlabel )
+        obj = SetSolaIntensity(obj)
         %delete later?
 %         obj = ImgSeq(obj,hobj,event);
 

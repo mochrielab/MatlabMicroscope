@@ -11,11 +11,24 @@ if strcmp(obj.status,'standing') && strcmp(get(hobj,'String'),'Start Movie')
         obj.status = 'movie_running_zstack_plain';
         pause(.01)
         
+        % prepare for save
+        t=clock;
+        istack=0;
+        datepath=fullfile(obj.datasavepath,...
+            [num2str(t(2),'%02d'),'_',num2str(t(3),'%02d'),'_',num2str(t(1))]);
+        if ~exist(datepath)
+            mkdir(datepath);
+        end
+        filename=fullfile(datepath,['movie_',...
+            num2str(t(4),'%02d'),'_',num2str(t(5),'%02d'),'_',...
+            num2str(round(t(6)),'%02d'),'.tif']);
+        imgtif=Tiff(filename,'w8');
+        tagstruct = obj.GetImageTag('Andor Zyla 5.5');
+        
         % set scanning parameters
         stacks =(-(obj.numstacks-1)/2:(obj.numstacks-1)/2)*obj.stepsize; % stack position
         width = obj.mm.getImageWidth(); % image width
         height = obj.mm.getImageHeight(); % image height
-        numstacks=length(stacks);
         
         % initialize ni daq
         rate_multiplier = 2;
@@ -35,13 +48,6 @@ if strcmp(obj.status,'standing') && strcmp(get(hobj,'String'),'Start Movie')
         obj.mm.setProperty(andorCam, 'TriggerMode', 'External'); % set exposure to external
         obj.mm.setExposure(obj.exposure); % set exposure time, ????? work or not
         obj.mm.clearCircularBuffer(); % clear the buffer for image storage
-        
-        %image type
-        if obj.mm.getBytesPerPixel == 2
-            pixelType = 'uint16';
-        else
-            pixelType = 'uint8';
-        end
         
         for iloop=1:obj.movie_cycles
             set(hobj,'String',['Stop Movie at ',num2str(iloop)]);
@@ -63,11 +69,17 @@ if strcmp(obj.status,'standing') && strcmp(get(hobj,'String'),'Start Movie')
             % live in background
             while obj.nidaq.IsRunning
                 img=obj.mm.getLastImage();
-                img = typecast(img, pixelType);      % pixels must be interpreted as unsigned integers
                 img = reshape(img, [width, height]); % image should be interpreted as a 2D array
-                img = transpose(img);                % make column-major order for MATLAB
                 axes(obj.imageaxis_handle);cla;
                 imagesc(img);colormap gray;axis image;axis off
+                if obj.mm.getRemainingImageCount()>0
+                    istack=istack+1;
+                    imgtmp=obj.mm.popNextImage();
+                    img = reshape(imgtmp, [width, height]);
+                    imgtif.setTag(tagstruct);
+                    imgtif.write(img);
+                    imgtif.writeDirectory;
+                end
                 drawnow;
             end
             
@@ -75,58 +87,27 @@ if strcmp(obj.status,'standing') && strcmp(get(hobj,'String'),'Start Movie')
             if obj.mm.isBufferOverflowed
                 warning('camera buffer over flowed, try set larger memory for the camera');
             end
-            display(['number of images in buffer: ',...
-                num2str(obj.mm.getRemainingImageCount())]);
-            
+
             % ending acquisition
             obj.nidaq.outputSingleScan([obj.zoffset,0]); % reset starting position
             obj.nidaq.stop;
             obj.mm.stopSequenceAcquisition;
             obj.SwitchLight('off');
-            
-            % grab frame (take 0.7 second)
-            istack=0;
-            img3=uint16(zeros(height,width,numstacks));
+                     
+            % save data
             while obj.mm.getRemainingImageCount()>0
                 istack=istack+1;
                 imgtmp=obj.mm.popNextImage();
                 img = reshape(imgtmp, [width, height]);
-                img3(:,:,istack)=img';
+                imgtif.setTag(tagstruct);
+                imgtif.write(img);
+                imgtif.writeDirectory;
             end
-            
-            % save data
-            tic
-            t=clock;
-            datepath=fullfile(obj.datasavepath,...
-                [num2str(t(2),'%02d'),'_',num2str(t(3),'%02d'),'_',num2str(t(1))]);
-            if ~exist(datepath)
-                mkdir(datepath);
-            end
-            
-            IllumMode = obj.illumination_mode;
-            Exposure = obj.exposure;
-            DispSize = obj.display_size;
-            FrameRate = obj.framerate;
-            NumbStacks = obj.numstacks;
-            StepSize = obj.stepsize;
-            
-            save(fullfile(datepath,['movie_',...
-                num2str(t(4),'%02d'),'_',num2str(t(5),'%02d'),'_',...
-                num2str(round(t(6)),'%02d')])...
-                ,'IllumMode','Exposure','DispSize','FrameRate','NumbStacks'...
-                ,'StepSize','img3','-v7.3');
-            
-            toc
+            display(['number of images collected: ',...
+                num2str(istack)]);
             
             %% Autofocusing section
-            %             Nframes = size(img3,3);
-            %             SumSqGrad = ImgGrad(Nframes,img3); %function that will find the sum
-            %             FocusLoc = LorentzPkFit(Nframes,SumSqGrad);
-            %             startLoc = round(numstacks/2); %initial starting location
-            %             stkDiff = startLoc - FocusLoc; %how many levels apart the in-focus plane is
-            %             TotVolts = stkDiff.*obj.volts_per_pix;
-            %             obj.zoffset=obj.zoffset+TotVolts;
-            
+
             %% pause
             for ipause =1:60*obj.movie_interval
                 if strcmp(obj.status,'standing')
@@ -135,6 +116,8 @@ if strcmp(obj.status,'standing') && strcmp(get(hobj,'String'),'Start Movie')
                 pause(1);
             end
         end
+        % close the image saving
+        imgtif.close();
         set(hobj,'String','Start Movie')
         obj.status = 'standing';
     end
@@ -145,13 +128,25 @@ if strcmp(obj.status,'standing') && strcmp(get(hobj,'String'),'Start Movie')
         obj.status = 'movie_running_zstack_singlefile';
         set(hobj,'String','Taking Movie');
         pause(.01)
-        obj.SwitchLight('on');
+        
+        % prepare for save
+        t=clock;
+        istack=0;
+        datepath=fullfile(obj.datasavepath,...
+            [num2str(t(2),'%02d'),'_',num2str(t(3),'%02d'),'_',num2str(t(1))]);
+        if ~exist(datepath)
+            mkdir(datepath);
+        end
+        filename=fullfile(datepath,['movie_',...
+            num2str(t(4),'%02d'),'_',num2str(t(5),'%02d'),'_',...
+            num2str(round(t(6)),'%02d'),'.tif']);
+        imgtif=Tiff(filename,'w8');
+        tagstruct = obj.GetImageTag('Andor Zyla 5.5');
         
         % set scanning parameters
         stacks =(-(obj.numstacks-1)/2:(obj.numstacks-1)/2)*obj.stepsize; % stack position
         width = obj.mm.getImageWidth(); % image width
         height = obj.mm.getImageHeight(); % image height
-        numstacks=length(stacks);
         
         % initialize ni daq
         rate_multiplier = 2;
@@ -172,116 +167,75 @@ if strcmp(obj.status,'standing') && strcmp(get(hobj,'String'),'Start Movie')
         obj.mm.setExposure(obj.exposure); % set exposure time, ????? work or not
         obj.mm.clearCircularBuffer(); % clear the buffer for image storage
         
-        %image type
-        if obj.mm.getBytesPerPixel == 2
-            pixelType = 'uint16';
-        else
-            pixelType = 'uint8';
-        end
+        % prepare data acquisition
+        obj.mm.initializeCircularBuffer();
+        obj.mm.prepareSequenceAcquisition(andorCam);
         
-        
-        istack=0;
-        img3=uint16(zeros(height,width,numstacks * obj.movie_cycles));
+        % start acquisition
+        obj.mm.startContinuousSequenceAcquisition(0);
+        % send data
+        obj.nidaq.queueOutputData(repmat([zdata,camtrigger;zdata(end),0],obj.movie_cycles,1))
+        obj.nidaq.startBackground;
+        obj.SwitchLight('on');
         
         for iloop=1:obj.movie_cycles
             if strcmp(obj.status,'standing')
                 break;
             end
-            obj.nidaq.queueOutputData([zdata,camtrigger;zdata(end),0])
-            
-            % prepare data acquisition
-            obj.mm.initializeCircularBuffer();
-            obj.mm.prepareSequenceAcquisition(andorCam);
-            
-            % start acquisition
-            obj.mm.startContinuousSequenceAcquisition(0);
-            obj.nidaq.startBackground;
-            
+
             % live in background
             while obj.nidaq.IsRunning
                 img=obj.mm.getLastImage();
-                img = typecast(img, pixelType);      % pixels must be interpreted as unsigned integers
                 img = reshape(img, [width, height]); % image should be interpreted as a 2D array
-                img = transpose(img);                % make column-major order for MATLAB
                 axes(obj.imageaxis_handle);cla;
                 imagesc(img);colormap gray;axis image;axis off
+                if obj.mm.getRemainingImageCount()>0
+                    istack=istack+1;
+                    imgtmp=obj.mm.popNextImage();
+                    img = reshape(imgtmp, [width, height]);
+                    imgtif.setTag(tagstruct);
+                    imgtif.write(img);
+                    imgtif.writeDirectory;
+                end
                 drawnow;
-            end
-            
-            % warning for buffer overflow
-            if obj.mm.isBufferOverflowed
-                warning('camera buffer over flowed, try set larger memory for the camera');
-            end
-            display(['number of images in buffer: ',...
-                num2str(obj.mm.getRemainingImageCount())]);
-            
-            % ending acquisition
-            obj.nidaq.outputSingleScan([obj.zoffset,0]); % reset starting position
-            obj.nidaq.stop;
-            obj.mm.stopSequenceAcquisition;
-            
-            % grab frame (take 0.7 second)
-            
-            while obj.mm.getRemainingImageCount()>0
-                istack=istack+1;
-                imgtmp=obj.mm.popNextImage();
-                img = reshape(imgtmp, [width, height]);
-                img3(:,:,istack)=img';
-            end
-            
-            
+            end         
             %% Autofocusing section
-            %             Nframes = size(img3,3);
-            %             SumSqGrad = ImgGrad(Nframes,img3); %function that will find the sum
-            %             FocusLoc = LorentzPkFit(Nframes,SumSqGrad);
-            %             startLoc = round(numstacks/2); %initial starting location
-            %             stkDiff = startLoc - FocusLoc; %how many levels apart the in-focus plane is
-            %             TotVolts = stkDiff.*obj.volts_per_pix;
-            %             obj.zoffset=obj.zoffset+TotVolts;
-            
             %% pause
-% 
-%             for ipause =1:60*obj.movie_interval
-%                 if strcmp(obj.status,'standing')
-%                     break
-%                 end
-%                 pause(1);
-%             end
-
+            for ipause =1:60*obj.movie_interval
+                if strcmp(obj.status,'standing')
+                    break
+                end
+                pause(1);
+            end
         end
-        
-        obj.SwitchLight('off');
 
+        % ending acquisition
+        obj.nidaq.stop;
+        obj.nidaq.outputSingleScan([obj.zoffset,0]); % reset starting position
+        obj.mm.stopSequenceAcquisition;
+                            
+        % warning for buffer overflow
+        if obj.mm.isBufferOverflowed
+            warning('camera buffer over flowed, try set larger memory for the camera');
+        end
+            
         % save data
-        tic
-        set(hobj,'String','Saving Movie');
-        pause(.01);
-        t=clock;
-        datepath=fullfile(obj.datasavepath,...
-            [num2str(t(2),'%02d'),'_',num2str(t(3),'%02d'),'_',num2str(t(1))]);
-        if ~exist(datepath)
-            mkdir(datepath);
+        while obj.mm.getRemainingImageCount()>0
+            istack=istack+1;
+            imgtmp=obj.mm.popNextImage();
+            img = reshape(imgtmp, [width, height]);
+            imgtif.setTag(tagstruct);
+            imgtif.write(img);
+            imgtif.writeDirectory;
         end
-        
-        IllumMode = obj.illumination_mode;
-        Exposure = obj.exposure;
-        DispSize = obj.display_size;
-        FrameRate = obj.framerate;
-        NumbStacks = obj.numstacks;
-        StepSize = obj.stepsize;
-        
-        save(fullfile(datepath,['movie_',...
-            num2str(t(4),'%02d'),'_',num2str(t(5),'%02d'),'_',...
-            num2str(round(t(6)),'%02d')])...
-            ,'IllumMode','Exposure','DispSize','FrameRate','NumbStacks'...
-            ,'StepSize','img3','-v7.3');
-        
-        toc
+        display(['number of images collected: ',...
+            num2str(istack)]);
+        % close tiff file
+        imgtif.close();
+        obj.SwitchLight('off');
         
         set(hobj,'String','Start Movie')
         obj.status = 'standing';
-        
-        
     end
     
 elseif strcmp(obj.status,'movie_running_zstack_plain') || ...

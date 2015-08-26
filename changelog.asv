@@ -46,6 +46,5 @@ refine singlefile movie taking for more precise timing
 5. change the default camera dynamic range to 16 int, low noise high capacity
 6. fixed the snapimage bug, need to set trigger mode to software mode before imaging
 7. image transposed for ooptimized speed
-8. changed from tif to BIGTIFF files, can save above 4G, ImageJ needs bioformat
-    plugin to read those files
+
 

@@ -109,14 +109,12 @@ elseif strcmp(obj.status,'standing')
         istack=istack+1;
         imgtmp=obj.mm.popNextImage();
         img = reshape(imgtmp, [width, height]);
-%         img = transpose(img);                % make column-major order for MATLAB
         imgtif.setTag(tagstruct);
         imgtif.write(img);
         imgtif.writeDirectory;   
     end
     imgtif.close();
     toc
-    
     
     display(['number of images in collected: ',...
         num2str(istack)]);  
