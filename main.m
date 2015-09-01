@@ -1,4 +1,4 @@
- % load java package
+  % load java package
 dirpath='C:\Program Files\Micro-Manager-1.4\plugins\Micro-Manager';
 files=dir(fullfile(dirpath,'*.jar'));
 for ifile=1:length(files)

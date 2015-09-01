@@ -110,6 +110,7 @@ classdef ymicroscope < handle
             fopen(obj.sola);
             fprintf(obj.sola,'%s',char([hex2dec('57') hex2dec('02') hex2dec('FF') hex2dec('50')]));
             fprintf(obj.sola,'%s',char([hex2dec('57') hex2dec('03') hex2dec('AB') hex2dec('50')]));
+            obj.SetSolaIntensity;
             disp('Sola connected!!!')
         end
         % destroyer
