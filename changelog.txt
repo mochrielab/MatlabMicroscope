@@ -49,3 +49,5 @@ refine singlefile movie taking for more precise timing
 8. changed from tif to BIGTIFF files, can save above 4G, ImageJ needs bioformat
     plugin to read those files
 
+9/2/2015
+1. getting rid of unneccessary variables in main buttons

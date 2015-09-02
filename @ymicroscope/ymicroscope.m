@@ -166,11 +166,11 @@ classdef ymicroscope < handle
         function obj = Reset(obj)
             obj.status = 'standing';
         end
-        img = Capture(obj,hobj,event);
-        obj = Live(obj,hobj,event);
+        img = Capture(obj,varargin);
+        obj = Live(obj,varargin);
         obj = SetupUI(obj);
-        img3 = Zscan(obj,hobj,event);
-        obj = Movie(obj,hobj,event);
+        img3 = Zscan(obj,varargin);
+        obj = Movie(obj,varargin);
         obj = ZFocus(obj,hobj,event);
         obj = DAQpkg(obj,hobj,event);
         obj = SwitchLight( obj, on_or_off );

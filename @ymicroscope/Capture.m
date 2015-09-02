@@ -1,5 +1,15 @@
-function [ img ] = Capture( obj, hobj, event )
+function [ img ] = Capture( obj, varargin )
 % capture of an image already exist in live
+
+if nargin == 1
+    update_button = 0;
+elseif nargin == 3
+    update_button = 1;
+    hobj = varargin{1};
+    event = varargin{2};
+else
+    warning('wrong number of input variables');
+end
 
 if strcmp(obj.status,'standing') 
     obj.SwitchLight('on');

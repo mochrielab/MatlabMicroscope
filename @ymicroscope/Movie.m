@@ -1,11 +1,23 @@
-function [ obj ] = Movie( obj,hobj,event )
+function [ obj ] = Movie( obj, varargin )
 %taking a movie
+
+if nargin == 1
+    update_button = 0;
+elseif nargin == 3
+    update_button = 1;
+    hobj = varargin{1};
+    event = varargin{2};
+else
+    warning('wrong number of input variables');
+end
+
 
 % do a movie
 
 if strcmp(obj.status,'standing') && strcmp(get(hobj,'String'),'Start Movie')
-    set(hobj,'String','Stop Movie')
-    
+    if update_button
+        set(hobj,'String','Stop Movie')
+    end
     % movie mod 1
     for itmp=1:double(strcmp(obj.movie_mode,'zstack_plain'))
         obj.status = 'movie_running_zstack_plain';

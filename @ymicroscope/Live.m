@@ -1,16 +1,26 @@
-function [ obj ] = Live( obj, hobj, event )
+function [ obj ] = Live( obj,varargin )
 %show live image
 
-% if strcmp(obj.status,'standing')
-%     msgbox('movie or zstack is running');
-% end
+if nargin == 1
+    update_button = 0;
+elseif nargin == 3
+    update_button = 1;
+    hobj = varargin{1};
+    event = varargin{2};
+else
+    warning('wrong number of input variables');
+end
 
 if strcmp(obj.status,'live_running')
-    set(hobj,'String','Start Live');
+    if update_button
+        set(hobj,'String','Start Live');
+    end
     obj.status = 'standing';
     obj.SwitchLight('off');
 elseif strcmp(obj.status,'standing')
-    set(hobj,'String','Stop Live');
+    if update_button
+        set(hobj,'String','Stop Live');
+    end
     obj.status = 'live_running';
     obj.SwitchLight('on');
     % set camera to be triggered by the computer
