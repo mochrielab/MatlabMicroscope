@@ -2,9 +2,9 @@ function [ img ] = Capture( obj, varargin )
 % capture of an image already exist in live
 
 if nargin == 1
-    update_button = 0;
+    UI_enabled = 0;
 elseif nargin == 3
-    update_button = 1;
+    UI_enabled = 1;
     hobj = varargin{1};
     event = varargin{2};
 else
@@ -22,7 +22,9 @@ end
 if strcmp(obj.status,'standing') 
     obj.SwitchLight('on');
     obj.mm.setExposure(obj.exposure);    
-    axes(obj.imageaxis_handle);
+    if UI_enabled
+        axes(obj.imageaxis_handle);
+    end
     andorCam = 'Andor sCMOS Camera';
     obj.mm.setProperty(andorCam, 'TriggerMode', 'Software (Recommended for Live Mode)'); % set exposure to external
     obj.mm.snapImage();
@@ -39,7 +41,12 @@ if strcmp(obj.status,'standing')
     drawnow;
     obj.SwitchLight('off');
 else
-    img=getimage(obj.imageaxis_handle);
+    if UI_enabled
+        img=getimage(obj.imageaxis_handle);
+    else
+        img=[];
+        warning('can''t capture while running')
+    end
 end
 
 % save data

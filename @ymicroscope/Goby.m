@@ -1,4 +1,4 @@
-function [ obj ] = Goby( obj,ax,increment )
+function [  ] = Goby( obj,ax,increment )
 %tell the stage to go by some increment
 % position units are pix
 % possible ax : 'x','y','z'

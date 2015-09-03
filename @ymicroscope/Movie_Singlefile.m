@@ -1,22 +1,22 @@
-function [ obj ] = Movie_Singlefile( obj, varargin )
-%save movie to a single file
+function [  ] = Movie_Singlefile( obj, varargin )
+%save movie to a single file, no auto focusing
 
 if nargin == 1
-    update_button = 0;
+    UI_enabled = 0;
 elseif nargin == 3
-    update_button = 1;
+    UI_enabled = 1;
     hobj = varargin{1};
     event = varargin{2};
 else
     warning('wrong number of input variables');
 end
 
-
 obj.status = 'movie_running_zstack_singlefile';
-if update_button
-    set(hobj,'String','Taking Movie');
+
+if UI_enabled
+    set(hobj,'String','Stop Movie');
+    pause(.01)
 end
-pause(.01)
 
 % prepare for save
 istack=0;
@@ -42,7 +42,7 @@ zdata = reshape(ones(rate_multiplier,1)*zdata,...
 camtrigger = reshape([0;1+zeros(rate_multiplier-1,1)]*ones(1,numdata),...
     rate_multiplier*numdata,1); % trigger for camera
 
-% camera setting (take 4 seconds!)
+% camera setting 
 andorCam = 'Andor sCMOS Camera';
 obj.mm.setProperty(andorCam, 'TriggerMode', 'External'); % set exposure to external
 obj.mm.setExposure(obj.exposure); % set exposure time, ????? work or not
@@ -70,10 +70,13 @@ for iloop=1:obj.movie_cycles
     
     % live in background
     while obj.nidaq.IsRunning
-        img=obj.mm.getLastImage();
-        img = reshape(img, [width, height]); % image should be interpreted as a 2D array
-        axes(obj.imageaxis_handle);cla;
-        imagesc(img);colormap gray;axis image;axis off
+        if UI_enabled
+            img=obj.mm.getLastImage();
+            img = reshape(img, [width, height]); % image should be interpreted as a 2D array
+            axes(obj.imageaxis_handle);cla;
+            imagesc(img);colormap gray;axis image;axis off
+            drawnow;
+        end
         if obj.mm.getRemainingImageCount()>0
             istack=istack+1;
             imgtmp=obj.mm.popNextImage();
@@ -82,15 +85,19 @@ for iloop=1:obj.movie_cycles
             imgtif.write(img);
             imgtif.writeDirectory;
         end
-        drawnow;
+        pause(.1);
     end
-    %% Autofocusing section
+    
     %% pause
-    for ipause =1:60*obj.movie_interval
-        if strcmp(obj.status,'standing')
-            break
+    if obj.movie_interval>0
+        obj.SwitchLight('off')
+        for ipause =1:60*obj.movie_interval
+            if strcmp(obj.status,'movie stopping')
+                break
+            end
+            pause(1);
         end
-        pause(1);
+        obj.SwitchLight('on')
     end
 end
 
@@ -116,8 +123,10 @@ while obj.mm.getRemainingImageCount()>0
     imgtif.writeDirectory;
 end
 
-display(['number of images collected: ',...
-    num2str(istack)]);
+if istack~=obj.numstacks * obj.movie_cycles
+    warning(['number of images collected: ',...
+        num2str(istack)]);
+end
 % close tiff file
 imgtif.close();
 
@@ -125,7 +134,7 @@ imgtif.close();
 setting=obj.GetSetting;
 save([filename(1:end-3),'mat'],'setting');
 
-if update_button
+if UI_enabled
     set(hobj,'String','Start Movie')
 end
 obj.status = 'standing';

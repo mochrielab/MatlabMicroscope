@@ -1,4 +1,4 @@
-function [ obj ] = GotoZCenter(obj, img_3d )
+function [  ] = GotoZCenter(obj, img_3d )
 %drive the microscope to focus to the z center 
 
 % getting image mode
@@ -8,11 +8,14 @@ if ~isempty(strfind(lower(obj.illumination_mode),'brightfield'))
 elseif ~isempty(strfind(lower(obj.illumination_mode),'fluorescent'))
     light_mode='fluorescent';
 else
+    warning('unsupported light mode');
+    return
 end
+
 
 % find where to move
 desired_z = GetZstackCenter(img_3d,[light_mode,' ',obj.sample_type],...
-    obj.autofocus_window_size);
+    obj.autofocus_window);
 
 current_z = (obj.numstacks+1)/2;
 

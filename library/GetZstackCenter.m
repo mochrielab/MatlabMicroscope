@@ -57,7 +57,9 @@ if strcmp(mode,'brightfield E.coli')
     %     ylabel('mean intensity gradient');
     %     legend('raw','smooth','center');
     %     title(['brightfield cell zstack center finding: ',num2str(zcenter)]);
-    
+    zcenter=max(1,zcenter);
+    zcenter=min(numstacks,zcenter);
+
 elseif strcmp(mode,'fluorescent E.coli')
     numstacks=size(img_3d,3);
     max_intensity=zeros(1,numstacks);
@@ -73,9 +75,11 @@ elseif strcmp(mode,'fluorescent E.coli')
     choose_range=max_intensity>mean(max_intensity);
     gaussfun = @(p,x)p(1)+p(2)*exp(-(x-p(3)).^2/p(4)^2);
     p0=[min(max_intensity),max(max_intensity)-min(max_intensity),zcenter,5];
-    pfit=fminunc(@(p)sum((gaussfun(p,zs(choose_range))-max_intensity(choose_range)).^2),p0);
+    options=optimoptions('fminunc','Algorithm','quasi-newton','Display','off');
+    pfit=fminunc(@(p)sum((gaussfun(p,zs(choose_range))-max_intensity(choose_range)).^2),p0,options);
     zcenter=pfit(3);
-    
+    zcenter=max(1,zcenter);
+    zcenter=min(numstacks,zcenter);
     % close all
     % plot(zs,max_intensity,'o',zs(choose_range),gaussfun(pfit,zs(choose_range)));
     % xlabel('zstack number');

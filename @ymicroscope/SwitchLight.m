@@ -1,4 +1,4 @@
-function [ obj ] = SwitchLight( obj, on_or_off )
+function [  ] = SwitchLight( obj, on_or_off )
 % turn on or off the light
 % accept input value of 'on' or 'off'
 

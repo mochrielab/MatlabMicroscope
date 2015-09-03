@@ -1,4 +1,4 @@
-function [ obj ] = Live( obj,varargin )
+function [  ] = Live( obj,varargin )
 %show live image
 
 if nargin == 1

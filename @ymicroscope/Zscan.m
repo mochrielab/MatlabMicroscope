@@ -2,9 +2,9 @@ function [ img_3d ] = Zscan( obj, varargin )
 % do a zscan
 
 if nargin == 1
-    update_button = 0;
+    UI_enabled = 0;
 elseif nargin == 3
-    update_button = 1;
+    UI_enabled = 1;
     hobj = varargin{1};
     event = varargin{2};
 else
@@ -26,10 +26,10 @@ if obj.exposure + magic_number >= 1000/obj.framerate
 elseif strcmp(obj.status,'standing')
     obj.status = 'zstack_running';
     obj.SwitchLight('on');
-    if update_button
+    if UI_enabled
         set(hobj,'String','Zstack Running')
+        pause(.01)
     end
-    pause(.01)
     
     % set scanning parameters
     stacks =(-(obj.numstacks-1)/2:(obj.numstacks-1)/2)*obj.stepsize; % stack position
@@ -62,7 +62,7 @@ elseif strcmp(obj.status,'standing')
     lh = addlistener(obj.nidaq,'DataAvailable',... % remember to delete pointer
         @(src,event)Nidaq_Data_log(src,event,data_pointer,counter_pointer));
     
-    % camera setting (take 4 seconds!)
+    % camera setting 
     andorCam = 'Andor sCMOS Camera';
     obj.mm.setProperty(andorCam, 'TriggerMode', 'External'); % set exposure to external
     obj.mm.setExposure(obj.exposure); % set exposure time, ????? work or not
@@ -88,10 +88,13 @@ elseif strcmp(obj.status,'standing')
     
     % live in background
     while obj.nidaq.IsRunning
-        img=obj.mm.getLastImage();
-        img = reshape(img, [width, height]); % image should be interpreted as a 2D array
-        axes(obj.imageaxis_handle);cla;
-        imagesc(img);colormap gray;axis image;axis off
+        if UI_enabled
+            img=obj.mm.getLastImage();
+            img = reshape(img, [width, height]); % image should be interpreted as a 2D array
+            axes(obj.imageaxis_handle);cla;
+            imagesc(img);colormap gray;axis image;axis off
+            drawnow;
+        end
         if obj.mm.getRemainingImageCount()>0
             istack=istack+1;
             imgtmp=obj.mm.popNextImage();
@@ -104,10 +107,10 @@ elseif strcmp(obj.status,'standing')
                 img_3d(:,:,istack)=img;
             end
         end
-        drawnow;
+        pause(.01);
     end
     tic
-    
+
     % warning for buffer overflow
     if obj.mm.isBufferOverflowed
         warning('camera buffer over flowed, try set larger memory for the camera');
@@ -119,14 +122,12 @@ elseif strcmp(obj.status,'standing')
     delete(lh);
     obj.mm.stopSequenceAcquisition;
     obj.SwitchLight('off');
-    %   display(['number of images in buffer: ',...
-    %         num2str(obj.mm.getRemainingImageCount)]);
     
     % continue to save
-    if update_button
+    if UI_enabled
         set(hobj,'String','Zstack Saving')
+        pause(.01)
     end
-    pause(.01)
     while obj.mm.getRemainingImageCount()>0
         istack=istack+1;
         imgtmp=obj.mm.popNextImage();
@@ -139,21 +140,22 @@ elseif strcmp(obj.status,'standing')
             img_3d(:,:,istack)=img;
         end
     end
-    if savedata
-        imgtif.close();
-    end
+    
     toc
     
-    if savedata
-        %save setting
-        setting=obj.GetSetting;
-        save([filename(1:end-3),'mat'],'setting');
-        
-        display(['number of images in collected: ',...
+    if istack~=obj.numstacks 
+        warning(['number of images in collected: ',...
             num2str(istack)]);
     end
     
-    if update_button
+    if savedata
+        imgtif.close();
+        %save setting        
+        setting=obj.GetSetting;
+        save([filename(1:end-3),'mat'],'setting');
+    end
+    
+    if UI_enabled
         set(hobj,'String','Zstack')
     end
     obj.status = 'standing';

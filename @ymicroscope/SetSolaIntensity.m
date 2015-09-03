@@ -1,4 +1,4 @@
-function [ obj ] = SetSolaIntensity( obj )
+function [  ] = SetSolaIntensity( obj )
 %set the intensity of the sola illumination light source
 
 intensity=round(obj.fluorescent_illumination_intensity);

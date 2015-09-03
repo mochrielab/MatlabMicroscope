@@ -1,4 +1,4 @@
-function [ obj ] = ZFocus( obj, varargin )
+function [  ] = ZFocus( obj, varargin )
 % z focus based on a zstack of image
 
 if nargin == 1
@@ -19,7 +19,7 @@ img_3d = obj.Zscan;
 obj.GotoZCenter(img_3d);
 
 if update_button
-    set(hobj,'String','ZFocus')
+    set(hobj,'String','Focus')
 end
 
 end

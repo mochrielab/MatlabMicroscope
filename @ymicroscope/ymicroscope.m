@@ -35,7 +35,7 @@ classdef ymicroscope < handle
         illumination_mode_options=...
             {'None','Brightfield - W','Brightfield - R','Fluorescent'};
         movie_mode = 'zstack_plain';
-        movie_mode_options = {'zstack_plain','zstack_singlefile'};
+        movie_mode_options = {'zstack_plain','zstack_singlefile','zstack_autofocus'};
         movie_interval = 0;
         movie_cycles = 2;
         autofocus_window = 250;
@@ -170,28 +170,26 @@ classdef ymicroscope < handle
         end
         
         % main functions
-        function obj = Reset(obj)
+        function [] = Reset(obj)
             obj.status = 'standing';
         end
         img = Capture(obj,varargin);
-        obj = Live(obj,varargin);
-        obj = SetupUI(obj);
+        [] = Live(obj,varargin);
+        [] = SetupUI(obj);
         img3 = Zscan(obj,varargin);
-        obj = Movie(obj,varargin);
-        obj = Movie_Singlefile(obj,varargin);
-        obj = Movie_ZstackPlain(obj,varargin);
-        obj = Go(obj);
-        obj = GotoZcenter(obj,img_3d);
-        obj = SwitchLight( obj, on_or_off );
+        [] = Movie(obj,varargin);
+        [] = Movie_Singlefile(obj,varargin);
+        [] = Movie_ZstackPlain(obj,varargin);
+        [] = Go(obj);
+        [] = GotoZcenter(obj,img_3d);
+        [] = SwitchLight( obj, on_or_off );
         tagstruct = GetImageTag( obj, camlabel );
-        obj = SetSolaIntensity(obj);
+        [] = SetSolaIntensity(obj);
         setting = GetSetting(obj);
-        obj = SetSetting(obj,setting);
+        [] = SetSetting(obj,setting);
         [ filename ] = GetFileHeader( obj, option )
+        [] = ZFocus(obj,varargin);
 
-        obj = ImgSeq(obj,hobj,event);
-        obj = ZFocus(obj,varargin);
-        obj = DAQpkg(obj,hobj,event);
 
     end
     

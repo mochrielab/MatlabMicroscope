@@ -1,21 +1,27 @@
-function [ obj ] = Movie_ZstackPlain( obj, varargin )
-% do a movie of zstack in plain mode
+function [  ] = Movie_ZstackAutoFocus( obj, varargin )
+% movie of zstack with auto focusing
+% should be used for long movies with long intervals
 
 if nargin == 1
-    update_button = 0;
+    UI_enabled = 0;
 elseif nargin == 3
-    update_button = 1;
+    UI_enabled = 1;
     hobj = varargin{1};
     event = varargin{2};
 else
     warning('wrong number of input variables');
 end
 
-obj.status = 'movie zstackplain running';
-pause(.01)
+obj.status = 'movie_running_zstack_autofocus';
+
+if UI_enabled
+    set(hobj,'String','Prepare Movie');
+    pause(.01)
+else
+    display('Start Movie');
+end
 
 % prepare for save
-istack=0;
 filename=obj.GetFileHeader('movie');
 imgtif=Tiff(filename,'w8');
 tagstruct = obj.GetImageTag('Andor Zyla 5.5');
@@ -29,6 +35,9 @@ height = obj.mm.getImageHeight(); % image height
 rate_multiplier = 2;
 obj.nidaq.Rate=obj.framerate * rate_multiplier; % set data acquisition rate
 obj.nidaq.IsContinuous=0; % continuous writing
+% add listener
+lh = addlistener(obj.nidaq,'DataAvailable',... % remember to delete pointer
+    @(src,event)1);
 
 % prepare data to send
 zdata=stacks*obj.volts_per_pix+obj.zoffset; % data to send
@@ -38,43 +47,44 @@ zdata = reshape(ones(rate_multiplier,1)*zdata,...
 camtrigger = reshape([0;1+zeros(rate_multiplier-1,1)]*ones(1,numdata),...
     rate_multiplier*numdata,1); % trigger for camera
 
-% camera setting (take 4 seconds!)
+% camera setting 
 andorCam = 'Andor sCMOS Camera';
 obj.mm.setProperty(andorCam, 'TriggerMode', 'External'); % set exposure to external
-obj.mm.setExposure(obj.exposure); % set exposure time, ????? work or not
+obj.mm.setExposure(obj.exposure); % 
 obj.mm.clearCircularBuffer(); % clear the buffer for image storage
-
-% add listener
-lh = addlistener(obj.nidaq,'DataAvailable',... % remember to delete pointer
-    @(src,event)1);
+obj.mm.initializeCircularBuffer();
+obj.mm.prepareSequenceAcquisition(andorCam);
+obj.mm.startContinuousSequenceAcquisition(0);
 
 % img_3d for z focus
 img_3d = zeros(width,height,obj.numstacks);
 for iloop=1:obj.movie_cycles
-    if update_button
-        set(hobj,'String',['Stop at ',num2str(iloop)]);
-    end
-    obj.SwitchLight('on');
-    pause(.01)
     if strcmp(obj.status,'movie stopping')
         break;
     end
+    
+    if UI_enabled
+        set(hobj,'String',['Stop at ',num2str(iloop)]);
+        pause(.01)
+    else
+        display(['Movie cycle ',num2str(iloop)])
+    end
+    
+    % send data
+    obj.SwitchLight('on');
     obj.nidaq.queueOutputData([zdata,camtrigger;obj.zoffset,0])
-    
-    % prepare data acquisition
-    obj.mm.initializeCircularBuffer();
-    obj.mm.prepareSequenceAcquisition(andorCam);
-    
-    % start acquisition
-    obj.mm.startContinuousSequenceAcquisition(0);
     obj.nidaq.startBackground;
-    
+    istack=0;
+
     % live in background
     while obj.nidaq.IsRunning
-        img=obj.mm.getLastImage();
-        img = reshape(img, [width, height]); % image should be interpreted as a 2D array
-        axes(obj.imageaxis_handle);cla;
-        imagesc(img);colormap gray;axis image;axis off
+        if UI_enabled
+            img=obj.mm.getLastImage();
+            img = reshape(img, [width, height]); % image should be interpreted as a 2D array
+            axes(obj.imageaxis_handle);cla;
+            imagesc(img);colormap gray;axis image;axis off
+            drawnow;
+        end
         if obj.mm.getRemainingImageCount()>0
             istack=istack+1;
             imgtmp=obj.mm.popNextImage();
@@ -84,7 +94,7 @@ for iloop=1:obj.movie_cycles
             imgtif.write(img);
             imgtif.writeDirectory;
         end
-        drawnow;
+        pause(.01)
     end
     
     % warning for buffer overflow
@@ -93,9 +103,7 @@ for iloop=1:obj.movie_cycles
     end
     
     % ending acquisition
-    obj.nidaq.outputSingleScan([obj.zoffset,0]); % reset starting position
     obj.nidaq.stop;
-    obj.mm.stopSequenceAcquisition;
     obj.SwitchLight('off');
     
     % save data
@@ -103,20 +111,23 @@ for iloop=1:obj.movie_cycles
         istack=istack+1;
         imgtmp=obj.mm.popNextImage();
         img = reshape(imgtmp, [width, height]);
+        img_3d(:,:,istack) = double(img);
         imgtif.setTag(tagstruct);
         imgtif.write(img);
         imgtif.writeDirectory;
     end
-    display(['number of images collected: ',...
-        num2str(istack)]);
     
+    if istack~=obj.numstacks
+    warning(['number of images collected: ',...
+        num2str(istack)]);
+    end
     %% Autofocusing section
     
-    obj.GotoZCenter(obj,img_3d);
+%     obj.GotoZCenter(obj,img_3d);
     
     %% pause
     for ipause =1:60*obj.movie_interval
-        if strcmp(obj.status,'standing')
+        if strcmp(obj.status,'movie stopping')
             break
         end
         pause(1);
@@ -125,12 +136,15 @@ end
 % close the image saving
 imgtif.close();
 delete(lh);
+obj.mm.stopSequenceAcquisition;
 
 %save setting
 setting=obj.GetSetting;
 save([filename(1:end-3),'mat'],'setting');
-if update_button
+if UI_enabled
     set(hobj,'String','Start Movie')
+else
+    display('Movie end');
 end
 obj.status = 'standing';
 

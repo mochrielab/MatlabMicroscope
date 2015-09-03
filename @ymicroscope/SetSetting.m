@@ -1,4 +1,4 @@
-function [ obj ] = SetSetting( obj,setting )
+function [  ] = SetSetting( obj,setting )
 %set the setting for the obj from a setting file
 
     obj.numstacks = setting.numstacks;

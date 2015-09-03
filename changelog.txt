@@ -59,4 +59,4 @@ refine singlefile movie taking for more precise timing
 7. build Zfocus function to take a zstack and focus to center
 8. changed zscan, so that when no output variable it saves to tiff, but
     doesnt save when it output to something
-9 changed capture, same as above
+9. changed capture, same as above

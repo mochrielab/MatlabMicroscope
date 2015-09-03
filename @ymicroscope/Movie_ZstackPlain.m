@@ -1,18 +1,22 @@
-function [ obj ] = Movie_ZstackPlain( obj, varargin )
-% do a movie of zstack in plain mode
+function [  ] = Movie_ZstackPlain( obj, varargin )
+% do a movie of zstack with plain, mode,
+% currently broken, prepared to be outdated, 
+% replace with Movie_ZstackAutofocus
+
+warning('this function is obsolete');
+return
 
 if nargin == 1
-    update_button = 0;
+    UI_enabled = 0;
 elseif nargin == 3
-    update_button = 1;
+    UI_enabled = 1;
     hobj = varargin{1};
     event = varargin{2};
 else
     warning('wrong number of input variables');
 end
 
-obj.status = 'movie zstackplain running';
-pause(.01)
+obj.status = 'movie_running_zstack_plain';
 
 % prepare for save
 istack=0;
@@ -38,11 +42,15 @@ zdata = reshape(ones(rate_multiplier,1)*zdata,...
 camtrigger = reshape([0;1+zeros(rate_multiplier-1,1)]*ones(1,numdata),...
     rate_multiplier*numdata,1); % trigger for camera
 
-% camera setting (take 4 seconds!)
+% camera setting 
 andorCam = 'Andor sCMOS Camera';
 obj.mm.setProperty(andorCam, 'TriggerMode', 'External'); % set exposure to external
 obj.mm.setExposure(obj.exposure); % set exposure time, ????? work or not
 obj.mm.clearCircularBuffer(); % clear the buffer for image storage
+
+% prepare data acquisition
+obj.mm.initializeCircularBuffer();
+obj.mm.prepareSequenceAcquisition(andorCam);
 
 % add listener
 lh = addlistener(obj.nidaq,'DataAvailable',... % remember to delete pointer
@@ -51,19 +59,17 @@ lh = addlistener(obj.nidaq,'DataAvailable',... % remember to delete pointer
 % img_3d for z focus
 img_3d = zeros(width,height,obj.numstacks);
 for iloop=1:obj.movie_cycles
-    if update_button
-        set(hobj,'String',['Stop at ',num2str(iloop)]);
-    end
-    obj.SwitchLight('on');
-    pause(.01)
     if strcmp(obj.status,'movie stopping')
         break;
     end
+    
+    if UI_enabled
+        set(hobj,'String',['Stop at ',num2str(iloop)]);
+        pause(.01)
+    end
+    obj.SwitchLight('on');
     obj.nidaq.queueOutputData([zdata,camtrigger;obj.zoffset,0])
     
-    % prepare data acquisition
-    obj.mm.initializeCircularBuffer();
-    obj.mm.prepareSequenceAcquisition(andorCam);
     
     % start acquisition
     obj.mm.startContinuousSequenceAcquisition(0);
@@ -113,7 +119,7 @@ for iloop=1:obj.movie_cycles
     
     %% Autofocusing section
     
-    obj.GotoZCenter(obj,img_3d);
+%     obj.GotoZCenter(obj,img_3d);
     
     %% pause
     for ipause =1:60*obj.movie_interval
@@ -130,7 +136,7 @@ delete(lh);
 %save setting
 setting=obj.GetSetting;
 save([filename(1:end-3),'mat'],'setting');
-if update_button
+if UI_enabled
     set(hobj,'String','Start Movie')
 end
 obj.status = 'standing';

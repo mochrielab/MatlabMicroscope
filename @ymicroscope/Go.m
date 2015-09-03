@@ -1,4 +1,4 @@
-function [ obj ] = Go( obj )
+function [  ] = Go( obj )
 %Update the stage position
 
 % update z position
