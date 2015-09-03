@@ -1,6 +1,9 @@
 function [  ] = GotoZCenter(obj, img_3d )
 %drive the microscope to focus to the z center 
 
+
+
+
 % getting image mode
 light_mode=[];
 if ~isempty(strfind(lower(obj.illumination_mode),'brightfield'))

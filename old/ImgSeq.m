@@ -2,7 +2,6 @@ function [ obj ] = ImgSeq( obj, hobj, event )
 
 
         %%
-        obj.status = 'standing';
         obj.illumination_mode = 'Fluorescent';
         obj.framerate = 10;
         obj.exposure_fluorescent = 50;

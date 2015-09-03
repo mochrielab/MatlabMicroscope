@@ -17,31 +17,37 @@ if strcmp(mode,'brightfield E.coli')
     %%
     numstacks=size(img_3d,3);
     zs=1:numstacks;
-    mean_gradient_intensity=zeros(1,numstacks);
+    meangradint=zeros(1,numstacks);
     midpoint=round([size(img_3d,1),size(img_3d,2)]/2);
     for istack=1:numstacks
         img=img_3d(midpoint(1)-wsize:midpoint(1)+wsize,...
             midpoint(2)-wsize:midpoint(2)+wsize,istack);
         imgrad=imgradient(img);
-        mean_gradient_intensity(istack)=mean(imgrad(:));
+        meangradint(istack)=mean(imgrad(:));
     end
-    y = sgolayfilt(mean_gradient_intensity,3,15);
+    y = sgolayfilt(meangradint,3,15);
     [~,loc_peak]=findpeaks(y);
     [~,loc_valley]=findpeaks(-y);
     
-    zcenter= [];
+    possible_pairs=[];
     choose_range=[];
     for ipeak=1:length(loc_peak)-1
         ind=find(loc_valley>loc_peak(ipeak)&loc_valley<loc_peak(ipeak+1));
         if ~isempty(ind)
-            zcenter = loc_valley(ind);
+            possible_pairs = [possible_pairs; ...
+                loc_valley(ind),loc_peak(ipeak),loc_peak(ipeak+1),...
+                meangradint(loc_peak(ipeak))+meangradint(loc_peak(ipeak+1))...
+                -2*meangradint(loc_valley(ind))];
             %         choose_range=loc_peak(ipeak)+5:loc_peak(ipeak+1)-5;
-            choose_range = zcenter-5:zcenter+5;
-            
             break
         end
     end
-    [~,zcenter]=min(mean_gradient_intensity(choose_range));
+    if size(possible_pairs,1)>0
+        [~,tmp]=max(possible_pairs(:,4));   
+        zcenter=possible_pairs(tmp,1);
+    end
+    choose_range = zcenter-5:zcenter+5;
+    [~,zcenter]=min(meangradint(choose_range));
     zcenter=zcenter+choose_range(1)-1;
     % gaussfun = @(p,x)p(1)+p(2)*exp(-(x-p(3)).^2/p(4)^2);
     % p0=[max(mean_gradient_intensity(choose_range)),...
@@ -51,14 +57,16 @@ if strcmp(mode,'brightfield E.coli')
     % zcenter=pfit(3);
     
     %     close all
-    %     % plot(zs,mean_gradient_intensity,'o',zs,y,zs(choose_range),gaussfun(pfit,zs(choose_range)));
-    %     plot(zs,mean_gradient_intensity,'o',zs,y,zcenter,mean_gradient_intensity(zcenter),'*');
-    %     xlabel('zstack number');
-    %     ylabel('mean intensity gradient');
-    %     legend('raw','smooth','center');
-    %     title(['brightfield cell zstack center finding: ',num2str(zcenter)]);
+    figure(12345)
+        % plot(zs,mean_gradient_intensity,'o',zs,y,zs(choose_range),gaussfun(pfit,zs(choose_range)));
+        plot(zs,meangradint,'o',zs,y,zcenter,meangradint(zcenter),'*');
+        xlabel('zstack number');
+        ylabel('mean intensity gradient');
+        legend('raw','smooth','center');
+        title(['brightfield cell zstack center finding: ',num2str(zcenter)]);
     zcenter=max(1,zcenter);
     zcenter=min(numstacks,zcenter);
+
 
 elseif strcmp(mode,'fluorescent E.coli')
     numstacks=size(img_3d,3);
@@ -81,12 +89,14 @@ elseif strcmp(mode,'fluorescent E.coli')
     zcenter=max(1,zcenter);
     zcenter=min(numstacks,zcenter);
     % close all
-    % plot(zs,max_intensity,'o',zs(choose_range),gaussfun(pfit,zs(choose_range)));
-    % xlabel('zstack number');
-    % ylabel('averaged maximum intensity');
-    % legend('raw','gaussin fitting');
-    % title(['fluroescent particle zstack center finding : ',num2str(zcenter)]);
-    
+   
+    figure(12345)
+    plot(zs,max_intensity,'o',zs(choose_range),gaussfun(pfit,zs(choose_range)));
+    xlabel('zstack number');
+    ylabel('averaged maximum intensity');
+    legend('raw','gaussin fitting');
+    title(['fluroescent particle zstack center finding : ',num2str(zcenter)]);
+
 else
     error('unsupported mode')
 end

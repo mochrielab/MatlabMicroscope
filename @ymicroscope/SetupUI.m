@@ -323,39 +323,12 @@ function set_sample_type(hobj,event,obj)
 
 input=get(hobj,'value');
 obj.sample_type=obj.sample_type_options{input};
-% switch input
-%     case 1
-%         obj.sample_type = obj;
-%     case 2
-%         obj.movie_mode = 'zstack_singlefile';
-%     otherwise
-%         msgbox('error movie option')
-% end
+
 end
 
 function set_ROI(hobj,event,obj)
 input=get(hobj,'value');
-if input==1 %Default 2160 x 2560 pixels
-    obj.display_size = '2160 x 2560';
-    obj.img_width = 2560;
-    obj.img_height = 2160;
-    obj.mm.clearROI();
-elseif input==2 %1024 x 1344 pixels
-    obj.display_size = '1024 x 1344';
-    obj.mm.setROI(608,568,1344,1024);
-    obj.img_width = 1344;
-    obj.img_height = 1024;
-elseif input==3 %512 x 512 pixels
-    obj.display_size = '512 x 512';
-    obj.mm.setROI(824,1024,512,512);
-    obj.img_width = 512;
-    obj.img_height = 512;
-elseif input==4 %256 x 256 pixels
-    obj.display_size = '256 x 256';
-    obj.mm.setROI(952,1152,256,256);
-    obj.img_width = 256;
-    obj.img_height = 256;
-end
+obj.display_size=obj.display_size_options{input};
 end
 
 %%% Added 06/04/15 - setting frame rate (Question!!! - is there a max frame rate we can set???)

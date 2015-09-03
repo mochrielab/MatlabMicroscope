@@ -16,9 +16,7 @@ if strcmp(camlabel,'Andor Zyla 5.5')
     tagstruct.SamplesPerPixel = 1;
     tagstruct.Software = 'MATLAB';
     tagstruct.XResolution = 0.000065;
-    tagstruct.YResolution = 0.000065;
-%     tagstruct.ImageLength = obj.img_height;
-%     tagstruct.ImageWidth = obj.img_width;   
+    tagstruct.YResolution = 0.000065;  
     tagstruct.ImageLength = obj.img_width;
     tagstruct.ImageWidth = obj.img_height;
 else

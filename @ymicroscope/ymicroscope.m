@@ -41,8 +41,6 @@ classdef ymicroscope < handle
         autofocus_window = 250;
         
         % ROI setting
-        img_width = 2560; %image width (number of pixels)
-        img_height = 2160; %image height(number of pixels)
         display_size = '2160 x 2560';
         display_size_options = {'2160 x 2560','1024 x 1344','512 x 512','256 x 256'};
 
@@ -59,6 +57,9 @@ classdef ymicroscope < handle
     properties (Dependent)
         volts_per_pix;
         exposure
+        img_width
+        img_height = 2160; %image height(number of pixels)
+
     end
     
     methods
@@ -142,6 +143,16 @@ classdef ymicroscope < handle
             value=obj.um_per_pix/obj.um_per_volts;
         end
         
+        function value=get.img_width(obj)
+            ind=regexp(obj.display_size,' x ');
+            value = str2double(obj.display_size(ind+3:end));
+        end
+        
+        function value=get.img_height(obj)
+            ind=regexp(obj.display_size,' x ');
+            value = str2double(obj.display_size(1:ind-1));
+        end
+        
         % set z off set
         function set.zoffset(obj,zoffset)
             if zoffset<=0
@@ -152,6 +163,23 @@ classdef ymicroscope < handle
                 warning('zoffset goes above ten');
             else
             obj.zoffset=zoffset;
+            end
+        end
+        
+        function set.display_size(obj,display_size)
+            obj.display_size = display_size;
+            if ~isempty(obj.mm)
+                if strcmp(display_size,'2160 x 2560')
+                    obj.mm.clearROI();
+                elseif strcmp(display_size,'1024 x 1344')
+                    obj.mm.setROI(608,568,1344,1024)
+                elseif strcmp(display_size,'512 x 512')
+                    obj.mm.setROI(824,1024,512,512);
+                elseif strcmp(display_size,'256 x 256')
+                    obj.mm.setROI(952,1152,256,256);
+                else
+                    warning('ROI not supported');
+                end
             end
         end
         

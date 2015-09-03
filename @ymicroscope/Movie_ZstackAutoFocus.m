@@ -39,13 +39,7 @@ obj.nidaq.IsContinuous=0; % continuous writing
 lh = addlistener(obj.nidaq,'DataAvailable',... % remember to delete pointer
     @(src,event)1);
 
-% prepare data to send
-zdata=stacks*obj.volts_per_pix+obj.zoffset; % data to send
-numdata = length(zdata); % length and data
-zdata = reshape(ones(rate_multiplier,1)*zdata,...
-    rate_multiplier*numdata,1); % data for z scan at clock rate
-camtrigger = reshape([0;1+zeros(rate_multiplier-1,1)]*ones(1,numdata),...
-    rate_multiplier*numdata,1); % trigger for camera
+
 
 % camera setting 
 andorCam = 'Andor sCMOS Camera';
@@ -70,6 +64,14 @@ for iloop=1:obj.movie_cycles
         display(['Movie cycle ',num2str(iloop)])
     end
     
+    % prepare data to send
+    zdata=stacks*obj.volts_per_pix+obj.zoffset; % data to send
+    numdata = length(zdata); % length and data
+    zdata = reshape(ones(rate_multiplier,1)*zdata,...
+        rate_multiplier*numdata,1); % data for z scan at clock rate
+    camtrigger = reshape([0;1+zeros(rate_multiplier-1,1)]*ones(1,numdata),...
+        rate_multiplier*numdata,1); % trigger for camera
+
     % send data
     obj.SwitchLight('on');
     obj.nidaq.queueOutputData([zdata,camtrigger;obj.zoffset,0])
@@ -123,7 +125,7 @@ for iloop=1:obj.movie_cycles
     end
     %% Autofocusing section
     
-%     obj.GotoZCenter(obj,img_3d);
+    obj.GotoZCenter(img_3d);
     
     %% pause
     for ipause =1:60*obj.movie_interval
