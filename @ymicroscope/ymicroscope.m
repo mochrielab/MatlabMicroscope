@@ -32,20 +32,27 @@ classdef ymicroscope < handle
         fluorescent_illumination_intensity=50; %(0-255)
         framerate=10; %(fps )
         illumination_mode='None';
+        illumination_mode_options=...
+            {'None','Brightfield - W','Brightfield - R','Fluorescent'};
         movie_mode = 'zstack_plain';
+        movie_mode_options = {'zstack_plain','zstack_singlefile'};
         movie_interval = 0;
         movie_cycles = 2;
+        autofocus_window = 250;
         
         % ROI setting
         img_width = 2560; %image width (number of pixels)
         img_height = 2160; %image height(number of pixels)
         display_size = '2160 x 2560';
+        display_size_options = {'2160 x 2560','1024 x 1344','512 x 512','256 x 256'};
 
         % microscope status
         status = 'standing'
+        sample_type = 'E.coli'
+        sample_type_options = {'E.coli'};
         
         % experiment name
-        experiment_name = '';
+        experiment_name = 'newexperiment';
     
     end
     
@@ -171,16 +178,20 @@ classdef ymicroscope < handle
         obj = SetupUI(obj);
         img3 = Zscan(obj,varargin);
         obj = Movie(obj,varargin);
-        obj = ZFocus(obj,hobj,event);
-        obj = DAQpkg(obj,hobj,event);
+        obj = Movie_Singlefile(obj,varargin);
+        obj = Movie_ZstackPlain(obj,varargin);
+        obj = Go(obj);
+        obj = GotoZcenter(obj,img_3d);
         obj = SwitchLight( obj, on_or_off );
         tagstruct = GetImageTag( obj, camlabel );
         obj = SetSolaIntensity(obj);
         setting = GetSetting(obj);
         obj = SetSetting(obj,setting);
         [ filename ] = GetFileHeader( obj, option )
-        %delete later?
-%         obj = ImgSeq(obj,hobj,event);
+
+        obj = ImgSeq(obj,hobj,event);
+        obj = ZFocus(obj,varargin);
+        obj = DAQpkg(obj,hobj,event);
 
     end
     

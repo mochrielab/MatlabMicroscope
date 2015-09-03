@@ -51,3 +51,12 @@ refine singlefile movie taking for more precise timing
 
 9/2/2015
 1. getting rid of unneccessary variables in main buttons
+2. build in z center find function
+3. build in biology sample options, and selector
+4. move all the possible options to class properties
+5. add Go function to move stage
+6. add function to move z stage to zcenter
+7. build Zfocus function to take a zstack and focus to center
+8. changed zscan, so that when no output variable it saves to tiff, but
+    doesnt save when it output to something
+9 changed capture, same as above

@@ -58,7 +58,7 @@ ImgSeq_handle=uicontrol('Parent',controlpanel_handle,'Style','pushbutton',...
     'String','ImgSeq','Fontsize',20,...
     'Callback',@(hobj,event)obj.DAQpkg(hobj,event));
 %% set illumination mode
-illumination_options={'None','Brightfield - W','Brightfield - R','Fluorescent'};
+illumination_options=obj.illumination_mode_options;
 illumination_handle=uicontrol('Parent',controlpanel_handle,'Style','popupmenu',...
     'Unit','Pixels','Position',[15 175 200 20],'Value',find(strcmp(illumination_options,obj.illumination_mode)),...
     'String',illumination_options,'Fontsize',10,...
@@ -67,7 +67,7 @@ uicontrol('Parent',controlpanel_handle,'Style','text',...
     'Unit','Pixels','Position',[15 195 200 20],...
     'String','Illumination Mode','Fontsize',10);
 %% set movie mode
-moviemode_options={'zstack_plain','zstack_singlefile'};
+moviemode_options=obj.movie_mode_options;
 illumination_handle=uicontrol('Parent',controlpanel_handle,'Style','popupmenu',...
     'Unit','Pixels','Position',[15 95 200 20],'Value',find(strcmp(obj.movie_mode,moviemode_options)),...
     'String',moviemode_options,...
@@ -76,8 +76,7 @@ uicontrol('Parent',controlpanel_handle,'Style','text',...
     'Unit','Pixels','Position',[15 115 200 20],...
     'String','Movie Mode','Fontsize',10);
 %% set display mode ROI
-%%% Added 06/03/15 - text to appear in the pop-up menu %%%
-ROI_options={'2160 x 2560','1024 x 1344','512 x 512','256 x 256'};
+ROI_options=obj.display_size_options;
 ROI_handle=uicontrol('Parent',controlpanel_handle,'Style','popupmenu',...
     'Unit','Pixels','Position',[240 175 200 20],'Value',find(strcmp(ROI_options,obj.display_size)),...
     'String',ROI_options,'Fontsize',10,...
@@ -85,6 +84,14 @@ ROI_handle=uicontrol('Parent',controlpanel_handle,'Style','popupmenu',...
 uicontrol('Parent',controlpanel_handle,'Style','text',...
     'Unit','Pixels','Position',[240 195 200 20],...
     'String','Display Size','Fontsize',10);
+%% set biology sample type
+sample_type_handle=uicontrol('Parent',controlpanel_handle,'Style','popupmenu',...
+    'Unit','Pixels','Position',[240 95 200 20],'Value',find(strcmp(obj.sample_type_options,obj.sample_type)),...
+    'String',ROI_options,'Fontsize',10,...
+    'Callback',@(hobj,event)set_sample_type(hobj,event,obj));
+uicontrol('Parent',controlpanel_handle,'Style','text',...
+    'Unit','Pixels','Position',[240 115 200 20],...
+    'String','sample type','Fontsize',10);
 %% setting parameters
 % fluorescent exposure
 fluorescent_exposure_handle=...
@@ -300,17 +307,32 @@ end
 function set_movie_mode(hobj,event,obj)
 
 input=get(hobj,'value');
-switch input
-    case 1
-        obj.movie_mode = 'zstack_plain';
-    case 2
-        obj.movie_mode = 'zstack_singlefile';
-    otherwise
-        msgbox('error movie option')
-end
+obj.movie_mode=obj.movie_mode_options{input};
+% 
+% switch input
+%     case 1
+%         obj.movie_mode = 'zstack_plain';
+%     case 2
+%         obj.movie_mode = 'zstack_singlefile';
+%     otherwise
+%         msgbox('error movie option')
+% end
 end
 
-%%% Added 06/03/15 - setting region of interest
+function set_sample_type(hobj,event,obj)
+
+input=get(hobj,'value');
+obj.sample_type=obj.sample_type_options{input};
+% switch input
+%     case 1
+%         obj.sample_type = obj;
+%     case 2
+%         obj.movie_mode = 'zstack_singlefile';
+%     otherwise
+%         msgbox('error movie option')
+% end
+end
+
 function set_ROI(hobj,event,obj)
 input=get(hobj,'value');
 if input==1 %Default 2160 x 2560 pixels

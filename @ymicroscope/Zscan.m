@@ -1,5 +1,23 @@
-function [ img3 ] = Zscan( obj, hobj,event )
+function [ img_3d ] = Zscan( obj, varargin )
 % do a zscan
+
+if nargin == 1
+    update_button = 0;
+elseif nargin == 3
+    update_button = 1;
+    hobj = varargin{1};
+    event = varargin{2};
+else
+    warning('wrong number of input variables');
+end
+
+if nargout == 0
+    savedata = 1;
+elseif nargout == 1
+    savedata = 0;
+else
+    error('wrong number of output')
+end
 
 magic_number = 0; % guessing the milli second take to stablily wrap up exposure
 
@@ -8,9 +26,11 @@ if obj.exposure + magic_number >= 1000/obj.framerate
 elseif strcmp(obj.status,'standing')
     obj.status = 'zstack_running';
     obj.SwitchLight('on');
-    set(hobj,'String','Zstack Running')
+    if update_button
+        set(hobj,'String','Zstack Running')
+    end
     pause(.01)
-
+    
     % set scanning parameters
     stacks =(-(obj.numstacks-1)/2:(obj.numstacks-1)/2)*obj.stepsize; % stack position
     width = obj.mm.getImageWidth(); % image width
@@ -20,7 +40,7 @@ elseif strcmp(obj.status,'standing')
     rate_multiplier = 2;
     obj.nidaq.Rate=obj.framerate * rate_multiplier; % set data acuisition rate
     obj.nidaq.IsContinuous=0; % continuous writing
-
+    
     % prepare data to send
     zdata=stacks*obj.volts_per_pix+obj.zoffset; % data to send
     numdata = length(zdata); % length and data
@@ -28,12 +48,12 @@ elseif strcmp(obj.status,'standing')
         rate_multiplier*numdata,1); % data for z scan at clock rate
     camtrigger = reshape([0;1+zeros(rate_multiplier-1,1)]*ones(1,numdata),...
         rate_multiplier*numdata,1); % trigger for camera
-%     camtrigger = reshape([1;zeros(rate_multiplier-1,1)]*ones(1,numdata),...
-%         rate_multiplier*numdata,1); % trigger for camera
+    %     camtrigger = reshape([1;zeros(rate_multiplier-1,1)]*ones(1,numdata),...
+    %         rate_multiplier*numdata,1); % trigger for camera
     
     obj.nidaq.queueOutputData([zdata,camtrigger;zdata(end),0])
-%     obj.nidaq.queueOutputData([zdata,camtrigger;zdata(end),1])
-
+    %     obj.nidaq.queueOutputData([zdata,camtrigger;zdata(end),1])
+    
     % log piezo position
     piezopos = zeros(size(zdata));
     counter = 0;
@@ -41,7 +61,7 @@ elseif strcmp(obj.status,'standing')
     counter_pointer = libpointer('doublePtr',counter);
     lh = addlistener(obj.nidaq,'DataAvailable',... % remember to delete pointer
         @(src,event)Nidaq_Data_log(src,event,data_pointer,counter_pointer));
-        
+    
     % camera setting (take 4 seconds!)
     andorCam = 'Andor sCMOS Camera';
     obj.mm.setProperty(andorCam, 'TriggerMode', 'External'); % set exposure to external
@@ -51,19 +71,23 @@ elseif strcmp(obj.status,'standing')
     % prepare data acquisition
     obj.mm.initializeCircularBuffer();
     obj.mm.prepareSequenceAcquisition(andorCam);
-
+    
     % start acquisition
     obj.mm.startContinuousSequenceAcquisition(0);
-    obj.nidaq.startBackground;    
-
+    obj.nidaq.startBackground;
+    
     % save data header
     istack=0;
-    filename=obj.GetFileHeader('zstack');
-    imgtif=Tiff(filename,'w8');
-    tagstruct = obj.GetImageTag('Andor Zyla 5.5');
+    if savedata
+        filename=obj.GetFileHeader('zstack');
+        imgtif=Tiff(filename,'w8');
+        tagstruct = obj.GetImageTag('Andor Zyla 5.5');
+    else
+        img_3d=zeros(width,height,obj.numstacks);
+    end
     
     % live in background
-    while obj.nidaq.IsRunning 
+    while obj.nidaq.IsRunning
         img=obj.mm.getLastImage();
         img = reshape(img, [width, height]); % image should be interpreted as a 2D array
         axes(obj.imageaxis_handle);cla;
@@ -72,50 +96,66 @@ elseif strcmp(obj.status,'standing')
             istack=istack+1;
             imgtmp=obj.mm.popNextImage();
             img = reshape(imgtmp, [width, height]);
-            imgtif.setTag(tagstruct);
-            imgtif.write(img);
-            imgtif.writeDirectory;
+            if savedata
+                imgtif.setTag(tagstruct);
+                imgtif.write(img);
+                imgtif.writeDirectory;
+            else
+                img_3d(:,:,istack)=img;
+            end
         end
         drawnow;
     end
     tic
-
+    
     % warning for buffer overflow
-    if obj.mm.isBufferOverflowed 
+    if obj.mm.isBufferOverflowed
         warning('camera buffer over flowed, try set larger memory for the camera');
     end
-
+    
     % ending acquisition
     obj.nidaq.outputSingleScan([obj.zoffset,0]); % reset starting position
     obj.nidaq.stop;
     delete(lh);
     obj.mm.stopSequenceAcquisition;
     obj.SwitchLight('off');
-%   display(['number of images in buffer: ',...
-%         num2str(obj.mm.getRemainingImageCount)]);
+    %   display(['number of images in buffer: ',...
+    %         num2str(obj.mm.getRemainingImageCount)]);
     
     % continue to save
-    set(hobj,'String','Zstack Saving')
+    if update_button
+        set(hobj,'String','Zstack Saving')
+    end
     pause(.01)
     while obj.mm.getRemainingImageCount()>0
         istack=istack+1;
         imgtmp=obj.mm.popNextImage();
         img = reshape(imgtmp, [width, height]);
-        imgtif.setTag(tagstruct);
-        imgtif.write(img);
-        imgtif.writeDirectory;   
+        if savedata
+            imgtif.setTag(tagstruct);
+            imgtif.write(img);
+            imgtif.writeDirectory;
+        else
+            img_3d(:,:,istack)=img;
+        end
     end
-    imgtif.close();
+    if savedata
+        imgtif.close();
+    end
     toc
     
-    %save setting
-    setting=obj.GetSetting;
-    save([filename(1:end-3),'mat'],'setting');
+    if savedata
+        %save setting
+        setting=obj.GetSetting;
+        save([filename(1:end-3),'mat'],'setting');
+        
+        display(['number of images in collected: ',...
+            num2str(istack)]);
+    end
     
-    display(['number of images in collected: ',...
-        num2str(istack)]);  
-    
-    set(hobj,'String','Zstack')    
+    if update_button
+        set(hobj,'String','Zstack')
+    end
     obj.status = 'standing';
 else
     msgbox(['error: microscope is ',obj.status]);

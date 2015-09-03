@@ -11,6 +11,14 @@ else
     warning('wrong number of input variables');
 end
 
+if nargout == 0
+    savedata = 1;
+elseif nargout == 1
+    savedata = 0;
+else
+    error('wrong number of output')
+end
+
 if strcmp(obj.status,'standing') 
     obj.SwitchLight('on');
     obj.mm.setExposure(obj.exposure);    
@@ -35,6 +43,7 @@ else
 end
 
 % save data
+if savedata
     filename=obj.GetFileHeader('capture');
     imgtif=Tiff(filename,'a');
     tagstruct = obj.GetImageTag('Andor Zyla 5.5');
@@ -45,6 +54,6 @@ end
     %save setting
     setting=obj.GetSetting;
     save([filename(1:end-3),'mat'],'setting');
-    
     display('image captured')
+end
 end
