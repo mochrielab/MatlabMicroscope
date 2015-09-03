@@ -49,7 +49,7 @@ refine singlefile movie taking for more precise timing
 8. changed from tif to BIGTIFF files, can save above 4G, ImageJ needs bioformat
     plugin to read those files
 
-9/2/2015
+9/2/2015 - version 2.8
 1. getting rid of unneccessary variables in main buttons
 2. build in z center find function
 3. build in biology sample options, and selector
@@ -60,3 +60,8 @@ refine singlefile movie taking for more precise timing
 8. changed zscan, so that when no output variable it saves to tiff, but
     doesnt save when it output to something
 9. changed capture, same as above
+10. fixed img_width independency to dependent
+
+
+
+

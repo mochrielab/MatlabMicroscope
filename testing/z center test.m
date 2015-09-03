@@ -38,13 +38,12 @@ xlabel('zstack number');
 ylabel('averaged maximum intensity');
 legend('raw','gaussin fitting');
 title(['fluroescent particle zstack center finding : ',num2str(zcenter)]);
-    
-    print(gcf,'fluoAutofocusfit','-dpng')
+print(gcf,'fluoAutofocusfit','-dpng')
 
-    figure
-    SI(squeeze(sum(img_3d,3)));
-    title('projection image');
-    print(gcf,'fluoAutofocusimg','-dpng')
+figure
+SI(img_3d(:,:,round(zcenter)));
+title('central image');
+print(gcf,'fluoAutofocusimg','-dpng')
 %% find the zstack center of the bright field
 
 dirpath='I:\microscope_pics\08_31_2015';
@@ -102,7 +101,13 @@ xlabel('zstack number');
 ylabel('mean intensity gradient');
 legend('raw','smooth','center');
 title(['brightfield cell zstack center finding: ',num2str(zcenter)]);
-%%
+print(gcf,'bfAutofocusfit','-dpng')
+
+figure
+SI(img_3d(:,:,round(zcenter)));
+title('central image');
+print(gcf,'bfAutofocusimg','-dpng')
+
 
 
 
