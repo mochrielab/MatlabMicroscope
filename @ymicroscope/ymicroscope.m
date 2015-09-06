@@ -20,7 +20,7 @@ classdef ymicroscope < handle
         % scanning parameters
         numstacks=61;
         stepsize=1;
-        zoffset = 1;
+        zoffset = 3;
         
         % ui handles
         figure_handle
@@ -29,7 +29,7 @@ classdef ymicroscope < handle
         % microscope parameters
         exposure_brightfield=40; %(ms)
         exposure_fluorescent=50; %(ms)
-        fluorescent_illumination_intensity=50; %(0-255)
+        fluorescent_illumination_intensity=30; %(0-255)
         framerate=10; %(fps )
         illumination_mode='None';
         illumination_mode_options=...
@@ -155,10 +155,10 @@ classdef ymicroscope < handle
         
         % set z off set
         function set.zoffset(obj,zoffset)
-            if zoffset<=0
+            if zoffset<0
                 obj.zoffset=0;
                 warning('zoffset goes below zero');
-            elseif zoffset>=10
+            elseif zoffset>10
                 obj.zoffset=10;          
                 warning('zoffset goes above ten');
             else
