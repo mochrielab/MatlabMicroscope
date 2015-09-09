@@ -35,10 +35,12 @@ if strcmp(obj.status,'standing')
 
     img = reshape(img, [width, height]); % image should be interpreted as a 2D array
 %     img = transpose(img);                % make column-major order for MATLAB
-    % plot
-    cla %clear current axis
-    imagesc(img);colormap gray;axis image;axis off
-    drawnow;
+    if UI_enabled
+        % plot
+        cla %clear current axis
+        imagesc(img);colormap gray;axis image;axis off
+        drawnow;
+    end
     obj.SwitchLight('off');
 else
     if UI_enabled

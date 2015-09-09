@@ -62,6 +62,16 @@ refine singlefile movie taking for more precise timing
 9. changed capture, same as above
 10. fixed img_width independency to dependent
 
+9/8/2015 - version 3.0
+1. add x,y coordinates
+2. update Go function
+3. update GoBy function
+4. add keyboard control of x,y,z
+5. stage vibration fix
+6. dirt clean
+7. condensor alignment
+
+
 
 
 
