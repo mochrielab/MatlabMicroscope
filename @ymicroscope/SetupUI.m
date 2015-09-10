@@ -363,12 +363,14 @@ function enable_joystick(hobj,event,obj)
     if obj.joystick_enabled==0
         hobj.set('string','JS Enabled');
         obj.joystick_enabled = 1;
+        obj.status = 'running_joystick';
         obj.JoystickControl;
     elseif obj.joystick_enabled==1
         hobj.set('string','JS Disabled');
         obj.joystick_enabled = 0;
+        obj.status='standing';
     else
-        msgbox(['joystick status is ',obj.joystick_enabled]);
+        msgbox(['microscope status is ',obj.status]);
     end
 end
 

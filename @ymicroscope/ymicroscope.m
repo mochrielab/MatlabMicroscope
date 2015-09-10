@@ -71,15 +71,6 @@ classdef ymicroscope < handle
     methods
         % contructor
         function obj=ymicroscope()
-%           % load java path
-%             warning off;
-%             dirpath='C:\Program Files\Micro-Manager-1.4\plugins\Micro-Manager';
-%             files=dir(fullfile(dirpath,'*.jar'));
-%             for ifile=1:length(files)
-%                 javaaddpath(fullfile(dirpath,files(ifile).name));
-%             end
-%             warning on;
-            display('finished loading java path');
             % load micro manager
             import mmcorej.*;
             obj.mm=CMMCore();
@@ -138,12 +129,9 @@ classdef ymicroscope < handle
             try
                 obj.priorXYstage = serial('COM5');
                 fopen(obj.priorXYstage);
-                set(obj.priorXYstage,'timeout',0.01);
-                fprintf(obj.priorXYstage,'%s\r','PS');
-                pos = fscanf(obj.priorXYstage);
-                pos = strsplit(pos,',');
-                obj.pos_x = str2double(pos{1});
-                obj.pos_y = str2double(pos{2});
+                set(obj.priorXYstage,'Terminator','CR');
+                set(obj.priorXYstage,'timeout',1);
+                obj.GetStagePosition;
                 disp('prior stage connected!')
             catch expname
                 warning('Connect prior XY Stage!');
@@ -156,6 +144,8 @@ classdef ymicroscope < handle
             catch expname
                 warning('Connect joystick!');
             end
+            
+            display('microscope ready to use :) ')
         end
         
         % destroyer
@@ -248,7 +238,7 @@ classdef ymicroscope < handle
         [] = Movie(obj,varargin);
         [] = Movie_Singlefile(obj,varargin);
         [] = Movie_ZstackPlain(obj,varargin);
-        [] = Go(obj);
+        [] = Go(obj,varargin);
         [] = GotoZcenter(obj,img_3d);
         [] = SwitchLight( obj, on_or_off );
         tagstruct = GetImageTag( obj, camlabel );
@@ -258,7 +248,8 @@ classdef ymicroscope < handle
         [ filename ] = GetFileHeader( obj, option )
         [] = ZFocus(obj,varargin);
         [ ] = JoystickControl( obj );
-        
+        [ pos ] = GetStagePosition( obj )
+        [ out ] = StageCommand( obj, str )
     end
     
 end
