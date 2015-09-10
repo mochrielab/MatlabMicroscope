@@ -64,15 +64,17 @@ refine singlefile movie taking for more precise timing
 
 9/8/2015 - version 3.0
 1. add x,y coordinates
-2. update Go function
-3. update GoBy function
-4. add keyboard control of x,y,z
+2. add stage handle
+3. 
+8. add joystick
+9. fixed javapath problem, add static path in windows
+10. disabled windows, 
+
 5. stage vibration fix
 6. dirt clean
 7. condensor alignment
-8. add joystick
-9. fixed javapath problem
-
-
+2. update Go function
+3. update GoBy function
+4. add keyboard control of x,y,z
 
 
