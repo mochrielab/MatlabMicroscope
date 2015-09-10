@@ -28,10 +28,16 @@ live_handle=uicontrol('Parent',controlpanel_handle,'Style','pushbutton',...
     'Unit','Pixels','Position',[15 340 200 60],...
     'String','Start Live','Fontsize',20,...
     'Callback',@(hobj,event)obj.Live(hobj,event));
+% light button
 light_handle=uicontrol('Parent',controlpanel_handle,'Style','pushbutton',...
     'Unit','Pixels','Position',[15 245 200 60],...
     'String','Light On','Fontsize',20,...
     'Callback',@(hobj,event)switch_light(hobj,event,obj));
+% stage button
+light_handle=uicontrol('Parent',controlpanel_handle,'Style','pushbutton',...
+    'Unit','Pixels','Position',[240 245 200 60],...
+    'String','JS Disabled','Fontsize',20,...
+    'Callback',@(hobj,event)enable_joystick(hobj,event,obj));
 % capture button
 capture_handle=uicontrol('Parent',controlpanel_handle,'Style','pushbutton',...
     'Unit','Pixels','Position',[240 340 200 60],...
@@ -52,11 +58,12 @@ focus_handle=uicontrol('Parent',controlpanel_handle,'Style','pushbutton',...
     'Unit','Pixels','Position',[465 245 200 60],...
     'String','Focus','Fontsize',20,...
     'Callback',@(hobj,event)obj.ZFocus(hobj,event));
-% DAQpkg button
-ImgSeq_handle=uicontrol('Parent',controlpanel_handle,'Style','pushbutton',...
-    'Unit','Pixels','Position',[690 245 200 60],...
-    'String','ImgSeq','Fontsize',20,...
-    'Callback',@(hobj,event)obj.DAQpkg(hobj,event));
+
+% % DAQpkg button
+% ImgSeq_handle=uicontrol('Parent',controlpanel_handle,'Style','pushbutton',...
+%     'Unit','Pixels','Position',[690 245 200 60],...
+%     'String','ImgSeq','Fontsize',20,...
+%     'Callback',@(hobj,event)obj.DAQpkg(hobj,event));
 %% set illumination mode
 illumination_options=obj.illumination_mode_options;
 illumination_handle=uicontrol('Parent',controlpanel_handle,'Style','popupmenu',...
@@ -308,15 +315,6 @@ function set_movie_mode(hobj,event,obj)
 
 input=get(hobj,'value');
 obj.movie_mode=obj.movie_mode_options{input};
-% 
-% switch input
-%     case 1
-%         obj.movie_mode = 'zstack_plain';
-%     case 2
-%         obj.movie_mode = 'zstack_singlefile';
-%     otherwise
-%         msgbox('error movie option')
-% end
 end
 
 function set_sample_type(hobj,event,obj)
@@ -331,7 +329,6 @@ input=get(hobj,'value');
 obj.display_size=obj.display_size_options{input};
 end
 
-%%% Added 06/04/15 - setting frame rate (Question!!! - is there a max frame rate we can set???)
 function set_framerate(hobj,event,obj)
 if ~isnan(str2double(get(hobj,'string')))
     obj.framerate=str2double(get(hobj,'string'));
@@ -361,3 +358,17 @@ function switch_light(hobj,event,obj)
         msgbox(['microscope status is ',obj.status]);
     end
 end
+
+function enable_joystick(hobj,event,obj)
+    if obj.joystick_enabled==0
+        hobj.set('string','JS Enabled');
+        obj.joystick_enabled = 1;
+        obj.JoystickControl;
+    elseif obj.joystick_enabled==1
+        hobj.set('string','JS Disabled');
+        obj.joystick_enabled = 0;
+    else
+        msgbox(['joystick status is ',obj.joystick_enabled]);
+    end
+end
+

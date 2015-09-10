@@ -1,0 +1,12 @@
+C:\Program Files\Micro-Manager-1.4\ij.jar
+C:\Program Files\Micro-Manager-1.4\plugins\Micro-Manager\MMAcqEngine.jar
+C:\Program Files\Micro-Manager-1.4\plugins\Micro-Manager\MMCoreJ.jar
+C:\Program Files\Micro-Manager-1.4\plugins\Micro-Manager\MMJ_.jar
+C:\Program Files\Micro-Manager-1.4\plugins\Micro-Manager\clojure.jar
+C:\Program Files\Micro-Manager-1.4\plugins\Micro-Manager\bsh-2.0b4.jar
+C:\Program Files\Micro-Manager-1.4\plugins\Micro-Manager\swingx-0.9.5.jar
+C:\Program Files\Micro-Manager-1.4\plugins\Micro-Manager\swing-layout-1.0.4.jar
+C:\Program Files\Micro-Manager-1.4\plugins\Micro-Manager\commons-math-2.0.jar
+C:\Program Files\Micro-Manager-1.4\plugins\Micro-Manager\ome-xml.jar
+C:\Program Files\Micro-Manager-1.4\plugins\Micro-Manager\scifio.jar
+C:\Program Files\Micro-Manager-1.4\plugins\Micro-Manager\guava-17.0.jar

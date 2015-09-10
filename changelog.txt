@@ -70,7 +70,8 @@ refine singlefile movie taking for more precise timing
 5. stage vibration fix
 6. dirt clean
 7. condensor alignment
-
+8. add joystick
+9. fixed javapath problem
 
 
 

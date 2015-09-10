@@ -1,30 +1,37 @@
 classdef ymicroscope < handle
     %controlling microscope
-    
-    properties
+    properties (Hidden)
         % equipment handles
         nidaq % handle of ni daq, in control of piezo stage
         nidaq2 %handle of ni daq to allow for control of b-field LEDs
         mm % handle of micro manager, in control of zyla camera
         sola % handle of com port 3, in control of sola illuminator
-        
+        priorXYstage % handle of com port 5, in control of the priorXYstage
+        joystick % handle of the joystick
+
+        % ui handles
+        figure_handle
+        imageaxis_handle
+    end
+    
+    properties
         % file system
         datasavepath='I:\microscope_pics';
-%         datasavepath2 = 'C:\microscope_log';
         
         % constants
         % piezo conversion
         um_per_volts=200/10;
         um_per_pix=6.5/100;
         
+        % position of the stage
+        pos_x = 0
+        pos_y = 0
+        pos_movespeed
+        
         % scanning parameters
         numstacks=61;
         stepsize=1;
         zoffset = 3;
-        
-        % ui handles
-        figure_handle
-        imageaxis_handle
         
         % microscope parameters
         exposure_brightfield=40; %(ms)
@@ -48,10 +55,10 @@ classdef ymicroscope < handle
         status = 'standing'
         sample_type = 'E.coli'
         sample_type_options = {'E.coli'};
+        joystick_enabled = 0;
         
         % experiment name
         experiment_name = 'newexperiment';
-    
     end
     
     properties (Dependent)
@@ -59,73 +66,106 @@ classdef ymicroscope < handle
         exposure
         img_width
         img_height = 2160; %image height(number of pixels)
-
     end
     
     methods
         % contructor
         function obj=ymicroscope()
 %           % load java path
-            warning off;
-            dirpath='C:\Program Files\Micro-Manager-1.4\plugins\Micro-Manager';
-            files=dir(fullfile(dirpath,'*.jar'));
-            for ifile=1:length(files)
-                javaaddpath(fullfile(dirpath,files(ifile).name));
-            end
-            warning on;
+%             warning off;
+%             dirpath='C:\Program Files\Micro-Manager-1.4\plugins\Micro-Manager';
+%             files=dir(fullfile(dirpath,'*.jar'));
+%             for ifile=1:length(files)
+%                 javaaddpath(fullfile(dirpath,files(ifile).name));
+%             end
+%             warning on;
             display('finished loading java path');
             % load micro manager
             import mmcorej.*;
             obj.mm=CMMCore();
             try
-            obj.mm.loadSystemConfiguration (...
-                'C:\Program Files\Micro-Manager-1.4\MMConfig_andorzyla.cfg');
+                obj.mm.loadSystemConfiguration (...
+                    'C:\Program Files\Micro-Manager-1.4\MMConfig_andorzyla.cfg');
+                % set buffer size for image storage: 16 GB
+                obj.mm.setCircularBufferMemoryFootprint(16000);
+                % set dynamic range of the camera to 16 bit
+                obj.mm.setProperty('Andor sCMOS Camera',...
+                    'Sensitivity/DynamicRange',...
+                    '16-bit (low noise & high well capacity)')
+                disp('Camera connected!');
             catch expname
                 warning('Turn on the camera!');
             end
-            % set buffer size for image storage: 16 GB
-            obj.mm.setCircularBufferMemoryFootprint(16000); 
-            % set dynamic range of the camera to 16 bit
-            obj.mm.setProperty('Andor sCMOS Camera',...
-                'Sensitivity/DynamicRange',...
-                '16-bit (low noise & high well capacity)')
-            disp('Camera connected!!!');
             % load ni daq
-            % devices = daq.getDevices;
-            obj.nidaq=daq.createSession('ni');
-            ch11 = obj.nidaq.addAnalogOutputChannel('Dev1',0,'Voltage');
-            ch11.Name = 'Z scan (output)';
-            ch12 = obj.nidaq.addAnalogInputChannel('Dev1',0,'Voltage');
-            ch12.Name = 'Z position (input)';
-            ch13 = obj.nidaq.addDigitalChannel('Dev1','Port0/Line0','OutputOnly');
-            ch13.Name = 'camera triggering (output)';
-            % add session for digital input and output controlling
-            % fluorescence
-            obj.nidaq2 = daq.createSession('ni');
-            ch21=obj.nidaq2.addDigitalChannel('Dev1','Port0/Line1','OutputOnly');
-            ch21.Name = 'Illumination White (output)';
-            ch22=obj.nidaq2.addDigitalChannel('Dev1','Port0/Line2','OutputOnly');
-            ch22.Name = 'Illumination Red (output)';
-            % set output voltage zero
-            obj.nidaq.outputSingleScan([0 0]);
-            obj.nidaq2.outputSingleScan([0 0]);
-            
-            disp('Piezo output voltage set to zero!!!')
-            disp('Brightfield Illumination OFF')
+            try
+                % devices = daq.getDevices;
+                obj.nidaq=daq.createSession('ni');
+                ch11 = obj.nidaq.addAnalogOutputChannel('Dev1',0,'Voltage');
+                ch11.Name = 'Z scan (output)';
+                ch12 = obj.nidaq.addAnalogInputChannel('Dev1',0,'Voltage');
+                ch12.Name = 'Z position (input)';
+                ch13 = obj.nidaq.addDigitalChannel('Dev1','Port0/Line0','OutputOnly');
+                ch13.Name = 'camera triggering (output)';
+                % add session for digital input and output controlling
+                % fluorescence
+                obj.nidaq2 = daq.createSession('ni');
+                ch21=obj.nidaq2.addDigitalChannel('Dev1','Port0/Line1','OutputOnly');
+                ch21.Name = 'Illumination White (output)';
+                ch22=obj.nidaq2.addDigitalChannel('Dev1','Port0/Line2','OutputOnly');
+                ch22.Name = 'Illumination Red (output)';
+                % set output voltage zero
+                obj.nidaq.outputSingleScan([0 0]);
+                obj.nidaq2.outputSingleScan([0 0]);
+                disp('Piezo output voltage set to zero!')
+                disp('Brightfield Illumination OFF!')
+            catch expname
+                warning('Connect NIDAQ!');
+            end
             
             % initialize the illuminator
-            obj.sola = serial('COM3');
-            fopen(obj.sola);
-            fprintf(obj.sola,'%s',char([hex2dec('57') hex2dec('02') hex2dec('FF') hex2dec('50')]));
-            fprintf(obj.sola,'%s',char([hex2dec('57') hex2dec('03') hex2dec('AB') hex2dec('50')]));
-            obj.SetSolaIntensity;
-            disp('Sola connected!!!')
+            try
+                obj.sola = serial('COM3');
+                fopen(obj.sola);
+                fprintf(obj.sola,'%s',char([hex2dec('57') hex2dec('02') hex2dec('FF') hex2dec('50')]));
+                fprintf(obj.sola,'%s',char([hex2dec('57') hex2dec('03') hex2dec('AB') hex2dec('50')]));
+                obj.SetSolaIntensity;
+                disp('Sola connected!')
+            catch expname
+                warning('Connect Sola illuminator!');
+            end
+            
+            % initialize STAGE
+            try
+                obj.priorXYstage = serial('COM5');
+                fopen(obj.priorXYstage);
+                set(obj.priorXYstage,'timeout',0.01);
+                fprintf(obj.priorXYstage,'%s\r','PS');
+                pos = fscanf(obj.priorXYstage);
+                pos = strsplit(pos,',');
+                obj.pos_x = str2double(pos{1});
+                obj.pos_y = str2double(pos{2});
+                disp('prior stage connected!')
+            catch expname
+                warning('Connect prior XY Stage!');
+            end
+            
+            % initialize joystick
+            try 
+                obj.joystick =  vrjoystick(1);
+                display('joystick connected!');
+            catch expname
+                warning('Connect joystick!');
+            end
         end
+        
         % destroyer
         function delete(obj)
             obj.nidaq.outputSingleScan([0 0]);
             obj.nidaq2.outputSingleScan([0 0]);
             fprintf(obj.sola,'%s',char([hex2dec('4F') hex2dec('7F') hex2dec('50')])); % Disable all channels
+            fclose(obj.sola);
+            fclose(obj.priorXYstage);
+            close(obj.joystick);
         end
         
         % override get function
@@ -217,8 +257,8 @@ classdef ymicroscope < handle
         [] = SetSetting(obj,setting);
         [ filename ] = GetFileHeader( obj, option )
         [] = ZFocus(obj,varargin);
-
-
+        [ ] = JoystickControl( obj );
+        
     end
     
 end
