@@ -73,6 +73,8 @@ refine singlefile movie taking for more precise timing
 1. update joystick to velocity
 2. update Go function
 
+9/11/2015 -version 3.0
+1. add capture button
 
 
 ----------------------

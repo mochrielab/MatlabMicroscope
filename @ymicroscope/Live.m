@@ -37,6 +37,7 @@ elseif strcmp(obj.status,'standing')
     directionY=1;
     looprate=10;
     obj.GetStagePosition;
+    capture_button = 0;
     
     while strcmp(obj.status,'live_running')
         try
@@ -65,6 +66,14 @@ elseif strcmp(obj.status,'standing')
             elseif button(obj.joystick,3);
                 dz= 1;
             end
+            
+            new_capture_button = button(obj.joystick,1);
+            % capture a image
+            if new_capture_button ==1 && capture_button == 0
+                obj.Capture;
+            end
+            capture_button = new_capture_button;
+            
             % sensitivity
             sensitivity_threshold = .1;
             if abs(velocityX)<sensitivity_threshold
