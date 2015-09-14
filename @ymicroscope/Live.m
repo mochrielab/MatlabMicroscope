@@ -2,25 +2,30 @@ function [  ] = Live( obj,varargin )
 %show live image
 
 if nargin == 1
-    update_button = 0;
+    UI_enabled = 0;
 elseif nargin == 3
-    update_button = 1;
+    UI_enabled = 1;
     hobj = varargin{1};
     event = varargin{2};
 else
     warning('wrong number of input variables');
 end
 
+if UI_enabled
+    zoffset_handle = obj.getUIHandle('Parameters','z offset (Volts)');
+end
+
 if strcmp(obj.status,'live_running')
-    if update_button
+    if UI_enabled
         set(hobj,'String','Start Live');
     end
     obj.status = 'standing';
     obj.SwitchLight('off');
 elseif strcmp(obj.status,'standing')
     
-    if update_button
+    if UI_enabled
         set(hobj,'String','Stop Live');
+        pause(.01);
     end
     obj.status = 'live_running';
     obj.SwitchLight('on');
@@ -38,6 +43,8 @@ elseif strcmp(obj.status,'standing')
     looprate=10;
     obj.GetStagePosition;
     capture_button = 0;
+    brightfield_button = 0;
+    fluorescent_button = 0 ;
     
     while strcmp(obj.status,'live_running')
         try
@@ -49,6 +56,7 @@ elseif strcmp(obj.status,'standing')
             height = obj.mm.getImageHeight();
             
             img = reshape(img, [width, height]); % image should be interpreted as a 2D array
+%             img = transpose(img);
             % plot
             axes(obj.imageaxis_handle);
             cla
@@ -58,8 +66,8 @@ elseif strcmp(obj.status,'standing')
             % get speed of x,y movement
             speed = (exp((-axis(obj.joystick,3)+1)/2)-1)/(exp(1)-1);
             obj.pos_movespeed =speed;
-            velocityX= (axis(obj.joystick,1));
-            velocityY= (axis(obj.joystick,2));
+            velocityX= (axis(obj.joystick,2));
+            velocityY= -(axis(obj.joystick,1));
             dz=0;
             if button(obj.joystick,2);
                 dz= -1;
@@ -67,12 +75,27 @@ elseif strcmp(obj.status,'standing')
                 dz= 1;
             end
             
-            new_capture_button = button(obj.joystick,1);
+            
             % capture a image
+            new_capture_button = button(obj.joystick,1);
             if new_capture_button ==1 && capture_button == 0
                 obj.Capture;
             end
             capture_button = new_capture_button;
+            
+            % turn on bright_field
+            new_brightfield_button = button(obj.joystick,4);
+            if new_brightfield_button == 1 && brightfield_button == 0
+                obj.illumination_mode = obj.illumination_mode{2};
+            end
+            brightfield_button = new_brightfield_button;
+            
+            % turn on fluorescent
+            new_fluorescent_button = button(obj.joystick,5);
+            if new_fluorescent_button == 1 && fluorescent_button == 0
+                obj.illumination_mode = obj.illumination_mode{4};
+            end
+            fluorescent_button = new_fluorescent_button;
             
             % sensitivity
             sensitivity_threshold = .1;
@@ -108,6 +131,11 @@ elseif strcmp(obj.status,'standing')
             
             % read stage position
             obj.GetStagePosition;
+            
+            % show x,y,z position
+            if UI_enabled
+                set(zoffset_handle,'String',num2str(obj.zoffset))
+            end
 
         catch error
             axes(obj.imageaxis_handle);

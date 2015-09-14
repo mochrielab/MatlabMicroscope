@@ -76,11 +76,14 @@ refine singlefile movie taking for more precise timing
 9/11/2015 -version 3.0
 1. add capture button
 
+9/14/2015 -version 3.0
+1. be able to track figure handle by title name
+2. add button for bright field and fluorescent on joystick
+3. condensor alignment
 
 ----------------------
 5. stage vibration fix
 6. dirt clean
-7. condensor alignment
 3. update GoBy function
 
 

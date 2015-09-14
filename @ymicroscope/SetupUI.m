@@ -234,7 +234,8 @@ if ~isnan(input)
     end
 end
 set(hobj,'String',num2str(obj.zoffset));
-obj.nidaq.outputSingleScan(obj.zoffset);
+% obj.nidaq.outputSingleScan(obj.zoffset);
+obj.Go('Z');
 end
 
 function set_numstacks(hobj,event,obj)

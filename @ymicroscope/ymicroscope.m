@@ -241,7 +241,9 @@ classdef ymicroscope < handle
         [] = Go(obj,varargin);
         [] = GotoZcenter(obj,img_3d);
         [] = SwitchLight( obj, on_or_off );
+        [ h ] = getUIHandle( obj, panel, textstring );
         tagstruct = GetImageTag( obj, camlabel );
+        [  ] = resetXYStageCeter( obj );
         [] = SetSolaIntensity(obj);
         setting = GetSetting(obj);
         [] = SetSetting(obj,setting);
