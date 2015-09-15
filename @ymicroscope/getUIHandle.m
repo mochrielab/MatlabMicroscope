@@ -3,7 +3,6 @@ function [ h ] = getUIHandle( obj, panel, textstring )
 %   used to update stuff on UI
 
 %%
-
 % get to the panel
 h=[];
 panel_hs=get(obj.figure_handle,'children');
@@ -35,22 +34,23 @@ if ipanel <= 0 || ipanel > length(panel_hs)
 end
 % get to the control
 control_hs=get(panel_hs(ipanel),'children');
-if isnumeric(textstring) 
+if isnumeric(textstring);
     if textstring >1 && textstring <=length(control_hs)
         h = control_hs(textstring);
     else
         warning('out of bound textstring number');
         return
     end
-else ischar(textstring)
-control_styles = {control_hs.Style};
-control_names = {control_hs.String};
-text_index = (strcmp(control_styles,'text'));
-textfield = find(strcmp(control_names,textstring) & text_index);
-if isempty(textfield);
-    warning('can''t find textstring');
-    return
-end
-h=control_hs(textfield+1);
+else ischar(textstring);
+    control_styles = {control_hs.Style};
+    control_names = {control_hs.String};
+    text_index = (strcmp(control_styles,'text'));
+    textfield = find(strcmp(control_names,textstring) & text_index);
+    if isempty(textfield)
+        warning('can''t find textstring');
+        return
+    end
+    h=control_hs(textfield+1);
 end
 
+end

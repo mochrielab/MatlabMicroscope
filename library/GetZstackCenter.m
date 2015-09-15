@@ -12,6 +12,13 @@ elseif nargin ==3
 else
     error('wrong number of input variables');
 end
+imgsize=size(img_3d);
+maxwsize = floor((min(imgsize(1:2))-1)/2);
+
+if wsize> maxwsize
+    wsize=maxwsize;
+    warning('wsize set to the max possible value');
+end
 
 if strcmp(mode,'brightfield E.coli')
     %%

@@ -46,8 +46,12 @@ else
     if UI_enabled
         img=getimage(obj.imageaxis_handle);
     else
-        img=[];
-        warning('can''t capture while running')
+        if ishandle(obj.imageaxis_handle)
+            img=getimage(obj.imageaxis_handle);
+        else
+            img=[];
+            warning('can''t capture while running')
+        end
     end
 end
 

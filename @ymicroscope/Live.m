@@ -1,6 +1,5 @@
 function [  ] = Live( obj,varargin )
 %show live image
-
 if nargin == 1
     UI_enabled = 0;
 elseif nargin == 3
@@ -11,8 +10,10 @@ else
     warning('wrong number of input variables');
 end
 
+
 if UI_enabled
     zoffset_handle = obj.getUIHandle('Parameters','z offset (Volts)');
+    disp_handle = obj.getUIHandle('Control','Display Size');
 end
 
 if strcmp(obj.status,'live_running')
@@ -44,7 +45,10 @@ elseif strcmp(obj.status,'standing')
     obj.GetStagePosition;
     capture_button = 0;
     brightfield_button = 0;
-    fluorescent_button = 0 ;
+    fluorescent_button = 0;
+    roi_index = find(strcmp(obj.display_size,obj.display_size_options));
+    zoom_in = 0;
+    zoom_out = 0;
     
     while strcmp(obj.status,'live_running')
         try
@@ -86,23 +90,47 @@ elseif strcmp(obj.status,'standing')
             % turn on bright_field
             new_brightfield_button = button(obj.joystick,4);
             if new_brightfield_button == 1 && brightfield_button == 0
-                obj.illumination_mode = obj.illumination_mode{2};
+                obj.illumination_mode = obj.illumination_mode_options{2};
+                obj.SwitchLight('on');
             end
             brightfield_button = new_brightfield_button;
             
             % turn on fluorescent
             new_fluorescent_button = button(obj.joystick,5);
             if new_fluorescent_button == 1 && fluorescent_button == 0
-                obj.illumination_mode = obj.illumination_mode{4};
+                obj.illumination_mode = obj.illumination_mode_options{4};
+                obj.SwitchLight('on');
             end
             fluorescent_button = new_fluorescent_button;
             
+            % zoom in or out
+            new_zoom_in = button(obj.joystick,9);
+            if new_zoom_in == 1 && zoom_in == 0
+                if roi_index < length(obj.display_size_options)
+                    roi_index = roi_index + 1 ;
+                    obj.display_size = obj.display_size_options{roi_index};
+                    set(disp_handle,'Value',roi_index);
+                end
+            end
+            zoom_in = new_zoom_in ;
+            
+            % zoom in or out
+            new_zoom_out = button(obj.joystick,8);
+            if new_zoom_out == 1 && zoom_out == 0
+                if roi_index >1
+                    roi_index = roi_index -1 ;
+                    obj.display_size = obj.display_size_options{roi_index};
+                    set(disp_handle,'Value',roi_index);
+                end
+            end
+            zoom_out = new_zoom_out ;
+                        
             % sensitivity
             sensitivity_threshold = .1;
             if abs(velocityX)<sensitivity_threshold
                 velocityX=0;
             end
-            if abs(velocityY)<sensitivity_threshold;
+            if abs(velocityY)<sensitivity_threshold
                 velocityY=0;
             end
             
@@ -134,13 +162,13 @@ elseif strcmp(obj.status,'standing')
             
             % show x,y,z position
             if UI_enabled
-                set(zoffset_handle,'String',num2str(obj.zoffset))
+                set(zoffset_handle,'String',num2str(obj.zoffset));
             end
 
         catch error
             axes(obj.imageaxis_handle);
-            cla
-            imagesc(0);colormap gray;axis image;axis off
+            cla;
+            imagesc(0);colormap gray;axis image;axis off;
             drawnow;
             warning(['error in live: ',error.identifier]);
         end
