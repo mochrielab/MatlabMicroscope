@@ -7,6 +7,8 @@ elseif nargin == 3
     UI_enabled = 1;
     hobj = varargin{1};
     event = varargin{2};
+    load gong.mat
+    soundsc(y, 3*Fs);
 else
     warning('wrong number of input variables');
 end

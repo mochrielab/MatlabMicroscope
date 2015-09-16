@@ -81,6 +81,12 @@ refine singlefile movie taking for more precise timing
 2. add button for bright field and fluorescent on joystick
 3. condensor alignment
 
+9/15/2015 - version 3.0
+1. update illumination
+2. turn on gloabal shutter
+3. add gong sound to capture :D
+4. update the test file to show all camera options
+
 ----------------------
 5. stage vibration fix
 6. dirt clean

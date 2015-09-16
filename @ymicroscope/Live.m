@@ -13,7 +13,8 @@ end
 
 if UI_enabled
     zoffset_handle = obj.getUIHandle('Parameters','z offset (Volts)');
-    disp_handle = obj.getUIHandle('Control','Display Size');
+    disp_handle = obj.getUIHandle('Control','Display Size'); 
+    illumination_handle = obj.getUIHandle('Control','Illumination Mode');
 end
 
 if strcmp(obj.status,'live_running')
@@ -83,7 +84,7 @@ elseif strcmp(obj.status,'standing')
             % capture a image
             new_capture_button = button(obj.joystick,1);
             if new_capture_button ==1 && capture_button == 0
-                obj.Capture;
+                obj.Capture([],[]);
             end
             capture_button = new_capture_button;
             
@@ -92,6 +93,7 @@ elseif strcmp(obj.status,'standing')
             if new_brightfield_button == 1 && brightfield_button == 0
                 obj.illumination_mode = obj.illumination_mode_options{2};
                 obj.SwitchLight('on');
+                set(illumination_handle,'Value',2);
             end
             brightfield_button = new_brightfield_button;
             
@@ -100,6 +102,7 @@ elseif strcmp(obj.status,'standing')
             if new_fluorescent_button == 1 && fluorescent_button == 0
                 obj.illumination_mode = obj.illumination_mode_options{4};
                 obj.SwitchLight('on');
+                set(illumination_handle,'Value',4);
             end
             fluorescent_button = new_fluorescent_button;
             

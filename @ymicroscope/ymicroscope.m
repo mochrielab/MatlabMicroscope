@@ -83,6 +83,7 @@ classdef ymicroscope < handle
                 obj.mm.setProperty('Andor sCMOS Camera',...
                     'Sensitivity/DynamicRange',...
                     '16-bit (low noise & high well capacity)')
+                obj.mm.setProperty('Andor sCMOS Camera','ElectronicShutteringMode','Global');
                 disp('Camera connected!');
             catch expname
                 warning('Turn on the camera!');
