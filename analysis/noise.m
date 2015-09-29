@@ -1,4 +1,4 @@
-dirpath = 'C:\Users\Yao\Desktop\foryao\table noise';
+dirpath = 'C:\Users\Yao\Desktop\microscope Yao\table noise';
 files=dir(fullfile(dirpath,'*.fig'));
 filenames={files.name};
 for ifile=1:length(filenames)
@@ -27,7 +27,7 @@ for ifile=1:length(filenames)
     plot(freq,psdx,'r'); hold on;
     plot(freq,psdy,'g');
     plot(freq,psdz,'b');
-    axis([0 40 0 max([psdx,psdy,psdz])+.1]);
+    axis([0 100 0 max([psdx,psdy,psdz])+.1]);
     xlabel('frequency(Hz)');
     ylabel('Power spectrum (\mum^{-2}Hz^{-1})');
     title('Power spectrum');

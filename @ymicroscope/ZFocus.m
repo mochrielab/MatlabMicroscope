@@ -19,6 +19,10 @@ if UI_enabled
     set(hobj,'String','Focusing')
 end
 
+if obj.stepsize == 0
+    warning('zstep is zero, change that');
+end
+
 img_3d = obj.Zscan;
 
 obj.GotoZCenter(img_3d);

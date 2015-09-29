@@ -32,7 +32,7 @@ if strcmp(obj.status,'standing')
     
     % set scanning parameters
 %     stacks =(-(obj.numstacks-1)/2:(obj.numstacks-1)/2)*obj.stepsize; % stack position
-    stacks = zeros(1,obj.movie_cycles);
+    stacks = zeros(1,numstacks);
     width = obj.mm.getImageWidth(); % image width
     height = obj.mm.getImageHeight(); % image height
     
@@ -68,12 +68,6 @@ if strcmp(obj.status,'standing')
     % prepare data acquisition
     obj.mm.initializeCircularBuffer();
     obj.mm.prepareSequenceAcquisition(andorCam);
-        
-    obj.SwitchLight('on');
-    if UI_enabled
-        set(hobj,'String','Movie Running')
-        pause(.01)
-    end
     
     % start acquisition
     obj.mm.startContinuousSequenceAcquisition(0);
@@ -82,7 +76,7 @@ if strcmp(obj.status,'standing')
     % save data header
     istack=0;
     if savedata
-        filename=obj.GetFileHeader('movie');
+        filename=obj.GetFileHeader('zstack');
         imgtif=Tiff(filename,'w8');
         tagstruct = obj.GetImageTag('Andor Zyla 5.5');
     else
@@ -159,12 +153,19 @@ if strcmp(obj.status,'standing')
     end
     
     if UI_enabled
-        set(hobj,'String','Start Movie')
+        set(hobj,'String','Zstack')
     end
     obj.status = 'standing';
 else
     msgbox(['error: microscope is ',obj.status]);
 end
 
+%save setting
+setting=obj.GetSetting;
+save([filename(1:end-3),'mat'],'setting');
+if UI_enabled
+    set(hobj,'String','Start Movie')
+end
+obj.status = 'standing';
 
 end

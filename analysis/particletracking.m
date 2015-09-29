@@ -4,7 +4,7 @@ dirpath='I:\microscope_pics\09_20_2015';
 % name='newexperiment_zstack_21_42_35';
 % name='newexperiment_zstack_21_57_26';
 
-files=dir(fullfile(dirpath,['drift*analog*.tif']));
+files=dir(fullfile(dirpath,'*iphone_*.tif'));
 filenames={files.name};
 %%
 for ifile=1:length(files)
@@ -37,19 +37,24 @@ for ifile=1:length(files)
     [ psdx,freq ] = PowerSpectrum( x, Fs );
     [ psdy,freq ] = PowerSpectrum( y, Fs );
     clf
-    set(gcf,'Position',[0 50 900 900]);
-    % plot(t,x,'r',t,y,'g');
-    % xlabel('time(s)');
-    % ylabel('displacement(\mum)');
-    % legend('x','y','z');
-    % title(strrep(name,'_',' '));
+    set(gcf,'Position',[0 50 1200 600]);
+%      figure('Position',[0 50 1200 600]);
+%     subplot(1,2,1);
+    plot(t,x,'r',t,y,'g');
+    xlabel('time(s)');
+    ylabel('displacement(\mum)');
+    legend('x','y');
+    title(strrep(name,'_',' '));
+    print(gcf,[name,'_raw'],'-dpng');
+
+%     subplot(1,2,2);
     plot(freq,psdx,'r'); hold on;
     plot(freq,psdy,'g');
-    axis([0 100 0 max([psdx,psdy])+.1]);
+    axis([0 100 0 max([psdx,psdy])*1.1]);
     xlabel('frequency(Hz)');
     ylabel('Power spectrum (\mum^{-2}Hz^{-1})');
     title(['Power spectrum, Sampling Freq: ',num2str(setting.setting.framerate)]);
     legend('x','y')
-    print(gcf,name,'-dpng');
+    print(gcf,[name,'_ps'],'-dpng');
     
 end

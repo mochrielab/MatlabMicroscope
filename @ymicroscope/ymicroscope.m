@@ -84,6 +84,7 @@ classdef ymicroscope < handle
                     'Sensitivity/DynamicRange',...
                     '16-bit (low noise & high well capacity)')
                 obj.mm.setProperty('Andor sCMOS Camera','ElectronicShutteringMode','Global');
+%                 obj.mm.setProperty('Andor sCMOS Camera','ElectronicShutteringMode','Rolling');
                 disp('Camera connected!');
             catch expname
                 warning('Turn on the camera!');
@@ -246,6 +247,7 @@ classdef ymicroscope < handle
         tagstruct = GetImageTag( obj, camlabel );
         [  ] = resetXYStageCeter( obj );
         [] = SetSolaIntensity(obj);
+        [  ] = setShutterMode( obj,str );
         setting = GetSetting(obj);
         [] = SetSetting(obj,setting);
         [ filename ] = GetFileHeader( obj, option )
