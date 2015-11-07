@@ -3,12 +3,9 @@ classdef Microscope < handle
     %   Yao Zhao 11/3/2015
     
     % microscope states
-    enumeration 
-            idle(0)
-            stopping(1) 
-            live(2)
-            zstack(3)
-            movie(4)
+    properties (Constant)
+       status_options = {'idle','stopping','live','zstack','movie'};
+       lightsource_options = {};
     end
     
     % handles to devices
@@ -33,10 +30,26 @@ classdef Microscope < handle
             % load micro manager
             import mmcorej.*;
             obj.mm=CMMCore();
+            % add camera
+            obj.camera = Camera (obj.mm);
             % create nidaq session
             obj.nidaq=daq.createSession('ni');
-            obj.status=Microscope.idle;
+            % add light sources
+            
+            % set status
+            obj.setStatus('idle');
         end
+        
+        function setStatus (obj, status_in)
+           for ii=1:length(obj.status_options)
+                if strcmp(obj.status_options{ii},status_in)
+                    obj.status = status_in;
+                    return;
+                end
+           end
+           warning('invalid status input');
+        end
+        
         function delete(obj)
         end
     end

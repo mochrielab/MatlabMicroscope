@@ -49,10 +49,10 @@ classdef ymicroscope < handle
         
         % ROI setting
         display_size = '2160 x 2560';
-        display_size_options = {'2160 x 2560','1024 x 1344','512 x 512','256 x 256'};
+        display_size_options = ;
 
         % microscope status
-        status = 'standing'
+%         status = 'standing'
         sample_type = 'E.coli'
         sample_type_options = {'E.coli'};
         joystick_enabled = 0;
@@ -74,21 +74,7 @@ classdef ymicroscope < handle
             % load micro manager
             import mmcorej.*;
             obj.mm=CMMCore();
-            try
-                obj.mm.loadSystemConfiguration (...
-                    'C:\Program Files\Micro-Manager-1.4\MMConfig_andorzyla.cfg');
-                % set buffer size for image storage: 16 GB
-                obj.mm.setCircularBufferMemoryFootprint(16000);
-                % set dynamic range of the camera to 16 bit
-                obj.mm.setProperty('Andor sCMOS Camera',...
-                    'Sensitivity/DynamicRange',...
-                    '16-bit (low noise & high well capacity)')
-                obj.mm.setProperty('Andor sCMOS Camera','ElectronicShutteringMode','Global');
-%                 obj.mm.setProperty('Andor sCMOS Camera','ElectronicShutteringMode','Rolling');
-                disp('Camera connected!');
-            catch expname
-                warning('Turn on the camera!');
-            end
+
             % load ni daq
             try
                 % devices = daq.getDevices;
@@ -114,19 +100,19 @@ classdef ymicroscope < handle
             catch expname
                 warning('Connect NIDAQ!');
             end
-            
-            % initialize the illuminator
-            try
-                obj.sola = serial('COM3');
-                fopen(obj.sola);
-                fprintf(obj.sola,'%s',char([hex2dec('57') hex2dec('02') hex2dec('FF') hex2dec('50')]));
-                fprintf(obj.sola,'%s',char([hex2dec('57') hex2dec('03') hex2dec('AB') hex2dec('50')]));
-                obj.SetSolaIntensity;
-                disp('Sola connected!')
-            catch expname
-                warning('Connect Sola illuminator!');
-            end
-            
+%             
+%             % initialize the illuminator
+%             try
+%                 obj.sola = serial('COM3');
+%                 fopen(obj.sola);
+%                 fprintf(obj.sola,'%s',char([hex2dec('57') hex2dec('02') hex2dec('FF') hex2dec('50')]));
+%                 fprintf(obj.sola,'%s',char([hex2dec('57') hex2dec('03') hex2dec('AB') hex2dec('50')]));
+%                 obj.SetSolaIntensity;
+%                 disp('Sola connected!')
+%             catch expname
+%                 warning('Connect Sola illuminator!');
+%             end
+%             
             % initialize STAGE
             try
                 obj.priorXYstage = serial('COM5');
