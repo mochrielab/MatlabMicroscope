@@ -48,7 +48,6 @@ classdef Solalight < Lightsource
         end
         
         function turnOff(obj)
-            
         end
         
         function delete(obj)
