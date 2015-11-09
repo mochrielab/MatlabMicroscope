@@ -19,14 +19,14 @@ classdef ymicroscope < handle
         datasavepath='I:\microscope_pics';
         
         % constants
-        % piezo conversion
-        um_per_volts=200/10;
-        um_per_pix=6.5/100;
+%         % piezo conversion
+%         um_per_volts=200/10;
+%         um_per_pix=6.5/100;
         
         % position of the stage
-        pos_x = 0
-        pos_y = 0
-        pos_movespeed
+%         pos_x = 0
+%         pos_y = 0
+%         pos_movespeed
         
         % scanning parameters
         numstacks=61;
@@ -47,9 +47,9 @@ classdef ymicroscope < handle
         movie_cycles = 2;
         autofocus_window = 250;
         
-        % ROI setting
-        display_size = '2160 x 2560';
-        display_size_options = ;
+%         % ROI setting
+%         display_size = '2160 x 2560';
+%         display_size_options = ;
 
         % microscope status
 %         status = 'standing'
@@ -60,13 +60,13 @@ classdef ymicroscope < handle
         % experiment name
         experiment_name = 'newexperiment';
     end
-    
-    properties (Dependent)
-        volts_per_pix;
-        exposure
-        img_width
-        img_height = 2160; %image height(number of pixels)
-    end
+%     
+%     properties (Dependent)
+%         volts_per_pix;
+%         exposure
+%         img_width
+%         img_height = 2160; %image height(number of pixels)
+%     end
     
     methods
         % contructor
@@ -114,25 +114,25 @@ classdef ymicroscope < handle
 %             end
 %             
             % initialize STAGE
-            try
-                obj.priorXYstage = serial('COM5');
-                fopen(obj.priorXYstage);
-                set(obj.priorXYstage,'Terminator','CR');
-                set(obj.priorXYstage,'timeout',1);
-                obj.GetStagePosition;
-                disp('prior stage connected!')
-            catch expname
-                warning('Connect prior XY Stage!');
-            end
+%             try
+%                 obj.priorXYstage = serial('COM5');
+%                 fopen(obj.priorXYstage);
+%                 set(obj.priorXYstage,'Terminator','CR');
+%                 set(obj.priorXYstage,'timeout',1);
+%                 obj.GetStagePosition;
+%                 disp('prior stage connected!')
+%             catch expname
+%                 warning('Connect prior XY Stage!');
+%             end
             
-            % initialize joystick
-            try 
-                obj.joystick =  vrjoystick(1);
-                display('joystick connected!');
-            catch expname
-                warning('Connect joystick!');
-            end
-            
+%             % initialize joystick
+%             try 
+%                 obj.joystick =  vrjoystick(1);
+%                 display('joystick connected!');
+%             catch expname
+%                 warning('Connect joystick!');
+%             end
+%             
             display('microscope ready to use :) ')
         end
         
@@ -157,19 +157,19 @@ classdef ymicroscope < handle
             end
         end
         
-        function value=get.volts_per_pix(obj)
-            value=obj.um_per_pix/obj.um_per_volts;
-        end
-        
-        function value=get.img_width(obj)
-            ind=regexp(obj.display_size,' x ');
-            value = str2double(obj.display_size(ind+3:end));
-        end
-        
-        function value=get.img_height(obj)
-            ind=regexp(obj.display_size,' x ');
-            value = str2double(obj.display_size(1:ind-1));
-        end
+%         function value=get.volts_per_pix(obj)
+%             value=obj.um_per_pix/obj.um_per_volts;
+%         end
+%         
+%         function value=get.img_width(obj)
+%             ind=regexp(obj.display_size,' x ');
+%             value = str2double(obj.display_size(ind+3:end));
+%         end
+%         
+%         function value=get.img_height(obj)
+%             ind=regexp(obj.display_size,' x ');
+%             value = str2double(obj.display_size(1:ind-1));
+%         end
         
         % set z off set
         function set.zoffset(obj,zoffset)
@@ -184,22 +184,22 @@ classdef ymicroscope < handle
             end
         end
         
-        function set.display_size(obj,display_size)
-            obj.display_size = display_size;
-            if ~isempty(obj.mm)
-                if strcmp(display_size,'2160 x 2560')
-                    obj.mm.clearROI();
-                elseif strcmp(display_size,'1024 x 1344')
-                    obj.mm.setROI(608,568,1344,1024)
-                elseif strcmp(display_size,'512 x 512')
-                    obj.mm.setROI(824,1024,512,512);
-                elseif strcmp(display_size,'256 x 256')
-                    obj.mm.setROI(952,1152,256,256);
-                else
-                    warning('ROI not supported');
-                end
-            end
-        end
+%         function set.display_size(obj,display_size)
+%             obj.display_size = display_size;
+%             if ~isempty(obj.mm)
+%                 if strcmp(display_size,'2160 x 2560')
+%                     obj.mm.clearROI();
+%                 elseif strcmp(display_size,'1024 x 1344')
+%                     obj.mm.setROI(608,568,1344,1024)
+%                 elseif strcmp(display_size,'512 x 512')
+%                     obj.mm.setROI(824,1024,512,512);
+%                 elseif strcmp(display_size,'256 x 256')
+%                     obj.mm.setROI(952,1152,256,256);
+%                 else
+%                     warning('ROI not supported');
+%                 end
+%             end
+%         end
         
         % set sola illuminatin intensity
         function set.fluorescent_illumination_intensity(obj,fluorescent_illumination_intensity)

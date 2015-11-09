@@ -26,6 +26,7 @@ classdef RGBlight < Lightsource
         
         function setExposure(obj,exposure)
             obj.exposure = exposure;
+            notify(obj,'ExposureDidSet');
         end
         
         function setColor(obj, color)
@@ -36,6 +37,7 @@ classdef RGBlight < Lightsource
                 end
             end
             warning('invalid input color');
+            notify(obj,'ColorDidSet');
         end
         
         function setIntensity(obj,intensity)
@@ -47,6 +49,7 @@ classdef RGBlight < Lightsource
                 end
             end
             warning('invalid input intensity');
+            notify(obj,'IntensityDidSet');
         end
         
         function turnOn(obj)

@@ -13,7 +13,7 @@ looprate=10;
 while obj.joystick_enabled
     
     % get speed of x,y movement
-    speed = (exp((-axis(obj.joystick,3)+1)/2)-1)/(exp(1)-1);
+%     speed = (exp((-axis(obj.joystick,3)+1)/2)-1)/(exp(1)-1);
     obj.pos_movespeed =speed;
     velocityX= (axis(obj.joystick,1));
     velocityY= (axis(obj.joystick,2));

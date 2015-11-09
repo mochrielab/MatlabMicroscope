@@ -26,6 +26,7 @@ classdef Solalight < Lightsource
         
         function setExposure(obj,exposure)
             obj.exposure = exposure;
+            notify(obj,'ExposureDidSet');
         end
         
         function setIntensity(obj,intensity)
@@ -45,6 +46,7 @@ classdef Solalight < Lightsource
             end
             fprintf(obj.com,'%s',char([hex2dec('53') hex2dec('18') hex2dec('03') ...
                 hex2dec('04') hex2dec(['F',s(1)]) hex2dec([s(2),'0']) hex2dec('50')]));
+            notify(obj,'IntensityDidSet');
         end
         
         
@@ -61,6 +63,7 @@ classdef Solalight < Lightsource
         end
         
         function delete(obj)
+            display('sola light disconnected')
             fclose(obj.com);
         end
     end

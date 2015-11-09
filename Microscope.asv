@@ -15,7 +15,7 @@ classdef Microscope < handle
     end
     
     % handles to devices
-    properties (SetAccess = public)
+    properties (SetAccess = private)
         nidaq % handle of ni daq
         camera % camera
         lightsources % light sources
@@ -33,6 +33,7 @@ classdef Microscope < handle
     methods
         % constructor
         function obj=Microscope()
+
             % add camera
             obj.camera = ZylaCamera ();
             %create nidaq session
@@ -67,7 +68,6 @@ classdef Microscope < handle
             if strcmp(on_or_off,'off')
                 obj.lightsources(obj.currentlightsourceindex).turnOn;
             elseif strcmp(on_or_off,'on')
-                obj.lightsources(obj.currentlightsourceindex).turnOff;
             end
             warning('unrecognized switch light command');
         end

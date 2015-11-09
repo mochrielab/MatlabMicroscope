@@ -18,5 +18,11 @@ classdef (Abstract) Lightsource < handle & matlab.mixin.Heterogeneous
         setColor(obj,string);
     end
     
+    events
+        ExposureDidSet
+        IntensityDidSet
+        ColorDidSet
+    end
+    
 end
 
