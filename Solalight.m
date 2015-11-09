@@ -24,19 +24,29 @@ classdef Solalight < Lightsource
             end
         end
         
-        function setExposure(obj,exposure)
-            obj.exposure = exposure;
-            notify(obj,'ExposureDidSet');
+        function didset=setExposure(obj,exposure)
+            if exposure < 0
+               warning('negative exposure')
+               didset=false;
+            else
+                obj.exposure = exposure;
+                notify(obj,'ExposureDidSet');
+                didset=true;
+            end
         end
         
-        function setIntensity(obj,intensity)
+        function didset=setIntensity(obj,intensity)
             % choose between 0-255
             if intensity<0
                 obj.intensity=0;
                 warning('zoffset goes below zero');
+                didset=false;
+                return;
             elseif intensity>255
                 obj.intensity=255;
                 warning('zoffset goes above 255');
+                didset=false;
+                return;
             else
                 obj.intensity=intensity;
             end
@@ -47,19 +57,23 @@ classdef Solalight < Lightsource
             fprintf(obj.com,'%s',char([hex2dec('53') hex2dec('18') hex2dec('03') ...
                 hex2dec('04') hex2dec(['F',s(1)]) hex2dec([s(2),'0']) hex2dec('50')]));
             notify(obj,'IntensityDidSet');
+            didset=true;
         end
         
         
-        function setColor(obj,color)
+        function didset=setColor(obj,color)
             warning('color mode not supported');
+            didset=false;
         end
         
         function turnOn(obj)
             fprintf(obj.com,'%s',char([hex2dec('4F') hex2dec('7D') hex2dec('50')])); % Enable all channels
+            obj.ison=true;
         end
         
         function turnOff(obj)
             fprintf(obj.com,'%s',char([hex2dec('4F') hex2dec('7F') hex2dec('50')])); % Disable all channels
+            obj.ison=false;
         end
         
         function delete(obj)

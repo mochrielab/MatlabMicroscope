@@ -8,6 +8,7 @@ classdef (Abstract) Lightsource < handle & matlab.mixin.Heterogeneous
         intensity = 1;
         com % handle for comp port
         color
+        ison
     end
     
     methods %(Abstract)

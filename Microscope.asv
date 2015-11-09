@@ -15,7 +15,7 @@ classdef Microscope < handle
     end
     
     % handles to devices
-    properties (SetAccess = private)
+    properties (SetAccess = public)
         nidaq % handle of ni daq
         camera % camera
         lightsources % light sources
@@ -33,7 +33,6 @@ classdef Microscope < handle
     methods
         % constructor
         function obj=Microscope()
-
             % add camera
             obj.camera = ZylaCamera ();
             %create nidaq session
@@ -68,13 +67,67 @@ classdef Microscope < handle
             if strcmp(on_or_off,'off')
                 obj.lightsources(obj.currentlightsourceindex).turnOn;
             elseif strcmp(on_or_off,'on')
+                obj.lightsources(obj.currentlightsourceindex).turnOff;
             end
             warning('unrecognized switch light command');
+        end
+        
+        % set property value
+        function didset=setProperty(obj,name, value)
+            % set properties for the devices and processes
+            try
+                names=strsplit(name,' ');
+                devicename=names{1};
+                propname=names{2};
+                handle=obj.getDeviceHandle(devicename);
+                didset=handle.(['set',captalize(propname),'(value)']);
+            catch exception
+                warning(['error setProperty:',exception.message])
+                didset=false;
+            end
+            function Name=captalize(name)
+                Name=[upper(name(1)),lower(name(2:end))];
+            end
+        end
+        
+        % get property value
+        function value=getProperty(obj,name)
+            try
+                names=strsplit(name,' ');
+                devicename=names{1};
+                propname=names{2};
+                handle=obj.getDeviceHandle(devicename);
+                value=handle.(propname);
+            catch exception
+                warning(['error getProperty:',exception.message])
+                value=[];
+            end
+        end
+        
+        % run action
+        function runAction
+        end
+        
+        % get device handle with label
+        function handle=getDeviceHandle(obj,label)
+            props=properties(obj);
+            for i=1:length(props)
+                if obj.(props{i}).isprop('label')
+                    if strcmp(obj.(props{i}).label,label)
+                        handle=obj.(props{i});
+                        return
+                    end
+                end
+            end
         end
         
         function delete(obj)
             
         end
+    end
+    
+    methods (Static)
+
     end
     
     events

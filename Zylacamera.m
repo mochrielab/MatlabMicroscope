@@ -65,17 +65,19 @@ classdef ZylaCamera < handle
         end
         
         % set exposure
-        function setExposure(obj,exposure_input)
+        function didset=setExposure(obj,exposure_input)
             if exposure_input < 0
                warning('negative exposure')
+               didset=false;
             else
                 obj.exposure = exposure_input;
                 obj.mm.setExposure(obj.exposure);
                 notify(obj,'ExposureDidSet');
+                didset=true;
             end
         end
         
-        function setRoi(obj,roi_input)
+        function didset=setRoi(obj,roi_input)
             warnning('roi input not valid');
             if strcmp(roi_input,'2160 x 2560')
                 obj.mm.clearROI();
@@ -87,8 +89,10 @@ classdef ZylaCamera < handle
                 obj.mm.setROI(952,1152,256,256);
             else
                 warning('ROI not supported');
+                didset=false;
                 return;
             end
+            didset=true;
             obj.roi=roi_input;
             notify(obj,'RoiDidSet');
             return;

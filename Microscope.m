@@ -72,9 +72,62 @@ classdef Microscope < handle
             warning('unrecognized switch light command');
         end
         
+        % set property value
+        function didset=setProperty(obj,name, value)
+            % set properties for the devices and processes
+            try
+                names=strsplit(name,' ');
+                devicename=names{1};
+                propname=names{2};
+                handle=obj.getDeviceHandle(devicename);
+                didset=handle.(['set',captalize(propname),'(value)']);
+            catch exception
+                warning(['error setProperty:',exception.message])
+                didset=false;
+            end
+            function Name=captalize(name)
+                Name=[upper(name(1)),lower(name(2:end))];
+            end
+        end
+        
+        % get property value
+        function value=getProperty(obj,name)
+            try
+                names=strsplit(name,' ');
+                devicename=names{1};
+                propname=names{2};
+                handle=obj.getDeviceHandle(devicename);
+                value=handle.(propname);
+            catch exception
+                warning(['error getProperty:',exception.message])
+                value=[];
+            end
+        end
+        
+        % run action
+        function didrun=runAction(obj,action)
+        end
+        
+        % get device handle with label
+        function handle=getDeviceHandle(obj,label)
+            props=properties(obj);
+            for i=1:length(props)
+                if obj.(props{i}).isprop('label')
+                    if strcmp(obj.(props{i}).label,label)
+                        handle=obj.(props{i});
+                        return
+                    end
+                end
+            end
+        end
+        
         function delete(obj)
             
         end
+    end
+    
+    methods (Static)
+
     end
     
     events

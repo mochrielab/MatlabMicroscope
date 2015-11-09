@@ -24,20 +24,30 @@ classdef RGBlight < Lightsource
             end
         end
         
-        function setExposure(obj,exposure)
-            obj.exposure = exposure;
-            notify(obj,'ExposureDidSet');
+        function didset=setExposure(obj,exposure)
+            if exposure < 0
+               warning('negative exposure')
+               didset=false;
+            else
+                obj.exposure = exposure;
+                notify(obj,'ExposureDidSet');
+                didset=true;
+            end
         end
         
-        function setColor(obj, color)
+        function didset=setColor(obj, color)
             for i=1:length(obj.color_options)
                 if strcmp(color,obj.color_options{i})
                     obj.color=color;
+                    didset=true;
+                    obj.turnOff;
+                    obj.turnOn;
+                    notify(obj,'ColorDidSet');
                     return;
                 end
             end
             warning('invalid input color');
-            notify(obj,'ColorDidSet');
+            didset=false;
         end
         
         function setIntensity(obj,intensity)
@@ -57,10 +67,12 @@ classdef RGBlight < Lightsource
             if ~isempty(code)
                 fprintf(obj.com,'%s\r',['*O',code]);
             end
+            obj.ison=true;
         end
         
         function turnOff(obj)
             fprintf(obj.com,'%s\r','*FT');
+            obj.ison=false;
         end
         
         function delete(obj)

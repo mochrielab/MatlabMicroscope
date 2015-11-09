@@ -4,6 +4,8 @@ classdef UIViewController < UIView
     
     properties
         microscope_handle
+        uilooprunning 
+        uilooprate
     end
     
     methods
@@ -22,15 +24,45 @@ classdef UIViewController < UIView
             
             % add parameters
             obj.addPanelCell(0,0,'brightfield exposure',...
-                'brightfield exposure(ms)',[])
+                'brightfield exposure(ms)',...
+                @(hobj,eventdata)obj.callbackSetParam(hobj,eventdata))
             obj.addPanelCell(0,1,'brightfield intensity',...
-                'brightfield itensity(1-10)',[])
+                'brightfield itensity(1-10)',...
+                @(hobj,eventdata)obj.callbackSetParam(hobj,eventdata))
             obj.addPanelCell(0,2,'fluorescence exposure',...
-                'fluorescence exposure(ms)',[])
+                'fluorescence exposure(ms)',...
+                @(hobj,eventdata)obj.callbackSetParam(hobj,eventdata))
             obj.addPanelCell(0,3,'fluorescence intensity',...
-                'fluorescence itensity(0-255)',[])
+                'fluorescence itensity(0-255)',...
+                @(hobj,eventdata)obj.callbackSetParam(hobj,eventdata))
 
         end
+        
+        function callbackSetParam(obj, hobj,eventdata)
+            tag=hobj.get('Tag');
+            value=hobj.get('String');
+            valuen=str2double(value);
+            if ~isnan(valuen)
+                value=valuen;
+            end
+            if ~obj.microscope_handle.setProperty(tag,value)
+                value=obj.microscope_handle.getProperty(tag);
+                hobj.set('String',num2str(value));
+            end
+        end
+        
+        % UI main loop used for joystick control and live image
+        function runUILoop(obj)
+            while obj.uilooprunning
+                %run live
+                % check joystick event
+                obj.microscope_handle.j
+            end
+        end
+    end
+    
+    events
+        UILoopDidStop
     end
     
 end
