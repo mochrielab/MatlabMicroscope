@@ -8,16 +8,19 @@ classdef RGBlight < Lightsource
     
     methods
         
-        function obj = RGBlight(comport)
+        function obj = RGBlight(comport,label)
             % add com port control
             try
+                obj.label=label;
                 obj.com = serial(comport);
                 fopen(obj.com);
                 fprintf(obj.com,'%s\r','*OA');
                 obj.setColor('White');
                 disp('RGB light connected')
-            catch 
-                warning('RGB illuminator not connected to com port');
+            catch exception
+                warning(...
+                    ['RGB illuminator not connected to com port:',...
+                    exception.message]);
             end
         end
         

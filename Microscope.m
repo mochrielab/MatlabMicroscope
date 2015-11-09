@@ -27,15 +27,17 @@ classdef Microscope < handle
     methods
         % constructor
         function obj=Microscope()
-            % load micro manager
-            import mmcorej.*;
-            obj.mm=CMMCore();
+
             % add camera
-            obj.camera = Camera (obj.mm);
-            % create nidaq session
+            obj.camera = zylacamera ();
+            % 
+            %create nidaq session
             obj.nidaq=daq.createSession('ni');
             % add light sources
-            
+%             obj.lightsources(1:2)=Lightsource.empty;
+%             obj.lightsources(1)=RGBlight('com4','brightfield');
+%             obj.lightsources(2)=Solalight('com3','fluorescent');
+            obj.lightsources=[RGBlight('com4','brightfield'),Solalight('com3','fluorescent')];
             % set status
             obj.setStatus('idle');
         end
@@ -51,7 +53,11 @@ classdef Microscope < handle
         end
         
         function delete(obj)
+            
         end
+    end
+    
+    events
     end
     
 end

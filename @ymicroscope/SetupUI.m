@@ -59,11 +59,7 @@ focus_handle=uicontrol('Parent',controlpanel_handle,'Style','pushbutton',...
     'String','Focus','Fontsize',20,...
     'Callback',@(hobj,event)obj.ZFocus(hobj,event));
 
-% % DAQpkg button
-% ImgSeq_handle=uicontrol('Parent',controlpanel_handle,'Style','pushbutton',...
-%     'Unit','Pixels','Position',[690 245 200 60],...
-%     'String','ImgSeq','Fontsize',20,...
-%     'Callback',@(hobj,event)obj.DAQpkg(hobj,event));
+
 %% set illumination mode
 illumination_options=obj.illumination_mode_options;
 illumination_handle=uicontrol('Parent',controlpanel_handle,'Style','popupmenu',...
@@ -281,36 +277,36 @@ if ~isnan(input)
 end
 set(hobj,'String',num2str(obj.movie_cycles));
 end
-
-function set_illumination_mode(hobj,event,obj)
-
-input=get(hobj,'value');
-if input==1 %No light sources are on
-    obj.illumination_mode='None'; %no illumination modes selected
-    if strcmp(obj.status,'live_running')
-        fprintf(obj.sola,'%s',char([hex2dec('4F') hex2dec('7F') hex2dec('50')])); % Disable all channels
-        obj.nidaq2.outputSingleScan([0 0]);
-    end
-elseif input==2
-    obj.illumination_mode='Brightfield - W'; %ßselect white LED
-    if strcmp(obj.status,'live_running')
-        fprintf(obj.sola,'%s',char([hex2dec('4F') hex2dec('7F') hex2dec('50')])); % Disable all channels
-        obj.nidaq2.outputSingleScan([1 0]);
-    end
-elseif input==3
-    obj.illumination_mode='Brightfield - R'; % select red LED
-    if strcmp(obj.status,'live_running')
-        fprintf(obj.sola,'%s',char([hex2dec('4F') hex2dec('7F') hex2dec('50')])); % Disable all channels
-        obj.nidaq2.outputSingleScan([0 1]);
-    end
-elseif input==4
-    obj.illumination_mode='Fluorescent';
-    if strcmp(obj.status,'live_running')
-        fprintf(obj.sola,'%s',char([hex2dec('4F') hex2dec('7D') hex2dec('50')])); % Enable all channels
-        obj.nidaq2.outputSingleScan([0 0]);
-    end
-end
-end
+% 
+% function set_illumination_mode(hobj,event,obj)
+% 
+% input=get(hobj,'value');
+% if input==1 %No light sources are on
+%     obj.illumination_mode='None'; %no illumination modes selected
+%     if strcmp(obj.status,'live_running')
+%         fprintf(obj.sola,'%s',char([hex2dec('4F') hex2dec('7F') hex2dec('50')])); % Disable all channels
+%         obj.nidaq2.outputSingleScan([0 0]);
+%     end
+% elseif input==2
+%     obj.illumination_mode='Brightfield - W'; %ßselect white LED
+%     if strcmp(obj.status,'live_running')
+%         fprintf(obj.sola,'%s',char([hex2dec('4F') hex2dec('7F') hex2dec('50')])); % Disable all channels
+%         obj.nidaq2.outputSingleScan([1 0]);
+%     end
+% elseif input==3
+%     obj.illumination_mode='Brightfield - R'; % select red LED
+%     if strcmp(obj.status,'live_running')
+%         fprintf(obj.sola,'%s',char([hex2dec('4F') hex2dec('7F') hex2dec('50')])); % Disable all channels
+%         obj.nidaq2.outputSingleScan([0 1]);
+%     end
+% elseif input==4
+%     obj.illumination_mode='Fluorescent';
+%     if strcmp(obj.status,'live_running')
+%         fprintf(obj.sola,'%s',char([hex2dec('4F') hex2dec('7D') hex2dec('50')])); % Enable all channels
+%         obj.nidaq2.outputSingleScan([0 0]);
+%     end
+% end
+% end
 
 function set_movie_mode(hobj,event,obj)
 

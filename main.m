@@ -1,10 +1,5 @@
-% 
-% % start program
-% obj=ymicroscope();
-% %%
-% % run
-% obj.SetupUI;
-% %%
 
 %%
+clear all;
+clc
 obj=Microscope();

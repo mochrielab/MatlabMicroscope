@@ -2,21 +2,25 @@ classdef Solalight < Lightsource
     % class for sola light, fluorescent illumination
     %  Yao Zhao 11/7/2015
     
-    properties
+    properties (Constant)
+        color_options = {'all'}
     end
     
     methods
         
-        function obj = Solalight(comport)
+        function obj = Solalight(comport,label)
             % add com port control
             try
+                obj.label=label;
                 obj.com = serial(comport);
                 fopen(obj.com);
                 fprintf(obj.com,'%s',char([hex2dec('57') hex2dec('02') hex2dec('FF') hex2dec('50')]));
                 fprintf(obj.com,'%s',char([hex2dec('57') hex2dec('03') hex2dec('AB') hex2dec('50')]));
+                obj.color=obj.color_options{1};
                 disp('Sola connected!')
-            catch 
-                warning('Sola illuminator! not connected to com port');
+            catch exception
+                warning(['Sola illuminator! not connected to com port:',...
+                    exception.message]);
             end
         end
         
@@ -43,12 +47,17 @@ classdef Solalight < Lightsource
                 hex2dec('04') hex2dec(['F',s(1)]) hex2dec([s(2),'0']) hex2dec('50')]));
         end
         
+        
+        function setColor(obj,color)
+            warning('color mode not supported');
+        end
+        
         function turnOn(obj)
-            
+            fprintf(obj.com,'%s',char([hex2dec('4F') hex2dec('7D') hex2dec('50')])); % Enable all channels
         end
         
         function turnOff(obj)
-            
+            fprintf(obj.com,'%s',char([hex2dec('4F') hex2dec('7F') hex2dec('50')])); % Disable all channels
         end
         
         function delete(obj)

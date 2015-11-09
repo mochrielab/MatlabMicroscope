@@ -1,4 +1,4 @@
-classdef Camera < handle
+classdef Zylacamera < handle
     % class of the andor zyla camera
     % 11/3/2015
     
@@ -12,27 +12,47 @@ classdef Camera < handle
     end
     
     properties (SetAccess = private)
-        exposure
-        roi =  roi_options{1};
+        exposure = 200;
+        roi =  '2160 x 2560';
     end
     
     methods
         % constructor
-        function obj =  Camera(mm)
-            obj.mm = mm;
+        function obj =  Zylacamera()
+            % load micro manager
+            import mmcorej.*;
+            obj.mm=CMMCore();
             try
                 % set buffer size for image storage: 16 GB
-                mm.setCircularBufferMemoryFootprint(16000);
+                obj.mm.setCircularBufferMemoryFootprint(16000);
                 % set dynamic range of the camera to 16 bit
-                mm.setProperty('Andor sCMOS Camera',...
+                obj.mm.setProperty('Andor sCMOS Camera',...
                     'Sensitivity/DynamicRange',...
                     '16-bit (low noise & high well capacity)')
-                mm.setProperty('Andor sCMOS Camera',...
+                obj.mm.setProperty('Andor sCMOS Camera',...
                     'ElectronicShutteringMode','Global');
                 %obj.mm.setProperty('Andor sCMOS Camera','ElectronicShutteringMode','Rolling');
                 disp('Camera successfully connected!');
-            catch 
-                warning('Camera not connected');
+            catch exp
+                warning(['Camera not connected:',exp.message]);
+            end
+        end
+        
+        function printCameraProperties(obj)
+            properties = obj.mm.getDevicePropertyNames('Andor sCMOS Camera');
+            for i=1:properties.size
+                property_name = properties.get(i-1);
+                display(['property name: ',char(property_name)]);
+                value = obj.mm.getAllowedPropertyValues('Andor sCMOS Camera', property_name);
+                for ii=0:value.size-1
+                    display(['value ',num2str(ii),': ',char(value.get(ii))])
+                end
+                if value.size == 0
+                    display('empty')
+                end
+                disp(['current value is: ',...
+                    char(obj.mm.getProperty('Andor sCMOS Camera',property_name))]);
+                fprintf('\n\n')
             end
         end
         
