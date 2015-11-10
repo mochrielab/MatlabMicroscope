@@ -28,7 +28,10 @@ classdef UIViewController < UIView
             obj.addControlButton(1,1,'joystick','JoysTick',[]);
             obj.addControlButton(2,1,'zfocus','ZFocus',[]);
             % add selectors
-            
+            obj.addControlSelector(0,2,'lightsources','Light Source',...
+                {obj.microscope_handle.lightsources.label}',...
+                @(hobj,eventdata)obj.microscope_handle...
+                .selectLightsources(get(hobj,'Value')));
             % add parameters
             obj.addPanelCell(0,0,'brightfield exposure',...
                 'brightfield exposure(ms)',...
@@ -83,6 +86,7 @@ classdef UIViewController < UIView
                 set(hobj,'String',str(6:end));
             end
         end
+    
         
         function refreshParam(obj)
             handles=obj.parampanel_handle.get('Children');
@@ -105,7 +109,6 @@ classdef UIViewController < UIView
     end
     
     events
-        UILoopDidStop
     end
     
 end

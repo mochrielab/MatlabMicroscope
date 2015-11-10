@@ -63,7 +63,7 @@ classdef UIView < handle
                 'Callback',callbackfunc,'Tag',tag);
         end
         
-        function addControlSelector(obj,x,y,tag,displayname,callbackfunc,selections)
+        function addControlSelector(obj,x,y,tag,displayname,selections,callbackfunc)
             pos=obj.getControlPanelPosition(x,y);
             uicontrol('Parent',obj.controlpanel_handle,'Style','popupmenu',...
                 'Unit','Pixels','Position',[pos(1) pos(2) 200 20],'Value',1,...

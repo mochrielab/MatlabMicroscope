@@ -23,7 +23,7 @@ classdef Microscope < handle
         zstage % z stage
         joystick % joystick
         status % current status
-        currentlightsourceindex % current light source
+        lightsourceindex % current light source
     end
     
     % current status of the microscope
@@ -40,7 +40,7 @@ classdef Microscope < handle
             % add light sources
             obj.lightsources=[RGBlight('com4','brightfield'),...
                 Solalight('com3','fluorescent')];
-            obj.currentlightsourceindex=1;
+            obj.lightsourceindex=1;
             % add xy stage
             obj.xystage = PriorXYStage('com5');
             % add z stage
@@ -164,6 +164,13 @@ classdef Microscope < handle
                     end
                 end
             end
+        end
+        
+        % select light source with index
+        function selectLightsources(obj,index)
+            obj.lightsourceindex=index;
+            obj.camera.setExposure(...
+                obj.lightsources(obj.lightsourceindex).exposure);
         end
         
         function delete(obj)
