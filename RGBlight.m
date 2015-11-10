@@ -18,48 +18,50 @@ classdef RGBlight < Lightsource
                 obj.setColor('White');
                 disp('RGB light connected')
             catch exception
-                warning(...
-                    ['RGB illuminator not connected to com port:',...
-                    exception.message]);
+                exception.message=['RGB illuminator not connected to com port:',...
+                    exception.message];
+                throw(exception);
             end
         end
         
-        function didset=setExposure(obj,exposure)
+        function setExposure(obj,exposure)
             if exposure < 0
-               warning('negative exposure')
-               didset=false;
+                exception=MException('Lightsource:NegativeExposure','negative exposure');
+               throw(exception);
             else
                 obj.exposure = exposure;
                 notify(obj,'ExposureDidSet');
-                didset=true;
             end
         end
         
-        function didset=setColor(obj, color)
+        function setColor(obj, color)
             for i=1:length(obj.color_options)
                 if strcmp(color,obj.color_options{i})
                     obj.color=color;
-                    didset=true;
                     obj.turnOff;
                     obj.turnOn;
                     notify(obj,'ColorDidSet');
                     return;
                 end
             end
-            warning('invalid input color');
-            didset=false;
+            exception=MException('Lightsource:UnsupportedColor',...
+                ['color ',color,' not supported']);
+            throw(exception);
         end
         
         function setIntensity(obj,intensity)
             % choose between 1-10
             for i=1:10
                 if intensity == i
+                    obj.intensity=intensity;
                     fprintf(obj.com,'%s\r',['*D',num2str(10-i)]);
+                    notify(obj,'IntensityDidSet');
                     return;
                 end
             end
-            warning('invalid input intensity');
-            notify(obj,'IntensityDidSet');
+            exception=MException('Lightsource:InvalidIntensity',...
+                ['intensity ',num2str(intensity),' not supported']);
+            throw(exception);
         end
         
         function turnOn(obj)

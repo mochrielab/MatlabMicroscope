@@ -19,34 +19,32 @@ classdef Solalight < Lightsource
                 obj.color=obj.color_options{1};
                 disp('Sola connected!')
             catch exception
-                warning(['Sola illuminator! not connected to com port:',...
-                    exception.message]);
+                exception.message=['Sola illuminator! not connected to com port:',...
+                    exception.message];
+                throw(exception);
             end
         end
         
-        function didset=setExposure(obj,exposure)
+        function setExposure(obj,exposure)
             if exposure < 0
-               warning('negative exposure')
-               didset=false;
+                exception=MException('Lightsource:NegativeExposure','negative exposure');
+               throw(exception);
             else
                 obj.exposure = exposure;
                 notify(obj,'ExposureDidSet');
-                didset=true;
             end
         end
         
-        function didset=setIntensity(obj,intensity)
+        function setIntensity(obj,intensity)
             % choose between 0-255
             if intensity<0
-                obj.intensity=0;
-                warning('zoffset goes below zero');
-                didset=false;
-                return;
+                exception=MException('Lightsource:InvalidIntensity',...
+                    ['intensity ',num2str(intensity),' not supported']);
+                throw(exception);
             elseif intensity>255
-                obj.intensity=255;
-                warning('zoffset goes above 255');
-                didset=false;
-                return;
+                exception=MException('Lightsource:InvalidIntensity',...
+                    ['intensity ',num2str(intensity),' not supported']);
+                throw(exception);
             else
                 obj.intensity=intensity;
             end
@@ -57,13 +55,16 @@ classdef Solalight < Lightsource
             fprintf(obj.com,'%s',char([hex2dec('53') hex2dec('18') hex2dec('03') ...
                 hex2dec('04') hex2dec(['F',s(1)]) hex2dec([s(2),'0']) hex2dec('50')]));
             notify(obj,'IntensityDidSet');
-            didset=true;
         end
         
         
-        function didset=setColor(obj,color)
-            warning('color mode not supported');
-            didset=false;
+        function setColor(obj,color)
+            if strcmp(color,'All')
+            else
+                exception=MException('Lightsource:UnsupportedColor',...
+                    ['color ',color,' not supported']);
+                throw(exception);
+            end
         end
         
         function turnOn(obj)

@@ -85,8 +85,6 @@ classdef UIView < handle
                 displayname);
         end
         
-        
-        
     end
     
     methods (Static, Access=protected)    

@@ -10,7 +10,7 @@ classdef LogitechJoystick < handle
     %         obj.Go('Z');
     %     end
     %
-    properties (SetAccess = private)
+    properties (Access = private)
         joystick
         sensitivity_threshold=.1;
         capture_state = 0
@@ -66,7 +66,7 @@ classdef LogitechJoystick < handle
             end
         end
         
-        function emmitActionEvents(obj)
+        function emitActionEvents(obj)
             % capture a image
             new_capture_button = button(obj.joystick,1);
             if new_capture_button ==1 && obj.capture_state == 0
@@ -105,7 +105,7 @@ classdef LogitechJoystick < handle
         
         
         function speed=getSpeed(obj)
-            speed = (exp((-axis(obj,3)+1)/2)-1)/(exp(1)-1);
+            speed = (exp((-axis(obj.joystick,3)+1)/2)-1)/(exp(1)-1);
         end
     end
     

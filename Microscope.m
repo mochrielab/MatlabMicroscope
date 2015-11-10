@@ -6,7 +6,6 @@ classdef Microscope < handle
     properties (Constant)
        status_options = {'idle','stopping','live','zstack','movie'};
        % piezo conversion
-        um_per_volts=200/10;
         um_per_pix=6.5/100;
     end
     
@@ -34,7 +33,7 @@ classdef Microscope < handle
         % constructor
         function obj=Microscope()
             % add camera
-            obj.camera = ZylaCamera ();
+            obj.camera = CameraAndorZyla ();
             %create nidaq session
             obj.nidaq=daq.createSession('ni');
             % add light sources
@@ -43,6 +42,8 @@ classdef Microscope < handle
             obj.currentlightsourceindex=1;
             % add xy stage
             obj.xystage = PriorXYStage('com5');
+            % add z stage
+            obj.zstage = PriorZStage();
             % add joystick
             obj.joystick = LogitechJoystick();
             % set status
@@ -60,7 +61,7 @@ classdef Microscope < handle
         end
         
         function value=get.volts_per_pix(obj)
-            value=obj.um_per_pix/obj.um_per_volts;
+            value=obj.um_per_pix/obj.zstage.um_per_volts;
         end
         
         function switchLight(obj, on_or_off)
@@ -80,7 +81,7 @@ classdef Microscope < handle
                 devicename=names{1};
                 propname=names{2};
                 handle=obj.getDeviceHandle(devicename);
-                didset=handle.(['set',captalize(propname),'(value)']);
+                handle.(['set',captalize(propname)])(value);
             catch exception
                 warning(['error setProperty:',exception.message])
                 didset=false;
@@ -91,9 +92,9 @@ classdef Microscope < handle
         end
         
         % get property value
-        function value=getProperty(obj,name)
+        function value=getProperty(obj,tag)
             try
-                names=strsplit(name,' ');
+                names=strsplit(tag,' ');
                 devicename=names{1};
                 propname=names{2};
                 handle=obj.getDeviceHandle(devicename);
@@ -112,12 +113,37 @@ classdef Microscope < handle
         function handle=getDeviceHandle(obj,label)
             props=properties(obj);
             for i=1:length(props)
-                if obj.(props{i}).isprop('label')
-                    if strcmp(obj.(props{i}).label,label)
-                        handle=obj.(props{i});
+                for j=1:length(obj.(props{i}))
+                if isprop(obj.(props{i})(j),'label')
+                    if strcmp(obj.(props{i})(j).label,label)
+                        handle=obj.(props{i})(j);
                         return
                     end
                 end
+                end
+            end
+            handle=[];
+            warning(['cant not find device with label:',label])
+        end
+        
+        function lock(obj,action)
+            if strcmp(obj.status,'idle')
+                obj.status = action.label;
+            else
+                exception=MException('Microscope:LockUnable',...
+                    ['can''t lock the microscope while ',obj.status]);
+                throw(exception);
+            end
+        end
+        
+                
+        function unlock(obj,action)
+            if strcmp(obj.status,action.label)
+                obj.status = 'idle';
+            else
+                exception=MException('Microscope:UnLockUnable',...
+                    'can''t unlock the microscope');
+                throw(exception);
             end
         end
         
@@ -131,6 +157,8 @@ classdef Microscope < handle
     end
     
     events
+%         DidStart
+%         DidFinish
     end
     
 end
