@@ -7,12 +7,14 @@ classdef TiffIO < handle
         handle
         tagstruct
         filename
+        tag
     end
        
     
     methods
-        function obj=Tiff(path)
+        function obj=TiffIO(path,tag)
             obj.rootpath=path;
+            obj.tag=tag;
         end
         
         function datepath=getDataSavePath(obj)
@@ -25,16 +27,20 @@ classdef TiffIO < handle
             end
         end
         
-        function filename=getFullFileName(obj,tag)
+        function filename=getFullFileName(obj)
             t=clock;
-            filename=fullfile(obj.getDataSavePath,[tag,'_',option,'_',...
+            filename=fullfile(obj.getDataSavePath,[obj.tag,'_',...
                 num2str(t(4),'%02d'),'_',num2str(t(5),'%02d'),'_',...
                 num2str(round(t(6)),'%02d'),'.tif']);
         end
         
-        function fopen(obj,tag)
-            obj.handle=Tiff(obj.getFullFileName(tag));
-            obj.tagstruct=obj.getTiffTag('Andor Zyla 5.5');
+        function fopen(obj,size)
+            if strcmp(obj.tag,'capture')
+                obj.handle=Tiff(obj.getFullFileName(),'a');
+            else
+                obj.handle=Tiff(obj.getFullFileName(),'w8');
+            end
+            obj.tagstruct=obj.getTiffTag('Andor Zyla 5.5',size);
             obj.filename=obj.getFullFileName;
         end
         
@@ -52,7 +58,7 @@ classdef TiffIO < handle
     end
     
     methods (Static)
-        function tagstruct = getTiffTag(camlabel)
+        function tagstruct = getTiffTag(camlabel,size)
             if strcmp(camlabel,'Andor Zyla 5.5')
                 tagstruct.Artist='Yao Zhao';
                 tagstruct.BitsPerSample = 16;
@@ -69,8 +75,8 @@ classdef TiffIO < handle
                 tagstruct.Software = 'MATLAB';
                 tagstruct.XResolution = 0.000065;
                 tagstruct.YResolution = 0.000065;
-                tagstruct.ImageLength = [];%obj.img_width;
-                tagstruct.ImageWidth = [];%obj.img_height;
+                tagstruct.ImageLength = size(1);%obj.img_width;
+                tagstruct.ImageWidth = size(2);%obj.img_height;
             else
                 warning('unsupported camera camera label');
             end

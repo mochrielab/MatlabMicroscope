@@ -2,9 +2,14 @@ classdef CameraAndorZyla < handle
     % class of the andor zyla camera
     % 11/3/2015
     
-    properties (SetAccess = private, Hidden = true)
+    properties (Access = private, Hidden = true)
         mm % handle for micromanager
     end
+    
+    properties (SetAccess=private)
+        label = 'AndorZyla' % handle for micromanager
+    end
+    
     
     properties (Constant)
         roi_options = ...
@@ -58,10 +63,11 @@ classdef CameraAndorZyla < handle
             end
         end
         
-        function [width,height]=getSize(obj)
+        function size=getSize(obj)
             strs=strsplit(obj.roi,' x ');
             width=str2double(strs{1});
             height=str2double(strs{2});
+            size=[width,height];
         end
         
         % set exposure

@@ -31,9 +31,12 @@ classdef MicroscopeActionLive < MicroscopeAction
                 obj.microscope_handle.joystick.emitMotionEvents();
                 obj.microscope_handle.joystick.emitActionEvents();
             end
+            % turn on light
+            obj.microscope_handle.switchLight('On');
             % run event loop
             obj.eventloop.run(@()callback(obj));
             % call call back function when finish
+            obj.microscope_handle.switchLight('Off');
             obj.finishAction;
         end
         

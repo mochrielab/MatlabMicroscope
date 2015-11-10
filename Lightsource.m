@@ -6,9 +6,12 @@ classdef (Abstract) Lightsource < handle & matlab.mixin.Heterogeneous
         label
         exposure = 200;
         intensity = 1;
-        com % handle for comp port
         color
-        ison
+        ison = 0;
+    end
+    
+    properties (Access = protected)
+        com % handle for comp port
     end
     
     methods %(Abstract)

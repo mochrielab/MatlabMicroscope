@@ -4,6 +4,9 @@ classdef MicroscopeAction < handle & matlab.mixin.Heterogeneous
     
     properties (SetAccess = protected)
         label = 'idle';
+    end
+    
+    properties (Access = protected)
         isrunning
         microscope_handle
     end
@@ -22,6 +25,9 @@ classdef MicroscopeAction < handle & matlab.mixin.Heterogeneous
         function finishAction(obj)
             obj.microscope_handle.unlock(obj);
             obj.isrunning = false;
+        end
+        function bool=isRunning(obj)
+            bool=obj.isrunning;
         end
     end
     

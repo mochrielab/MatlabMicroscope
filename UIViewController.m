@@ -7,7 +7,7 @@ classdef UIViewController < UIView
         uilooprunning 
         uilooprate =10;
         live
-        
+        capture
     end
     
     methods
@@ -16,10 +16,12 @@ classdef UIViewController < UIView
 %             obj.figure_handle.set('CloseRequestFcn',@(src,callbackdata)obj.delete);
             obj.microscope_handle=microscope_handle;
             obj.live=MicroscopeActionLive(obj.microscope_handle,obj.imageaxis_handle);
+            obj.capture=MicroscopeActionCapture(obj.microscope_handle,obj.imageaxis_handle);
             % add controls
             obj.addControlButton(0,0,'live','Live',...
                 @(hobj,eventdata)obj.callbackActions(hobj,eventdata));
-            obj.addControlButton(1,0,'capture','Capture',[]);
+            obj.addControlButton(1,0,'capture','Capture',...
+                @(hobj,eventdata)obj.callbackActions(hobj,eventdata));
             obj.addControlButton(2,0,'zstack','Zstack',[]);
             obj.addControlButton(3,0,'movie','Movie',[]);
             obj.addControlButton(0,1,'light','Light',[]);
@@ -63,19 +65,15 @@ classdef UIViewController < UIView
                 throw(MException('UIController:InvalidAction',...
                     'action not supported'))
             end
-%             try
-                if obj.(tag).isrunning
-                    addlistener(obj.(tag),'DidFinish',...
-                        @(hobj1,eventdata)callbackDidFinish(hobj));
-                    obj.(tag).stopAction;
-                else
-                    addlistener(obj.(tag),'DidStart',...
-                        @(hobj1,eventdata)callbackDidStart(hobj));
-                    obj.(tag).startAction;
-                end
-%             catch exception
-%                 warning(exception.message);
-%             end
+            addlistener(obj.(tag),'DidStart',...
+                @(hobj1,eventdata)callbackDidStart(hobj));
+            addlistener(obj.(tag),'DidFinish',...
+                @(hobj1,eventdata)callbackDidFinish(hobj));
+            if obj.(tag).isRunning
+                obj.(tag).stopAction;
+            else
+                obj.(tag).startAction;
+            end
             function callbackDidStart(hobj)
                 str=get(hobj,'String');
                 set(hobj,'String',['Stop ',str]);
