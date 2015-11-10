@@ -18,93 +18,33 @@ classdef UIViewController < UIView
             obj.live=MicroscopeActionLive(obj.microscope_handle,obj.imageaxis_handle);
             obj.capture=MicroscopeActionCapture(obj.microscope_handle,obj.imageaxis_handle);
             % add controls
-            obj.addControlButton(0,0,'live','Live',...
-                @(hobj,eventdata)obj.callbackActions(hobj,eventdata));
-            obj.addControlButton(1,0,'capture','Capture',...
-                @(hobj,eventdata)obj.callbackActions(hobj,eventdata));
-            obj.addControlButton(2,0,'zstack','Zstack',[]);
-            obj.addControlButton(3,0,'movie','Movie',[]);
-            obj.addControlButton(0,1,'light','Light',[]);
-            obj.addControlButton(1,1,'joystick','JoysTick',[]);
-            obj.addControlButton(2,1,'zfocus','ZFocus',[]);
+            obj.addControlButton(0,0,obj.live);
+            obj.addControlButton(1,0,obj.capture);
+%             obj.addControlButton(1,0,'capture','Capture',...
+%                 @(hobj,eventdata)obj.callbackActions(hobj,eventdata));
+%             obj.addControlButton(2,0,'zstack','Zstack',[]);
+%             obj.addControlButton(3,0,'movie','Movie',[]);
+%             obj.addControlButton(0,1,'light','Light',[]);
+%             obj.addControlButton(1,1,'joystick','JoysTick',[]);
+%             obj.addControlButton(2,1,'zfocus','ZFocus',[]);
+
             % add selectors
-            obj.addControlSelector(0,2,'lightsources','Light Source',...
-                {obj.microscope_handle.lightsources.label}',...
-                @(hobj,eventdata)obj.microscope_handle...
-                .selectLightsources(get(hobj,'Value')));
+%             obj.addControlSelector(0,2,'lightsources','Light Source',...
+%                 {obj.microscope_handle.lightsources.label}',...
+%                 @(hobj,eventdata)obj.microscope_handle...
+%                 .selectLightsources(get(hobj,'Value')));
+            obj.addControlSelector(1,2,'roi','Camera ROI',obj.microscope_handle.camera)
+
             % add parameters
-            obj.addPanelCell(0,0,'brightfield exposure',...
-                'brightfield exposure(ms)',...
-                @(hobj,eventdata)obj.callbackSetParam(hobj,eventdata))
-            obj.addPanelCell(0,1,'brightfield intensity',...
-                'brightfield itensity(1-10)',...
-                @(hobj,eventdata)obj.callbackSetParam(hobj,eventdata))
-            obj.addPanelCell(0,2,'fluorescent exposure',...
-                'fluorescent exposure(ms)',...
-                @(hobj,eventdata)obj.callbackSetParam(hobj,eventdata))
-            obj.addPanelCell(0,3,'fluorescent intensity',...
-                'fluorescent itensity(0-255)',...
-                @(hobj,eventdata)obj.callbackSetParam(hobj,eventdata))
-            obj.refreshParam;
-        end
-        
-        function callbackSetParam(obj, hobj,eventdata)
-            tag=hobj.get('Tag');
-            value=hobj.get('String');
-            valuen=str2double(value);
-            if ~isnan(valuen)
-                value=valuen;
-            end
-            if ~obj.microscope_handle.setProperty(tag,value)
-                value=obj.microscope_handle.getProperty(tag);
-                hobj.set('String',num2str(value));
-                obj.popWarning;
-            end
-        end
-        
-        function callbackActions(obj,hobj,eventdata)
-            tag=get(hobj,'Tag');
-            if ~isprop(obj,tag)
-                throw(MException('UIController:InvalidAction',...
-                    'action not supported'))
-            end
-            addlistener(obj.(tag),'DidStart',...
-                @(hobj1,eventdata)callbackDidStart(hobj));
-            addlistener(obj.(tag),'DidFinish',...
-                @(hobj1,eventdata)callbackDidFinish(hobj));
-            if obj.(tag).isRunning
-                obj.(tag).stopAction;
-            else
-                obj.(tag).startAction;
-            end
-            function callbackDidStart(hobj)
-                str=get(hobj,'String');
-                set(hobj,'String',['Stop ',str]);
-            end
-            function callbackDidFinish(hobj)
-                str=get(hobj,'String');
-                set(hobj,'String',str(6:end));
-            end
-        end
-    
-        
-        function refreshParam(obj)
-            handles=obj.parampanel_handle.get('Children');
-            for i=1:length(handles)
-                tag=handles(i).get('Tag');
-                if ~isempty(tag)
-                    value=obj.microscope_handle.getProperty(tag);
-                    handles(i).set('String',num2str(value));
-                end
-            end
-        end
-        
-        % pop out windows for warnings
-        function popWarning(obj)
-            msgbox(lastwarn);
-        end
-        
-        function delete(obj)
+            obj.addParamCell(0,0,'exposure','brightfield exposure(ms)',...
+                obj.microscope_handle.lightsources(1));
+            obj.addParamCell(0,1,'intensity','brightfield itensity(1-10)',...
+                obj.microscope_handle.lightsources(1));
+            obj.addParamCell(0,2,'exposure','fluorescent exposure(ms)',...
+                obj.microscope_handle.lightsources(2));
+            obj.addParamCell(0,3,'intensity','fluorescent itensity(0-255)',...
+                obj.microscope_handle.lightsources(2));
+
         end
     end
     

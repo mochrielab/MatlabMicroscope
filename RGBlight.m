@@ -38,8 +38,10 @@ classdef RGBlight < Lightsource
             for i=1:length(obj.color_options)
                 if strcmp(color,obj.color_options{i})
                     obj.color=color;
-                    obj.turnOff;
-                    obj.turnOn;
+                    if obj.ison
+                        obj.turnOff;
+                        obj.turnOn;
+                    end
                     notify(obj,'ColorDidSet');
                     return;
                 end

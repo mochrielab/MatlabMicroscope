@@ -44,7 +44,7 @@ classdef Microscope < handle
             % add xy stage
             obj.xystage = PriorXYStage('com5');
             % add z stage
-            obj.zstage = PriorZStage();
+            obj.zstage = PriorZStage.finescan;
             % add joystick
             obj.joystick = LogitechJoystick();
             % set status
@@ -67,10 +67,10 @@ classdef Microscope < handle
         
         % switch the light on or off
         function switchLight(obj, on_or_off)
-            if strcmpi(on_or_off,'off')
-                obj.lightsources(obj.currentlightsourceindex).turnOn;
-            elseif strcmpi(on_or_off,'on')
-                obj.lightsources(obj.currentlightsourceindex).turnOff;
+            if strcmpi(on_or_off,'on')
+                obj.lightsources(obj.lightsourceindex).turnOn;
+            elseif strcmpi(on_or_off,'off')
+                obj.lightsources(obj.lightsourceindex).turnOff;
             else
                 throw(MException('Microscope:SwitchLight',...
                     'unrecognized switch light command'));

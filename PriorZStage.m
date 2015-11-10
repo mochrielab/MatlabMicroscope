@@ -1,9 +1,15 @@
 classdef PriorZStage < handle
     %11/9/2015
     %  Yao Zhao
+    enumeration
+        finescan(3,61,1)
+        coarsescan(3,11,3)
+    end
     
     properties
-        center
+        zoffset
+        numstacks
+        stepsize
     end
     
     properties (Constant)
@@ -11,8 +17,10 @@ classdef PriorZStage < handle
     end
     
     methods
-        function obj=PriorZStage()
-            obj.center=5;
+        function obj=PriorZStage(zoffset,numstacks,stepsize)
+            obj.zoffset=zoffset;
+            obj.numstacks=numstacks;
+            obj.stepsize=stepsize;
         end
     end
     
