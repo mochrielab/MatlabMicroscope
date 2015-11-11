@@ -14,6 +14,12 @@ classdef StageZPrior < handle
     
     properties (Constant)
         um_per_volts=200/10;
+        % piezo conversion
+        um_per_pix=6.5/100;
+        volts_per_pix=(6.5/100)/(200/10);
+    end
+    
+    properties (Dependent)
     end
     
     methods
@@ -60,8 +66,9 @@ classdef StageZPrior < handle
         
         function zarray = getZarray(obj)
             stacks=(1:obj.numstacks)-(obj.numstacks+1)/2;
-            zarray=obj.zoffset+obj.stepsize*stacks;
+            zarray=obj.zoffset+obj.stepsize*stacks*obj.volts_per_pix;
         end
+        
     end
     
     

@@ -44,8 +44,7 @@ classdef TriggerNidaq < Trigger
         end
         
         function setFramerate(obj,framerate)
-            
-            setFramerate@Trigger(clockrate);
+            setFramerate@Trigger(framerate);
         end
         
         function setLightsources(obj,lightsources)
@@ -85,11 +84,9 @@ classdef TriggerNidaq < Trigger
         function queue=getOutputQueueStack(obj,zarray)
             numz=length(zarray);
             single_time=ceil(1000/obj.framerate);
-            queue=zeros(obj.getNumChannels,numz*single_time);
+            queue=zeros(numz*single_time,obj.getNumChannels);
             for i=1:numz
-                single_time
-                size(obj.getOutputQueueSingle(zarray(i)))
-                queue(:,(i-1)*single_time+1:i*single_time)=...
+                queue((i-1)*single_time+1:i*single_time,:)=...
                     obj.getOutputQueueSingle(zarray(i));
             end
         end
@@ -98,14 +95,15 @@ classdef TriggerNidaq < Trigger
         function queue=getOutputQueueSingle(obj,zoffset)
             if obj.isValidExposures
                 total_time=ceil(1000/obj.framerate);
-                queue=zeros(obj.getNumChannels,total_time);
-                queue(strcmp(obj.channel_labels,'zstage'),:)=zoffset;
+                queue=zeros(total_time,obj.getNumChannels);
+                queue(:,strcmp(obj.channel_labels,'zstage'))=zoffset;
                 time_pointer=1;
                 for i=1:length(obj.lightsources)
                     exposure=obj.lightsources(i).exposure;
-                    queue(strcmp(obj.channel_labels,'camera')&...
-                        strcmp(obj.channel_labels,obj.lightsources(i).label),...
-                        time_pointer:time_pointer+exposure)=1;
+                    queue(time_pointer:time_pointer+exposure,...
+                        strcmp(obj.channel_labels,'camera')&...
+                        strcmp(obj.channel_labels,obj.lightsources(i).label))...
+                        =1;
                     time_pointer=time_pointer+exposure+obj.getDeadTime;
                 end
             else
@@ -125,13 +123,13 @@ classdef TriggerNidaq < Trigger
     methods 
         function start(obj,outputdata)
             obj.clock.queueOutputData(outputdata)
-            obj.nidaq.startBackground;
+            obj.clock.startBackground;
         end
         function finish(obj,zoffset)
             obj.clock.stop;
             resetarray=zeros(1,obj.getNumChannels);
             resetarray(strcmp(obj.channel_labels,'zstage'))=zoffset;
-            obj.nidaq.outputSingleScan(resetarray); % reset starting position
+            obj.clock.outputSingleScan(resetarray); % reset starting position
         end
         
         function bool =isRunning(obj)

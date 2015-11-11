@@ -5,14 +5,10 @@ classdef Microscope < handle
     % microscope states
     properties (Constant)
        status_options = {'idle','stopping','live','zstack','movie'};
-       % piezo conversion
-        um_per_pix=6.5/100;
-        datapath='I:\microscope_pics';
+       datapath='I:\microscope_pics';
     end
     
-    properties (Dependent)
-        volts_per_pix
-    end
+
     
     % handles to devices
     properties (SetAccess = public)
@@ -71,9 +67,7 @@ classdef Microscope < handle
            warning('invalid status input');
         end
         
-        function value=get.volts_per_pix(obj)
-            value=obj.um_per_pix/obj.zstage.um_per_volts;
-        end
+
         
         % switch the light on or off
         function switchLight(obj, on_or_off)

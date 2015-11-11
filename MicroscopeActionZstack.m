@@ -36,7 +36,9 @@ classdef MicroscopeActionZstack < MicroscopeAction
             zarray=zstage_handle.getZarray();
             trigger_handle.start(trigger_handle.getOutputQueueStack(zarray));
             % run event loop
+            j=1
             while trigger_handle.isRunning
+                j=j+1
                 if ishandle(obj.image_axes)
                     cla(obj.image_axes);
                     imagesc(camera_handle.getLastImage);
