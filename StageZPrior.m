@@ -57,6 +57,11 @@ classdef StageZPrior < handle
                 notify(obj,'StepsizeDidSet');
             end
         end
+        
+        function zarray = getZarray(obj)
+            stacks=(1:obj.numstacks)-(obj.numstacks+1)/2;
+            zarray=obj.zoffset+obj.stepsize*stacks;
+        end
     end
     
     

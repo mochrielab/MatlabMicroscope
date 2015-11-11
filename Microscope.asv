@@ -37,9 +37,6 @@ classdef Microscope < handle
         % constructor
         function obj=Microscope()
             display('initiallizing...')
-            % 
-            obj.moviecycles=1;
-            obj.movieinterval=0;
             % add camera
             obj.camera = CameraAndorZyla ();
             % add light sources
@@ -208,10 +205,10 @@ classdef Microscope < handle
         function setMovieinterval(movieinterval)
             if movieinterval >=0
                 obj.movieinterval=movieinterval;
-                notify(obj,'MovieintervalDidSet');
+                notify(obj,'MoviecyclesDidSet');
             else
-                throw(MException('Microscope:NegativeMovieInterval',...
-                    'negative movie interval'));
+                throw(MException('Microscope:NegativeMovieCycles',...
+                    'negative movie cycles'));
             end
         end
         

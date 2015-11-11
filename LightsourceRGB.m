@@ -10,19 +10,14 @@ classdef LightsourceRGB < Lightsource
         
         function obj = LightsourceRGB(comport,label)
             % add com port control
-            try
-                obj.label=label;
-                obj.exposure=40;
-                obj.com = serial(comport);
-                fopen(obj.com);
-                fprintf(obj.com,'%s\r','*OA');
-                obj.setColor('White');
-                disp('RGB light connected')
-            catch exception
-                exception.message=['RGB illuminator not connected to com port:',...
-                    exception.message];
-                throw(exception);
-            end
+            obj.label=label;
+            obj.com = serial(comport);
+            fopen(obj.com);
+            fprintf(obj.com,'%s\r','*OA');
+            obj.setColor('White');
+            obj.setExposure(40);
+            obj.setIntensity(1);
+            disp('RGB light connected')
         end
         
         function setExposure(obj,exposure)

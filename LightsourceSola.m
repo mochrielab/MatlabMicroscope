@@ -10,20 +10,15 @@ classdef LightsourceSola < Lightsource
         
         function obj = LightsourceSola(comport,label)
             % add com port control
-            try
-                obj.exposure=100;
-                obj.label=label;
-                obj.com = serial(comport);
-                fopen(obj.com);
-                fprintf(obj.com,'%s',char([hex2dec('57') hex2dec('02') hex2dec('FF') hex2dec('50')]));
-                fprintf(obj.com,'%s',char([hex2dec('57') hex2dec('03') hex2dec('AB') hex2dec('50')]));
-                obj.color=obj.color_options{1};
-                disp('Sola connected!')
-            catch exception
-                exception.message=['Sola illuminator! not connected to com port:',...
-                    exception.message];
-                throw(exception);
-            end
+            obj.label=label;
+            obj.com = serial(comport);
+            fopen(obj.com);
+            fprintf(obj.com,'%s',char([hex2dec('57') hex2dec('02') hex2dec('FF') hex2dec('50')]));
+            fprintf(obj.com,'%s',char([hex2dec('57') hex2dec('03') hex2dec('AB') hex2dec('50')]));
+            obj.color=obj.color_options{1};
+            obj.setExposure(100);
+            obj.setIntensity(30);
+            disp('Sola connected!')
         end
         
         function setExposure(obj,exposure)

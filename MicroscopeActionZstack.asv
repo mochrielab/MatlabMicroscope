@@ -15,13 +15,12 @@ classdef MicroscopeActionZstack < MicroscopeAction
         function startAction(obj)
             % call super
             startAction@MicroscopeAction(obj);
+            % set light source
+            
             % handles
             zstage_handle=obj.microscope_handle.zstage;
             trigger_handle=obj.microscope_handle.trigger;
             camera_handle=obj.microscope_handle.camera;
-            % set light source
-            trigger_handle.setLightsources...
-                (obj.microscope_handle.getLightsource);
             % create tiff
             tif=TiffIO(obj.microscope_handle.datapath,obj.label);
             tif.fopen(obj.microscope_handle.camera.getSize);

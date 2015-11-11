@@ -134,21 +134,19 @@ classdef CameraAndorZyla < handle
             obj.mm.startContinuousSequenceAcquisition(0);
         end
         
-        % stop a image sequnce
-        function stopSequenceAcquisition(obj)
-            obj.mm.stopSequenceAcquisition;
+                % start a image sequnce
+        function startSequenceAcquisition(obj)
+            obj.mm.startContinuousSequenceAcquisition(0);
         end
         
         
         % pop out next image on stack
-        function img=popNextImage(obj)
+        function img=popNextImage(obj,width,height)
             if obj.mm.isBufferOverflowed
                 warning('camera buffer over flowed, try set larger memory for the camera');
             end
             if obj.mm.getRemainingImageCount()>0
                 imgtmp=obj.mm.popNextImage();
-                width = obj.mm.getImageWidth();
-                height = obj.mm.getImageHeight();
                 img = reshape(imgtmp, [width, height]);
             else
                 img=[];
@@ -156,11 +154,9 @@ classdef CameraAndorZyla < handle
         end
         
          % get most recent image
-        function img=getLastImage(obj)
+        function img=getLastImage(obj,width,height)
                 img=obj.mm.getLastImage();
-                width = obj.mm.getImageWidth();
-                height = obj.mm.getImageHeight();
-                img = reshape(img, [width, height]);
+                img = reshape(imgtmp, [width, height]);
         end
         
         function delete(obj)

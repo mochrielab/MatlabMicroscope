@@ -58,9 +58,11 @@ classdef MicroscopeAction < handle & matlab.mixin.Heterogeneous
                 case 'ObjectBeingDestroyed'
                     dispstr='default';
                 case 'DidStart'
-                    dispstr='default';
+                    dispstr='Started';
                 case 'DidFinish'
-                    dispstr='default';
+                    dispstr='Ready';
+                case 'WillStop'
+                    dispstr='Stopping';
                 otherwise
                     warning(['no events has been set for: ',eventstr]);
                     dispstr=[];
@@ -71,6 +73,7 @@ classdef MicroscopeAction < handle & matlab.mixin.Heterogeneous
     events
         DidStart
         DidFinish
+        WillStop
     end
     
 end

@@ -42,7 +42,8 @@ classdef MicroscopeActionLive < MicroscopeAction
         function stopAction(obj)
             obj.eventloop.stop;
         end
-
+        
+        % get event display for UI
         function dispstr=getEventDisplay(obj,eventstr)
             switch eventstr
                 case 'DidStart'

@@ -1,10 +1,11 @@
 classdef Trigger < handle & matlab.mixin.Heterogeneous
     % trigger class for device synchronization
     %   Yao Zhao 11/10/2015
-    properties (Access = public)
+    properties (Access = protected)
         clock
     end
     properties (SetAccess = protected)
+        
         label='trigger';
         clockrate=1000;
         framerate=1;
@@ -40,6 +41,7 @@ classdef Trigger < handle & matlab.mixin.Heterogeneous
     
     methods (Abstract)
         start(obj)
+        finish(obj)
         isRunning(obj)
     end
     
