@@ -13,6 +13,12 @@ classdef UIView < handle
     methods
         function obj=UIView()
             obj.figure_handle=figure('Position',[0 50 1920 950]);
+            obj.figure_handle.set('CloseRequestFcn',...
+                @(src,eventdata)callbackFunc(src,obj));
+            function callbackFunc (hobj,obj)
+                delete(hobj);
+                delete(obj);
+            end
             % image axes
             obj.imageaxis_handle=axes('Parent',obj.figure_handle,...
                 'Unit','Pixels','Position',[20 20 910 910],'Box','on','BoxStyle','full',...
@@ -114,9 +120,7 @@ classdef UIView < handle
             numlh=length(obj.listeners);
             obj.listeners(numlh+1)=...
                 addlistener(device_handle,[capitalize(tag),'DidSet'],...
-                @(hobj,eventdata)set(uic,'Value',...
-                find(strcmp(device_handle.(tag),...
-                device_handle.([tag,'_options'])))));
+                @(hobj,eventdata)updateDisplay(uic,hobj,tag));
             % call back actions
             function callbackFunc(hobj,eventdata,device_handle,tag)
                 try
@@ -126,6 +130,13 @@ classdef UIView < handle
                 catch exception
                     set(hobj,'String',device_handle.(tag));
                     warning(exception.message);
+                end
+            end
+            function updateDisplay(hobj,device_handle,tag)
+                if ishandle(hobj)
+                    set(hobj,'Value',...
+                        find(strcmp(device_handle.(tag),...
+                        device_handle.([tag,'_options']))))
                 end
             end
             function Name=capitalize(name)
@@ -151,8 +162,7 @@ classdef UIView < handle
             numlh=length(obj.listeners);
             obj.listeners(numlh+1)=...
                 addlistener(device_handle,[capitalize(tag),'DidSet'],...
-                @(hobj,eventdata)set(uic,'String',num2str(...
-                device_handle.(tag))));
+                @(hobj,eventdata)updateDisplay(uic,hobj,tag));
             % call back actions
             function callbackFunc(hobj,eventdata,device_handle,tag)
                 value=str2double(hobj.get('String'));
@@ -162,6 +172,10 @@ classdef UIView < handle
                     set(hobj,'String',device_handle.(tag));
                     warning(exception.message);
                 end
+            end
+            function updateDisplay(hobj,device_handle,tag)
+                set(hobj,'String',num2str(...
+                device_handle.(tag)))
             end
             function Name=capitalize(name)
                 Name=[upper(name(1)),lower(name(2:end))];
@@ -174,6 +188,15 @@ classdef UIView < handle
         end
         
         function delete(obj)
+            if ~ishandle(obj.figure_handle)
+                obj.figure_handle=[];
+            else
+                close(obj.figure_handle);
+            end
+            delete(obj.listeners);
+        end
+        
+        function deleteListeners(obj)
             delete(obj.listeners);
         end
     end

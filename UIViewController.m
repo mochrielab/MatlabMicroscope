@@ -13,7 +13,6 @@ classdef UIViewController < UIView
     methods
         function obj = UIViewController(microscope_handle)
             obj@UIView();
-%             obj.figure_handle.set('CloseRequestFcn',@(src,callbackdata)obj.delete);
             obj.microscope_handle=microscope_handle;
             obj.live=MicroscopeActionLive(obj.microscope_handle,obj.imageaxis_handle);
             obj.capture=MicroscopeActionCapture(obj.microscope_handle,obj.imageaxis_handle);
@@ -29,11 +28,10 @@ classdef UIViewController < UIView
 %             obj.addControlButton(2,1,'zfocus','ZFocus',[]);
 
             % add selectors
-%             obj.addControlSelector(0,2,'lightsources','Light Source',...
-%                 {obj.microscope_handle.lightsources.label}',...
-%                 @(hobj,eventdata)obj.microscope_handle...
-%                 .selectLightsources(get(hobj,'Value')));
-            obj.addControlSelector(1,2,'roi','Camera ROI',obj.microscope_handle.camera)
+            obj.addControlSelector(0,2,'illumination','illumination',...
+                obj.microscope_handle)
+            obj.addControlSelector(1,2,'roi','Camera ROI',...
+                obj.microscope_handle.camera)
 
             % add parameters
             obj.addParamCell(0,0,'exposure','brightfield exposure(ms)',...
@@ -44,6 +42,13 @@ classdef UIViewController < UIView
                 obj.microscope_handle.lightsources(2));
             obj.addParamCell(0,3,'intensity','fluorescent itensity(0-255)',...
                 obj.microscope_handle.lightsources(2));
+            obj.addParamCell(1,0,'zoffset','piezo center (volts)',...
+                obj.microscope_handle.zstage);
+            obj.addParamCell(1,1,'numstacks','number of stacks',...
+                obj.microscope_handle.zstage);
+            obj.addParamCell(1,2,'stepsize','step size (pixels)',...
+                obj.microscope_handle.zstage);
+
 
         end
     end

@@ -1,4 +1,4 @@
-classdef PriorXYStage < handle
+classdef StageXYPrior < handle
     %Prior XY stage
     
     properties (SetAccess = private)
@@ -9,7 +9,7 @@ classdef PriorXYStage < handle
     end
     
     methods
-        function obj=PriorXYStage(com)
+        function obj=StageXYPrior(com)
             try
                 obj.com = serial(com);
                 fopen(obj.com);

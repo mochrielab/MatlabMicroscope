@@ -21,6 +21,7 @@ classdef MicroscopeActionCapture < MicroscopeAction
             tif=TiffIO(obj.microscope_handle.datapath,'capture');
             tif.fopen(obj.microscope_handle.camera.getSize);
             img=obj.microscope_handle.camera.capture;
+            pause(.1);
             if obj.has_ui
                 cla(obj.image_axes);imagesc(img);
             end

@@ -28,21 +28,21 @@ classdef ymicroscope < handle
 %         pos_y = 0
 %         pos_movespeed
         
-        % scanning parameters
-        numstacks=61;
-        stepsize=1;
-        zoffset = 3;
-        
-        % microscope parameters
-        exposure_brightfield=40; %(ms)
-        exposure_fluorescent=50; %(ms)
-        fluorescent_illumination_intensity=30; %(0-255)
-        framerate=10; %(fps )
-        illumination_mode='None';
-        illumination_mode_options=...
-            {'None','Brightfield - W','Brightfield - R','Fluorescent'};
-        movie_mode = 'zstack_plain';
-        movie_mode_options = {'zstack_plain','zstack_singlefile','zstack_autofocus'};
+%         % scanning parameters
+%         numstacks=61;
+%         stepsize=1;
+%         zoffset = 3;
+%         
+%         % microscope parameters
+%         exposure_brightfield=40; %(ms)
+%         exposure_fluorescent=50; %(ms)
+%         fluorescent_illumination_intensity=30; %(0-255)
+%         framerate=10; %(fps )
+%         illumination_mode='None';
+%         illumination_mode_options=...
+%             {'None','Brightfield - W','Brightfield - R','Fluorescent'};
+%         movie_mode = 'zstack_plain';
+%         movie_mode_options = {'zstack_plain','zstack_singlefile','zstack_autofocus'};
         movie_interval = 0;
         movie_cycles = 2;
         autofocus_window = 250;

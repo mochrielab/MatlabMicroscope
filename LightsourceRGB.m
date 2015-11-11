@@ -1,4 +1,4 @@
-classdef RGBlight < Lightsource
+classdef LightsourceRGB < Lightsource
     % class for sola light, fluorescent illumination
     %  Yao Zhao 11/7/2015
             
@@ -8,10 +8,11 @@ classdef RGBlight < Lightsource
     
     methods
         
-        function obj = RGBlight(comport,label)
+        function obj = LightsourceRGB(comport,label)
             % add com port control
             try
                 obj.label=label;
+                obj.exposure=40;
                 obj.com = serial(comport);
                 fopen(obj.com);
                 fprintf(obj.com,'%s\r','*OA');

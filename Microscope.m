@@ -16,14 +16,14 @@ classdef Microscope < handle
     
     % handles to devices
     properties (SetAccess = public)
-        nidaq % handle of ni daq
         camera % camera
         lightsources % light sources
         xystage % xy stage
         zstage % z stage
         joystick % joystick
         status % current status
-        lightsourceindex % current light source
+        illumination % current light source
+        illumination_options % current light source
     end
     
     % current status of the microscope
@@ -33,22 +33,26 @@ classdef Microscope < handle
     methods
         % constructor
         function obj=Microscope()
+            display('initiallizing...')
             % add camera
             obj.camera = CameraAndorZyla ();
-            %create nidaq session
-            obj.nidaq=daq.createSession('ni');
+%             %create nidaq session
+%             obj.nidaq=daq.createSession('ni');
             % add light sources
-            obj.lightsources=[RGBlight('com4','brightfield'),...
-                Solalight('com3','fluorescent')];
-            obj.lightsourceindex=1;
+            obj.lightsources=[LightsourceRGB('com4','brightfield'),...
+                LightsourceSola('com3','fluorescent')];
+            obj.illumination_options={obj.lightsources.label};
+            obj.illumination=obj.illumination_options{1};
+            obj.camera.setExposure(obj.getLightsource.exposure);
             % add xy stage
-            obj.xystage = PriorXYStage('com5');
+            obj.xystage = StageXYPrior('com5');
             % add z stage
-            obj.zstage = PriorZStage.finescan;
+            obj.zstage = StageZPrior.finescan;
             % add joystick
-            obj.joystick = LogitechJoystick();
+            obj.joystick = JoystickLogitech();
             % set status
             obj.setStatus('idle');
+            display('done')
         end
         
         function setStatus (obj, status_in)
@@ -68,9 +72,9 @@ classdef Microscope < handle
         % switch the light on or off
         function switchLight(obj, on_or_off)
             if strcmpi(on_or_off,'on')
-                obj.lightsources(obj.lightsourceindex).turnOn;
+                obj.getLightsource.turnOn;
             elseif strcmpi(on_or_off,'off')
-                obj.lightsources(obj.lightsourceindex).turnOff;
+                obj.getLightsource.turnOff;
             else
                 throw(MException('Microscope:SwitchLight',...
                     'unrecognized switch light command'));
@@ -167,14 +171,27 @@ classdef Microscope < handle
         end
         
         % select light source with index
-        function selectLightsources(obj,index)
-            obj.lightsourceindex=index;
-            obj.camera.setExposure(...
-                obj.lightsources(obj.lightsourceindex).exposure);
+        function setIllumination(obj,str)
+            value=find(strcmp(str,obj.illumination_options));
+            if length(value)==1
+                obj.illumination=obj.illumination_options{value};
+                obj.camera.setExposure(...
+                    obj.lightsources(value).exposure);
+            else
+                throw(MException('Microscope:IlluminationNotSupported',...
+                    ['illumination mode not supported for ',str]))
+            end
         end
         
+        % get current light source
+        function handle=getLightsource(obj)
+            handle=obj.lightsources(strcmp(obj.illumination,...
+                obj.illumination_options));
+        end
+        
+        % destructor
         function delete(obj)
-            
+            display('closing...');
         end
     end
     
@@ -183,6 +200,7 @@ classdef Microscope < handle
     end
     
     events
+        IlluminationDidSet
 %         DidStart
 %         DidFinish
     end

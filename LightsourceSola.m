@@ -1,4 +1,4 @@
-classdef Solalight < Lightsource
+classdef LightsourceSola < Lightsource
     % class for sola light, fluorescent illumination
     %  Yao Zhao 11/7/2015
     
@@ -8,9 +8,10 @@ classdef Solalight < Lightsource
     
     methods
         
-        function obj = Solalight(comport,label)
+        function obj = LightsourceSola(comport,label)
             % add com port control
             try
+                obj.exposure=100;
                 obj.label=label;
                 obj.com = serial(comport);
                 fopen(obj.com);

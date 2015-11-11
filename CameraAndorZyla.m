@@ -108,6 +108,7 @@ classdef CameraAndorZyla < handle
             width = obj.mm.getImageWidth();
             height = obj.mm.getImageHeight();
             img = reshape(img, [width, height]);
+            
         end
         
         function prepareModeSnapshot (obj)
@@ -122,8 +123,10 @@ classdef CameraAndorZyla < handle
         end
         
         function delete(obj)
+            obj.mm.reset();
             display('Andor Zyla camera disconnected')
         end
+       
         
     end
     

@@ -1,4 +1,4 @@
-classdef LogitechJoystick < handle
+classdef JoystickLogitech < handle
     % class for logic joystick control
     % 11/8/2015
     %
@@ -21,7 +21,7 @@ classdef LogitechJoystick < handle
     end
     
     methods
-        function obj =  LogitechJoystick()
+        function obj =  JoystickLogitech()
             % initialize joystick
             obj.joystick=vrjoystick(1);
             display('joystick connected!');
