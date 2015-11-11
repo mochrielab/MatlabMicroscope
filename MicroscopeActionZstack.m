@@ -46,6 +46,7 @@ classdef MicroscopeActionZstack < MicroscopeAction
                 for i=1:3
                     img=camera_handle.popNextImage;
                     if ~isempty(img)
+                        'output'
                         tif.fwrite(img)
                     end
                 end
