@@ -13,8 +13,8 @@ classdef MicroscopeActionZstack < MicroscopeActionSequence
             obj.file_handle=TiffIO(microscope.datapath,obj.label);
         end
         
-        function run (obj)
-            obj.start
+        function start(obj)
+            start@MicroscopeActionSequence(obj);
             % set light source
             obj.microscope_handle.trigger.setLightsources...
                 (obj.microscope_handle.getLightsource);
@@ -24,6 +24,10 @@ classdef MicroscopeActionZstack < MicroscopeActionSequence
             zarray=obj.microscope_handle.zstage.getZarray();
             obj.microscope_handle.trigger.start(...
                 obj.microscope_handle.trigger.getOutputQueueStack(zarray));
+        end
+        
+        function run (obj)
+            obj.start
             % run event loop
             while obj.microscope_handle.trigger.isRunning
                 obj.drawImage(obj.microscope_handle.camera.getLastImage);

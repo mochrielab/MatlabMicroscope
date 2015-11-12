@@ -30,6 +30,11 @@ classdef EventLoop < handle
 %             notify(obj,'StopLoop');
             obj.isrunning=false;
         end
+        
+        function setRate(obj,rate)
+            obj.rate=rate;
+        end
+        
     end
     
     events

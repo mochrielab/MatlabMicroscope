@@ -118,6 +118,7 @@ classdef TriggerNidaq < Trigger
         end
         
         function delete(obj)
+            obj.finish(0);
         end
     end
     

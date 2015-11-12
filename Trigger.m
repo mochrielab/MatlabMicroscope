@@ -1,4 +1,4 @@
-classdef Trigger < handle & matlab.mixin.Heterogeneous
+classdef (Abstract) Trigger < handle & matlab.mixin.Heterogeneous
     % trigger class for device synchronization
     %   Yao Zhao 11/10/2015
     properties (Access = public)

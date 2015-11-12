@@ -1,4 +1,4 @@
-classdef MicroscopeAction < handle & matlab.mixin.Heterogeneous 
+classdef (Abstract) MicroscopeAction < handle & matlab.mixin.Heterogeneous 
     %basic class for microscope actions
     %   Yao Zhao 11/9/2015
     
@@ -52,9 +52,7 @@ classdef MicroscopeAction < handle & matlab.mixin.Heterogeneous
                 imagesc(img);
             end
         end      
-        
-        function run(obj)
-        end
+       
         
         % test if action is running
         function bool=isRunning(obj)
@@ -77,6 +75,10 @@ classdef MicroscopeAction < handle & matlab.mixin.Heterogeneous
                     dispstr=[];
             end
         end
+    end
+    
+    methods (Abstract)
+        run(obj)
     end
     
     events

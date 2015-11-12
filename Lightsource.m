@@ -14,7 +14,7 @@ classdef (Abstract) Lightsource < handle & matlab.mixin.Heterogeneous
         com % handle for comp port
     end
     
-    methods %(Abstract)
+    methods (Abstract)
         setExposure(obj);
         setIntensity(obj,intensity);
         turnOn(obj);

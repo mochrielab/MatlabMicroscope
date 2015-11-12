@@ -1,4 +1,4 @@
-classdef MicroscopeActionSequence < MicroscopeAction
+classdef (Abstract) MicroscopeActionSequence < MicroscopeAction
     %basic class for microscope sequence actions
     %   Yao Zhao 11/12/2015
     
@@ -9,7 +9,7 @@ classdef MicroscopeActionSequence < MicroscopeAction
     methods
         function obj = MicroscopeActionSequence(microscope,image_axes)
             obj@MicroscopeAction(microscope,image_axes);
-            obj.label = 'zstack';
+            obj.label = 'sequence';
             obj.file_handle=TiffIO(microscope.datapath,obj.label);
         end
         
