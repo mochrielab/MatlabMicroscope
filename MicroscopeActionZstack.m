@@ -1,4 +1,4 @@
-classdef MicroscopeActionZstack < MicroscopeAction
+classdef MicroscopeActionZstack < MicroscopeActionSequence
     %zstack class for microscope actions
     %   Yao Zhao 11/10/2015
     
@@ -8,66 +8,40 @@ classdef MicroscopeActionZstack < MicroscopeAction
     
     methods
         function obj = MicroscopeActionZstack(microscope,image_axes)
-            obj@MicroscopeAction(microscope,image_axes);
+            obj@MicroscopeActionSequence(microscope,image_axes);
             obj.label = 'zstack';
+            obj.file_handle=TiffIO(microscope.datapath,obj.label);
         end
         
-        function startAction(obj)
-            % call super
-            startAction@MicroscopeAction(obj);
-            % handles
-            zstage_handle=obj.microscope_handle.zstage;
-            trigger_handle=obj.microscope_handle.trigger;
-            camera_handle=obj.microscope_handle.camera;
+        function run (obj)
+            obj.start
             % set light source
-            trigger_handle.setLightsources...
+            obj.microscope_handle.trigger.setLightsources...
                 (obj.microscope_handle.getLightsource);
-            % create tiff
-            tif=TiffIO(obj.microscope_handle.datapath,obj.label);
-            tif.fopen(obj.microscope_handle.camera.getSize);
-            % clear image
-            if ishandle(obj.image_axes)
-                cla(obj.image_axes);axis equal;colormap gray;
-            end
-            % start camera
-            camera_handle.prepareModeSequence();
-            camera_handle.startSequenceAcquisition();
+            % start sequence
+            obj.microscope_handle.camera.startSequenceAcquisition();
             % start nidaq in background
-            zarray=zstage_handle.getZarray();
-            trigger_handle.start(trigger_handle.getOutputQueueStack(zarray));
+            zarray=obj.microscope_handle.zstage.getZarray();
+            obj.microscope_handle.trigger.start(...
+                obj.microscope_handle.trigger.getOutputQueueStack(zarray));
             % run event loop
-            j=1
-            while trigger_handle.isRunning
-                j=j+1
-                if ishandle(obj.image_axes)
-                    cla(obj.image_axes);
-                    imagesc(camera_handle.getLastImage);
-                end
+            while obj.microscope_handle.trigger.isRunning
+                obj.drawImage(obj.microscope_handle.camera.getLastImage);
                 for i=1:3
-                    img=camera_handle.popNextImage;
+                    img=obj.microscope_handle.camera.popNextImage;
                     if ~isempty(img)
-                        'output'
-                        tif.fwrite(img)
+                        obj.file_handle.fwrite(img)
                     end
                 end
             end
             while ~isempty(img)
-                img=camera_handle.popNextImage;
-                tif.fwrite(img)
-            end
-            % finish
-            trigger_handle.finish(zstage_handle.zoffset);
-            camera_handle.stopSequenceAcquisition();
-            % save file
-            tif.fclose(obj.microscope_handle.getSettings);
-            % finish
-            obj.finishAction;
+                img=obj.microscope_handle.camera.popNextImage;
+                obj.file_handle.fwrite(img)
+            end            
+            %finish
+            obj.finish
         end
         
-        function stopAction(obj)
-            obj.microscope_handle.trigger.finish(...
-                obj.microscope_handle.zstage.zoffset);
-        end
         
         % get event display for UI
         function dispstr=getEventDisplay(obj,eventstr)

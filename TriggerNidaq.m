@@ -77,7 +77,7 @@ classdef TriggerNidaq < Trigger
         
         % the transfer time of the camera
         function deadtime=getDeadTime(obj)
-            deadtime=5;
+            deadtime=ceil(5*obj.clockrate/1000);
         end
         
         % get output data queue of a stack
@@ -99,9 +99,10 @@ classdef TriggerNidaq < Trigger
                 queue(:,strcmp(obj.channel_labels,'zstage'))=zoffset;
                 time_pointer=1;
                 for i=1:length(obj.lightsources)
-                    exposure=obj.lightsources(i).exposure;
+                    exposure=round(obj.lightsources(i).exposure...
+                        /1000*obj.clockrate);
                     queue(time_pointer:time_pointer+exposure,...
-                        strcmp(obj.channel_labels,'camera')&...
+                        strcmp(obj.channel_labels,'camera')|...
                         strcmp(obj.channel_labels,obj.lightsources(i).label))...
                         =1;
                     time_pointer=time_pointer+exposure+obj.getDeadTime;
@@ -133,7 +134,9 @@ classdef TriggerNidaq < Trigger
         end
         
         function bool =isRunning(obj)
+            pause(.001) % give it time to update
             bool=obj.clock.IsRunning;
+            pause(.001)
         end
     end
     

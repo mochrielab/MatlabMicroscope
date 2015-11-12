@@ -15,19 +15,20 @@ classdef EventLoop < handle
         
         function run(obj,callback)
             obj.isrunning=true;
-            lh=addlistener(obj,'StopLoop',@(hobj,eventdata)callbackStop(hobj));
+%             lh=addlistener(obj,'StopLoop',@(hobj,eventdata)callbackStop(hobj));
             while obj.isrunning
                 callback();
                 pause(1/obj.rate);
             end
-            delete(lh);
-            function callbackStop (obj)
-                obj.isrunning=false;
-            end
+%             delete(lh);
+%             function callbackStop (obj)
+%                 obj.isrunning=false;
+%             end
         end
         
         function stop(obj)
-            notify(obj,'StopLoop');
+%             notify(obj,'StopLoop');
+            obj.isrunning=false;
         end
     end
     

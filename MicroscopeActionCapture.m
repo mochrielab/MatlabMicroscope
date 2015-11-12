@@ -1,4 +1,4 @@
-classdef MicroscopeActionCapture < MicroscopeAction
+classdef MicroscopeActionCapture < MicroscopeAction 
     %basic class for microscope actions
     %   Yao Zhao 11/9/2015
     
@@ -9,30 +9,35 @@ classdef MicroscopeActionCapture < MicroscopeAction
         function obj = MicroscopeActionCapture(microscope,image_axes)
             obj@MicroscopeAction(microscope,image_axes);
             obj.label = 'capture';
+            obj.file_handle=TiffIO(microscope.datapath,obj.label);
         end
         
-        function startAction(obj)
+        function start(obj)
             % call super
-            startAction@MicroscopeAction(obj);
+            start@MicroscopeAction(obj);
+            % create tiff
+            obj.file_handle.fopen(obj.microscope_handle.camera.getSize);
             % start camera
             obj.microscope_handle.camera.prepareModeSnapshot();
-            obj.microscope_handle.switchLight('on');
-            % create tiff
-            tif=TiffIO(obj.microscope_handle.datapath,'capture');
-            tif.fopen(obj.microscope_handle.camera.getSize);
-            img=obj.microscope_handle.camera.capture;
-            pause(.1);
-            if obj.has_ui
-                cla(obj.image_axes);imagesc(img);
-            end
-            tif.fwrite(img);
-            tif.fclose(obj.microscope_handle.getSettings);
-            obj.microscope_handle.switchLight('off');
-            % call finish function when finish
-            obj.finishAction;
         end
         
-        function stopAction(obj)
+        function run(obj)
+            obj.start;
+            obj.microscope_handle.switchLight('on');
+            img=obj.microscope_handle.camera.capture;
+            obj.drawImage(img);
+            obj.file_handle.fwrite(img);
+            obj.microscope_handle.switchLight('off');
+            pause(.2)
+            obj.finish;
+        end
+        
+        function finish(obj)
+            obj.file_handle.fclose(obj.microscope_handle.getSettings);
+            finish@MicroscopeAction(obj);
+        end
+        
+        function stop(obj)
         end
         
         % get event display for ui

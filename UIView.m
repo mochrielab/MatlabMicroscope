@@ -95,9 +95,9 @@ classdef UIView < handle
             % call back actions
             function callbackFunc(obj)
                 if obj.isRunning
-                    obj.stopAction;
+                    obj.stop;
                 else
-                    obj.startAction;
+                    obj.run;
                 end
             end
         end

@@ -1,4 +1,4 @@
-classdef MicroscopeAction < handle & matlab.mixin.Heterogeneous
+classdef MicroscopeAction < handle & matlab.mixin.Heterogeneous 
     %basic class for microscope actions
     %   Yao Zhao 11/9/2015
     
@@ -9,27 +9,23 @@ classdef MicroscopeAction < handle & matlab.mixin.Heterogeneous
     properties (Access = protected)
         isrunning
         microscope_handle
-        image_axes;
+        image_axes
         eventloop
-        has_ui
+        file_handle
     end
     
     methods
         % constructor
         function obj = MicroscopeAction(microscope,image_axes)
+            obj.label='idle';
             obj.microscope_handle=microscope;
             obj.isrunning = false;
             obj.image_axes=image_axes;
-            if ishandle(obj.image_axes)
-                obj.has_ui=true;
-            else
-                obj.has_ui=false;
-            end
             obj.eventloop=EventLoop(10);
         end
         
         % start action
-        function startAction(obj)
+        function start(obj)
             obj.microscope_handle.lock(obj);
             obj.isrunning = true;
             % notify event
@@ -37,14 +33,27 @@ classdef MicroscopeAction < handle & matlab.mixin.Heterogeneous
         end
         
         % interrupt action
-        function stopAction(obj)
+        function stop(obj)
+            obj.eventloop.stop;
+            notify(obj,'WillStop');
         end
         
         % finish action
-        function finishAction(obj)
+        function finish(obj)
             obj.microscope_handle.unlock(obj);
             obj.isrunning = false;
             notify(obj,'DidFinish');
+        end
+        
+        % draw image to ui
+        function drawImage(obj,img)
+            if ishandle(obj.image_axes)
+                cla(obj.image_axes);
+                imagesc(img);
+            end
+        end      
+        
+        function run(obj)
         end
         
         % test if action is running

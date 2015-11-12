@@ -12,21 +12,24 @@ classdef MicroscopeActionLive < MicroscopeAction
             obj.label = 'live';
         end
         
-        function startAction(obj)
-            if ~obj.has_ui
+        function start(obj)
+            if ~ishandle(obj.image_axes)
                 throw(MException('MicroscopeActionLive:UINeed',...
                     'can''t run without UI'));
             end
             % call super
-            startAction@MicroscopeAction(obj);
+            start@MicroscopeAction(obj);
             % start camera
             obj.microscope_handle.camera.prepareModeSnapshot();
             % create eventloop
             cla(obj.image_axes);axis equal;colormap gray;
+        end
+        
+        function run(obj)
+            obj.start;
             % callback function
             function callback (obj)
-                cla(obj.image_axes);
-                imagesc(obj.microscope_handle.camera.capture);
+                obj.drawImage(obj.microscope_handle.camera.capture);
                 obj.microscope_handle.joystick.emitMotionEvents();
                 obj.microscope_handle.joystick.emitActionEvents();
             end
@@ -36,11 +39,8 @@ classdef MicroscopeActionLive < MicroscopeAction
             obj.eventloop.run(@()callback(obj));
             % call call back function when finish
             obj.microscope_handle.switchLight('Off');
-            obj.finishAction;
-        end
-        
-        function stopAction(obj)
-            obj.eventloop.stop;
+            % finish
+            obj.finish;
         end
         
         % get event display for UI
