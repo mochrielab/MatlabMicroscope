@@ -11,7 +11,7 @@ classdef Microscope < handle
 
     
     % handles to devices
-    properties (SetAccess = public)
+    properties (SetAccess = protected)
         camera % camera
         lightsources % light sources
         xystage % xy stage
@@ -21,7 +21,7 @@ classdef Microscope < handle
         illumination % current light source
         illumination_options % current light source
         trigger % trigger for synchronized aquisition
-
+        islighton % status of the illumination;
     end
     
     % current status of the microscope
@@ -69,8 +69,10 @@ classdef Microscope < handle
         function switchLight(obj, on_or_off)
             if strcmpi(on_or_off,'on')
                 obj.getLightsource.turnOn;
+                obj.islighton=true;
             elseif strcmpi(on_or_off,'off')
                 obj.getLightsource.turnOff;
+                obj.islightoff=false;
             else
                 throw(MException('Microscope:SwitchLight',...
                     'unrecognized switch light command'));

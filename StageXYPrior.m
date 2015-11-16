@@ -50,7 +50,11 @@ classdef StageXYPrior < handle
             end
         end
         
-        function [ out ] = setCommand( obj, str )
+        function setSpeed(obj,vx,vy)
+            obj.sendCommand(['VS,',num2str(vx),',',num2str(vy)]);
+        end
+        
+        function [ out ] = sendCommand( obj, str )
         % send stage command, and get feed back
             fprintf(obj.com,'%s\r',str);
             % wait and load

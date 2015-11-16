@@ -1,14 +1,13 @@
-classdef MicroscopeActionLive < MicroscopeActionControllerResponder
-    % live function of the microscope
-    % inherited the class of action controller responder
-    % will respond to events created by the joystick or keyboard
-    %   Yao Zhao 11/16/2015
+classdef MicroscopeActionLive < MicroscopeAction & MicroscopeActionControllerResponder
+    %basic class for microscope actions
+    %   Yao Zhao 11/9/2015
     
     properties (SetAccess = protected)
 
     end
     
     methods
+        
         function start(obj)
             if ~ishandle(obj.image_axes)
                 throw(MException('MicroscopeActionLive:UINeed',...
@@ -20,6 +19,8 @@ classdef MicroscopeActionLive < MicroscopeActionControllerResponder
             obj.microscope_handle.camera.prepareModeSnapshot();
             % clear image
             cla(obj.image_axes);axis equal;colormap gray;
+            % start responder
+            
         end
         
         function run(obj)

@@ -1,5 +1,5 @@
 classdef MicroscopeActionCapture < MicroscopeAction 
-    %basic class for microscope actions
+    % a simple class for single image capture and saving
     %   Yao Zhao 11/9/2015
     
     properties (SetAccess = protected)
@@ -32,8 +32,6 @@ classdef MicroscopeActionCapture < MicroscopeAction
             finish@MicroscopeAction(obj);
         end
         
-        function stop(obj)
-        end
         
         % get event display for ui
         function dispstr=getEventDisplay(obj,eventstr)

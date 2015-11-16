@@ -1,15 +1,7 @@
-classdef JoystickLogitech < handle
+classdef ControllerJoystickLogitech < Controller
     % class for logic joystick control
     % 11/8/2015
-    %
-    %     % rescale XY
-    %     velocityX = round(velocityX*speed*3000);
-    %     velocityY = round(velocityY*speed*3000);
-    %         if abs(dz)>0
-    %         obj.zoffset = obj.zoffset + dz*speed*obj.volts_per_pix*looprate*3;
-    %         obj.Go('Z');
-    %     end
-    %
+
     properties (Access = private)
         joystick
         sensitivity_threshold=.1;
@@ -21,7 +13,7 @@ classdef JoystickLogitech < handle
     end
     
     methods
-        function obj =  JoystickLogitech()
+        function obj =  ControllerJoystickLogitech()
             % initialize joystick
             obj.joystick=vrjoystick(1);
             display('joystick connected!');
@@ -47,21 +39,21 @@ classdef JoystickLogitech < handle
                 velocityY=0;
             end
             % rescale XY
-            velocityX = velocityX*speed;
-            velocityY = velocityY*speed;
-            velocityZ = dz * speed;
+            velocityX = round(velocityX*speed*3000);
+            velocityY = round(velocityY*speed*3000);
+            velocityZ = dz * speed * (6.5/100)/(200/10)*3;
             
             % move xy
             if (velocityX~=0 || velocityY~=0 )
                 eventdata = ...
-                    JoystickEventData(velocityX,velocityY,0);
+                    JoystickEventData(velocityX,velocityY,0,true);
                 notify(obj,'MoveXYStage',eventdata);
             end
             
             % move z
             if (velocityZ~=0)
                 eventdata = ...
-                    JoystickEventData(0,0,velocityZ);
+                    JoystickEventData(0,0,velocityZ,false);
                 notify(obj,'MoveZStage',eventdata);
             end
         end
@@ -111,14 +103,6 @@ classdef JoystickLogitech < handle
     
     
     events
-        MoveXYStage
-        MoveZStage
-        ToggleLightSelection
-        ToggleLight
-        Capture
-        ZoomIn
-        ZoomOut
-        
     end
     
 end
