@@ -7,11 +7,6 @@ classdef (Abstract) MicroscopeActionSequence < MicroscopeAction
     end
     
     methods
-        function obj = MicroscopeActionSequence(microscope,image_axes)
-            obj@MicroscopeAction(microscope,image_axes);
-            obj.label = 'sequence';
-            obj.file_handle=TiffIO(microscope.datapath,obj.label);
-        end
         
         function start(obj)
             % call super

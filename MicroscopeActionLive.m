@@ -7,10 +7,6 @@ classdef MicroscopeActionLive < MicroscopeAction
     end
     
     methods
-        function obj = MicroscopeActionLive(microscope,image_axes)
-            obj@MicroscopeAction(microscope,image_axes);
-            obj.label = 'live';
-        end
         
         function start(obj)
             if ~ishandle(obj.image_axes)

@@ -1,4 +1,4 @@
-classdef MicroscopeActionZstack < MicroscopeActionSequence
+classdef MicroscopeActionSequenceZstack < MicroscopeActionSequence
     %zstack class for microscope actions
     %   Yao Zhao 11/10/2015
     
@@ -7,11 +7,6 @@ classdef MicroscopeActionZstack < MicroscopeActionSequence
     end
     
     methods
-        function obj = MicroscopeActionZstack(microscope,image_axes)
-            obj@MicroscopeActionSequence(microscope,image_axes);
-            obj.label = 'zstack';
-            obj.file_handle=TiffIO(microscope.datapath,obj.label);
-        end
         
         function start(obj)
             start@MicroscopeActionSequence(obj);

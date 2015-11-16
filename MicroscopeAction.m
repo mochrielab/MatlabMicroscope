@@ -3,7 +3,7 @@ classdef (Abstract) MicroscopeAction < handle & matlab.mixin.Heterogeneous
     %   Yao Zhao 11/9/2015
     
     properties (SetAccess = protected)
-        label = 'idle';
+        label;
     end
     
     properties (Access = protected)
@@ -16,12 +16,13 @@ classdef (Abstract) MicroscopeAction < handle & matlab.mixin.Heterogeneous
     
     methods
         % constructor
-        function obj = MicroscopeAction(microscope,image_axes)
-            obj.label='idle';
+        function obj = MicroscopeAction(label,microscope,image_axes)
+            obj.label=label;
             obj.microscope_handle=microscope;
             obj.isrunning = false;
             obj.image_axes=image_axes;
             obj.eventloop=EventLoop(10);
+            obj.file_handle=TiffIO(microscope.datapath,obj.label);
         end
         
         % start action

@@ -4,15 +4,11 @@ classdef (Abstract) MicroscopeActionMovie < MicroscopeActionSequence
     
     properties (SetAccess = protected)
         icycle
+        moviecycles =0;
+        movieinterval =0;
     end
     
     methods
-        %constructor
-        function obj = MicroscopeActionMovie(microscope,image_axes)
-            obj@MicroscopeActionSequence(microscope,image_axes);
-            obj.label = 'movie';
-            obj.file_handle=TiffIO(microscope.datapath,obj.label);
-        end
         
         % start movie acquisition
         function start(obj)
@@ -20,20 +16,41 @@ classdef (Abstract) MicroscopeActionMovie < MicroscopeActionSequence
             start@MicroscopeActionSequence(obj);
         end
         
+        function setMoviecycles(moviecycles)
+            if moviecycles >=0
+                obj.moviecycles=moviecycles;
+                notify(obj,'MoviecyclesDidSet');
+            else
+                throw(MException('Action:NegativeMovieCycles',...
+                    'negative movie cycles'));
+            end
+        end
+        
+        function setMovieinterval(movieinterval)
+            if movieinterval >=0
+                obj.movieinterval=movieinterval;
+                notify(obj,'MovieintervalDidSet');
+            else
+                throw(MException('Action:NegativeMovieInterval',...
+                    'negative movie interval'));
+            end
+        end
+        
+        
         % run acquisition
         function run (obj)
-            obj.start
+            obj.start;
             % refresh cycle
             obj.icycle=1;
             % set movie interval
-            obj.eventloop.setRate(1/obj.microscope_handle.movieinterval);
+            obj.eventloop.setRate(1/obj.movieinterval);
             % run event loop
             obj.eventloop.run(@()callbackSingleLoop(obj));
             %finish
-            obj.finish
+            obj.finish;
             % call back function
             function callbackSingleLoop (obj)
-                if obj.icycle<=obj.microscope_handle.moviecycles
+                if obj.icycle<=obj.moviecycles
                     obj.eventloop.stop;
                 else
                     obj.runSingleLoop;
@@ -61,6 +78,8 @@ classdef (Abstract) MicroscopeActionMovie < MicroscopeActionSequence
     end
     
     events
+        MoviecyclesDidSet
+        MovieintervalDidSet
     end
     
 end

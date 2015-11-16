@@ -21,8 +21,7 @@ classdef Microscope < handle
         illumination % current light source
         illumination_options % current light source
         trigger % trigger for synchronized aquisition
-        moviecycles
-        movieinterval
+
     end
     
     % current status of the microscope
@@ -33,9 +32,6 @@ classdef Microscope < handle
         % constructor
         function obj=Microscope()
             display('initiallizing...')
-            % 
-            obj.moviecycles=1;
-            obj.movieinterval=0;
             % add camera
             obj.camera = CameraAndorZyla ();
             % add light sources
@@ -189,25 +185,7 @@ classdef Microscope < handle
                 obj.illumination_options));
         end
         
-        function setMoviecycles(moviecycles)
-            if moviecycles >=0
-                obj.moviecycles=moviecycles;
-                notify(obj,'MoviecyclesDidSet');
-            else
-                throw(MException('Microscope:NegativeMovieCycles',...
-                    'negative movie cycles'));
-            end
-        end
-        
-        function setMovieinterval(movieinterval)
-            if movieinterval >=0
-                obj.movieinterval=movieinterval;
-                notify(obj,'MovieintervalDidSet');
-            else
-                throw(MException('Microscope:NegativeMovieInterval',...
-                    'negative movie interval'));
-            end
-        end
+
         
         % destructor
         function delete(obj)
@@ -223,8 +201,7 @@ classdef Microscope < handle
     
     events
         IlluminationDidSet
-        MoviecyclesDidSet
-        MovieintervalDidSet
+
 %         DidStart
 %         DidFinish
     end

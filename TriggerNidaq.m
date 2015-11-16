@@ -38,15 +38,18 @@ classdef TriggerNidaq < Trigger
             obj.setLightsources([]);
         end
         
+        % set clock rate
         function setClockrate(obj,clockrate)
             obj.clock.Rate=clockrate;
             setClockrate@Trigger(clockrate);
         end
         
+        % set frame rate
         function setFramerate(obj,framerate)
             setFramerate@Trigger(framerate);
         end
         
+        % select light sources
         function setLightsources(obj,lightsources)
             obj.lightsources=lightsources;
         end
@@ -89,6 +92,13 @@ classdef TriggerNidaq < Trigger
                 queue((i-1)*single_time+1:i*single_time,:)=...
                     obj.getOutputQueueSingle(zarray(i));
             end
+        end
+        
+        % get output data queue of a waitingtime
+        function queue=getOutputQueueWait(obj,zvalue,waittime)
+            numframes=waittime/(1000/obj.clockrate);
+            queue=zeros(numframes,obj.getNumChannels);
+            queue(:,1)=zvalue;
         end
         
         % get output data queue

@@ -14,17 +14,19 @@ classdef UIViewController < UIView
         function obj = UIViewController(microscope_handle)
             obj@UIView();
             obj.microscope_handle=microscope_handle;
-            obj.live=MicroscopeActionLive...
-                (obj.microscope_handle,obj.imageaxis_handle);
-            obj.capture=MicroscopeActionCapture...
-                (obj.microscope_handle,obj.imageaxis_handle);
-            obj.zstack=MicroscopeActionZstack...
-                (obj.microscope_handle,obj.imageaxis_handle);
+            obj.actions=[ MicroscopeActionLive('live',...
+                obj.microscope_handle,obj.imageaxis_handle),...
+                MicroscopeActionCapture('capture',...
+                obj.microscope_handle,obj.imageaxis_handle),...
+                MicroscopeActionSequenceZstack('zstack',...
+                obj.microscope_handle,obj.imageaxis_handle)];
   
             % add controls
-            obj.addControlButton(0,0,obj.live);
-            obj.addControlButton(1,0,obj.capture);
-            obj.addControlButton(2,0,obj.zstack);
+            for i=1:length(obj.actions)
+                ir= floor((i-1)/4);
+                ic= mod((i-1),4);
+                obj.addControlButton(ic,ir,obj.actions(i));
+            end
 
             % add selectors
             obj.addControlSelector(0,2,'illumination','illumination',...
@@ -48,9 +50,9 @@ classdef UIViewController < UIView
             obj.addParamCell(1,2,'stepsize','step size (pixels)',...
                 obj.microscope_handle.zstage);
             obj.addParamCell(2,0,'moviecycles','number of movie cycles',...
-                obj.microscope_handle);
+                obj);
             obj.addParamCell(2,1,'movieinterval','movie interval (mins)',...
-                obj.microscope_handle);
+                obj);
 
 
         end

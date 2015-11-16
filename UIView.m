@@ -8,6 +8,9 @@ classdef UIView < handle
         controlpanel_handle
         parampanel_handle
         listeners
+        
+        moviecycles
+        movieinterval
     end
     
     methods
@@ -37,12 +40,35 @@ classdef UIView < handle
             obj.listeners=event.listener.empty;
         end
         
+        function setMoviecycles(moviecycles)
+            if moviecycles >=0
+                obj.moviecycles=moviecycles;
+                notify(obj,'MoviecyclesDidSet');
+            else
+                throw(MException('UIView:NegativeMovieCycles',...
+                    'negative movie cycles'));
+            end
+        end
+        
+        function setMovieinterval(movieinterval)
+            if movieinterval >=0
+                obj.movieinterval=movieinterval;
+                notify(obj,'MovieintervalDidSet');
+            else
+                throw(MException('UIView:NegativeMovieInterval',...
+                    'negative movie interval'));
+            end
+        end
+        
+        
+        
+        
 %         set the value for specific tag
         function setValue(obj,tag,stringvalue)
             warning('need to be updated');return
             % set string value for a given tag
             handles=[obj.controlpanel_handle.get('Children'),...
-                obj.parampanel_handle.get('Children');];
+                obj.parampanel_handle.get('Children')];
             display('handle size')
             size(handles)
             for i=1:numel(handles)
@@ -74,7 +100,7 @@ classdef UIView < handle
                 'Unit','Pixels','Position',[pos(1) pos(2) 200 60],...
                 'String',microscope_action.getEventDisplay('DidFinish'),...
                 'Fontsize',20,...
-                'Callback',@(hobj,eventdata)callbackFunc(microscope_action),...
+                'Callback',@(hobj,eventdata)callbackFunc(obj,microscope_action),...
                 'Tag',microscope_action.label);
             
             % set up all event listners
@@ -93,11 +119,13 @@ classdef UIView < handle
                 end
             end
             % call back actions
-            function callbackFunc(obj)
-                if obj.isRunning
-                    obj.stop;
+            function callbackFunc(obj,action)
+                if action.isRunning
+                    action.stop;
                 else
-                    obj.run;
+                    action.moviecycles=obj.moviecycles;
+                    action.movieinterval=obj.movieinterval;
+                    action.run;
                 end
             end
         end
@@ -212,6 +240,8 @@ classdef UIView < handle
     end
     
     events
+        MoviecyclesDidSet
+        MovieintervalDidSet
     end
 end
 

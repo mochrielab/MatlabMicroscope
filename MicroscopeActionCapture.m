@@ -6,11 +6,6 @@ classdef MicroscopeActionCapture < MicroscopeAction
     end
     
     methods
-        function obj = MicroscopeActionCapture(microscope,image_axes)
-            obj@MicroscopeAction(microscope,image_axes);
-            obj.label = 'capture';
-            obj.file_handle=TiffIO(microscope.datapath,obj.label);
-        end
         
         function start(obj)
             % call super
