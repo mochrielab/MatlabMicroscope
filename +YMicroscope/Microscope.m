@@ -36,7 +36,7 @@ classdef Microscope < handle
             % add camera
             obj.camera = CameraAndorZyla ();
             % add light sources
-            obj.lightsources=[LightsourceRGB('com4','brightfield'),...
+            obj.lightsources=[LightsourceRGB('com6','brightfield'),...
                 LightsourceSola('com3','fluorescent')];
             obj.illumination_options={obj.lightsources.label};
             obj.illumination=obj.illumination_options{1};
@@ -46,7 +46,7 @@ classdef Microscope < handle
             % add z stage
             obj.zstage = StageZPrior.finescan;
             % add joystick
-            obj.joystick = JoystickLogitech();
+            obj.joystick = ControllerJoystickLogitech();
             % add trigger
             obj.trigger=TriggerNidaq();
             % set status
@@ -54,17 +54,17 @@ classdef Microscope < handle
             display('done')
         end
         
+        % set status of the microscope
         function setStatus (obj, status_in)
            for ii=1:length(obj.status_options)
                 if strcmp(obj.status_options{ii},status_in)
                     obj.status = status_in;
+                    notify(obj, 'StatusDidSet');
                     return;
                 end
            end
-           warning('invalid status input');
+           warning('invalid status input, status not set');
         end
-        
-
         
         % switch the light on or off
         function switchLight(obj, on_or_off)
@@ -73,7 +73,7 @@ classdef Microscope < handle
                 obj.islighton=true;
             elseif strcmpi(on_or_off,'off')
                 obj.getLightsource.turnOff;
-                obj.islightoff=false;
+                obj.islighton=false;
             else
                 throw(MException('Microscope:SwitchLight',...
                     'unrecognized switch light command'));
@@ -174,7 +174,13 @@ classdef Microscope < handle
         
         % select light source with index
         function setIllumination(obj,str)
-            value=find(strcmp(str,obj.illumination_options));
+            % check if string or numeric
+            if ischar(str)
+                value=find(strcmp(str,obj.illumination_options));
+            elseif isnumeric(str)
+                value = str;
+            end
+            % set value
             if length(value)==1
                 obj.illumination=obj.illumination_options{value};
                 obj.camera.setExposure(...
@@ -203,7 +209,7 @@ classdef Microscope < handle
 
     events
         IlluminationDidSet
-
+        StatusDidSet
 %         DidStart
 %         DidFinish
     end
