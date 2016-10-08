@@ -23,12 +23,14 @@ classdef StageZPrior < handle
     end
     
     methods
+        % constructor
         function obj=StageZPrior(zoffset,numstacks,stepsize)
             obj.zoffset=zoffset;
             obj.numstacks=numstacks;
             obj.stepsize=stepsize;
         end
         
+        % get z off set
         function setZoffset(obj,zoffset)
             if zoffset<0
                 throw(MException('PrioZStage:ZoffsetOutOfLowerBound',...
@@ -42,7 +44,7 @@ classdef StageZPrior < handle
             end
         end
         
-        
+        % get number stacks
         function setNumstacks(obj,numstacks)
             if numstacks<0
                 throw(MException('PrioZStage:NegativeNumstacks',...
@@ -53,6 +55,7 @@ classdef StageZPrior < handle
             end
         end
         
+        % get step size
         function setStepsize(obj,stepsize)
             stepsize=round(stepsize);
             if stepsize<0
@@ -64,6 +67,7 @@ classdef StageZPrior < handle
             end
         end
         
+        % get z array
         function zarray = getZarray(obj)
             stacks=(1:obj.numstacks)-(obj.numstacks+1)/2;
             zarray=obj.zoffset+obj.stepsize*stacks*obj.volts_per_pix;

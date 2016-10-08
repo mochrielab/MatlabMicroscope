@@ -49,11 +49,19 @@ classdef StageXYPrior < YMicroscope.Stage
             end
         end
         
+        function setPosition( obj, pos )
+            warning('not implemented')
+        end
+        
         % set speed of stage
         function setSpeed(obj,vs)
             obj.sendCommand(['VS,',num2str(vs(1)),',',num2str(vs(2))]);
             obj.v_x = vs(1);
             obj.v_y = vs(2);
+        end
+        
+        function vs = getSpeed(obj)
+            warning('not implemented');
         end
         
         % send command to stage

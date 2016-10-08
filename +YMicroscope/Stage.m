@@ -10,22 +10,12 @@ classdef (Abstract) Stage < handle & matlab.mixin.Heterogeneous
         v_z = 0
     end
     
-    methods
-        % constructor
-        function obj=Stage()
-        end
-
+    methods (Abstract)
         [ pos ] = getPosition( obj )
         setPosition( obj, pos)
         
         setSpeed(obj,vs)
         [ vs ] = getSpeed(obj)
-
-        % delete object
-        function delete(obj)
-        end
-        
     end
-    
 end
 
