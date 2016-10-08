@@ -1,0 +1,2 @@
+import YMicroscope.*
+camera = Andor
