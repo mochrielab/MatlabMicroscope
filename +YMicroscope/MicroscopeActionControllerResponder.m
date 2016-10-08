@@ -52,19 +52,19 @@ classdef MicroscopeActionControllerResponder < YMicroscope.MicroscopeAction
             switch name
                 case 'MoveXYStage'
                     isadjustedtolooprate=eventdata.isadjustedtolooprate;
-                    if isadjustedtolooprate
+                    if ~isadjustedtolooprate
                         scale=1;
                     else
-                        scale=obj.eventloop.rate;
+                        scale=obj.eventloop.getRate();
                     end
                     vs = [eventdata.xspeed*scale, eventdata.yspeed*scale];
                     microscope.xystage.setSpeed(vs);
                 case 'MoveZStage'
                     isadjustedtolooprate=eventdata.isadjustedtolooprate;
-                    if isadjustedtolooprate
+                    if ~isadjustedtolooprate
                         scale=1;
                     else
-                        scale=obj.eventloop.rate;
+                        scale=obj.eventloop.getRate();
                     end
                     microscope.zstage.setZoffset...
                         (microscope.zstage.zoffset+eventdata.zspeed*scale);

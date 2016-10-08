@@ -3,7 +3,7 @@ classdef EventLoop < handle
     % the loop is used for detecting event
     % Yao Zhao 11/9/2015
     
-    properties (Access = private)
+    properties (Access = protected)
         rate = 10;
         isrunning
     end
@@ -39,6 +39,10 @@ classdef EventLoop < handle
             obj.rate=rate;
         end
         
+        % get rate
+        function rate = getRate(obj)
+            rate = obj.rate;
+        end
     end
     
     events
