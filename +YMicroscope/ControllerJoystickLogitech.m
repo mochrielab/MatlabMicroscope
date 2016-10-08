@@ -1,4 +1,4 @@
-classdef ControllerJoystickLogitech < Controller
+classdef ControllerJoystickLogitech < YMicroscope.Controller
     % class for logic joystick control
     % 11/8/2015
 
