@@ -1,8 +1,26 @@
 import YMicroscope.*
-%%
+%% test constructor
 cam = CameraAndorZyla();
 display('camera successfully loaded')
-%%
-cam.setExposure(200);
-display('exposure successfully set')
-%%
+%% test exposure
+for i = 0:100:400
+    cam.setExposure(i);
+    display(['exposure successfully set for ',num2str(i)]);
+end
+%% test roi options
+for i = 1:length(cam.roi_options)
+    roi = cam.roi_options{i};
+    cam.setRoi(roi)
+    display(['roi successfully set for ',roi]);
+end
+%% test image capture
+cam.prepareModeSnapshot();
+img = cam.capture();
+display('image capture successful');
+%% test image sequence
+% cam.prepareModeSequence();
+% cam.startSequenceAcquisition();
+% cam.stopSequenceAcquisition();
+% cam.getLastImage();
+% cam.popNextImage();
+% display('image capture successful');
