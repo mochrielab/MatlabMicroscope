@@ -1,5 +1,5 @@
 classdef TiffIO < handle
-    %class for image IO
+    %class for TIFF image IO
     %   11/8/2015
     
     properties 
@@ -12,11 +12,13 @@ classdef TiffIO < handle
        
     
     methods
+        % create a tiffIO with path and tag
         function obj=TiffIO(path,tag)
             obj.rootpath=path;
             obj.tag=tag;
         end
         
+        % get fulll saving path
         function datepath=getDataSavePath(obj)
             t=clock;
             datepath=fullfile(obj.rootpath,...
@@ -27,6 +29,7 @@ classdef TiffIO < handle
             end
         end
         
+        % get full file name
         function filename=getFullFileName(obj)
             t=clock;
             filename=fullfile(obj.getDataSavePath,[obj.tag,'_',...
@@ -34,22 +37,27 @@ classdef TiffIO < handle
                 num2str(round(t(6)),'%02d'),'.tif']);
         end
         
-        function fopen(obj,size)
+        % open file for write
+        function fopen(obj,tagstruct)
             if strcmp(obj.tag,'capture')
                 obj.handle=Tiff(obj.getFullFileName(),'a');
             else
                 obj.handle=Tiff(obj.getFullFileName(),'w8');
             end
-            obj.tagstruct=obj.getTiffTag('Andor Zyla 5.5',size);
+            obj.tagstruct=tagstruct;
             obj.filename=obj.getFullFileName;
         end
         
+        % write to file with image
         function fwrite(obj,img)
-            obj.handle.setTag(obj.tagstruct);
+            if ~isempty(obj.tagstruct)
+                obj.handle.setTag(obj.tagstruct);
+            end
             obj.handle.write(img);
             obj.handle.writeDirectory;
         end
         
+        % close the file
         function fclose(obj,setting)
             obj.handle.close();
             save([obj.filename(1:end-3),'mat'],'setting');
@@ -57,31 +65,6 @@ classdef TiffIO < handle
         
     end
     
-    methods (Static)
-        function tagstruct = getTiffTag(camlabel,size)
-            if strcmp(camlabel,'Andor Zyla 5.5')
-                tagstruct.Artist='Yao Zhao';
-                tagstruct.BitsPerSample = 16;
-                tagstruct.Compression = Tiff.Compression.None;
-                tagstruct.ExtraSamples = Tiff.ExtraSamples.Unspecified;
-                tagstruct.HostComputer='Regan Lab''s computer';
-                tagstruct.MaxSampleValue=2^12-1;
-                tagstruct.MinSampleValue=0;
-                tagstruct.Photometric = Tiff.Photometric.MinIsBlack;
-                tagstruct.PlanarConfiguration = Tiff.PlanarConfiguration.Chunky;
-                tagstruct.ResolutionUnit = Tiff.ResolutionUnit.Centimeter;
-                tagstruct.SampleFormat = Tiff.SampleFormat.Int;
-                tagstruct.SamplesPerPixel = 1;
-                tagstruct.Software = 'MATLAB';
-                tagstruct.XResolution = 0.000065;
-                tagstruct.YResolution = 0.000065;
-                tagstruct.ImageLength = size(1);%obj.img_width;
-                tagstruct.ImageWidth = size(2);%obj.img_height;
-            else
-                warning('unsupported camera camera label');
-            end
-        end
-    end
     
 end
 

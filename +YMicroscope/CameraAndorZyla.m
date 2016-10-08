@@ -14,7 +14,7 @@ classdef CameraAndorZyla < YMicroscope.Camera
     methods
         % constructor
         function obj =  CameraAndorZyla()
-            obj.label = 'AndorZyla'; 
+            obj.label = 'AndorZyla';
             obj.exposure = 200;
             obj.roi =  '2160 x 2560';
             % load micro manager
@@ -68,8 +68,8 @@ classdef CameraAndorZyla < YMicroscope.Camera
         % set exposure
         function setExposure(obj,exposure_input)
             if exposure_input < 0
-               exception=MException('Camera:NegativeExposure','negative exposure');
-               throw(exception);
+                exception=MException('Camera:NegativeExposure','negative exposure');
+                throw(exception);
             else
                 obj.exposure = exposure_input;
                 obj.mm.setExposure(obj.exposure);
@@ -89,7 +89,7 @@ classdef CameraAndorZyla < YMicroscope.Camera
                 obj.mm.setROI(952,1152,256,256);
             else
                 exception=MException('Camera:UnsupportedROI','ROI not supported');
-               throw(exception);
+                throw(exception);
             end
             obj.roi=roi_input;
             notify(obj,'RoiDidSet');
@@ -111,17 +111,17 @@ classdef CameraAndorZyla < YMicroscope.Camera
             andorCam = 'Andor sCMOS Camera';
             % set exposure to external
             obj.mm.setProperty(andorCam, ...
-                'TriggerMode', 'Software (Recommended for Live Mode)'); 
+                'TriggerMode', 'Software (Recommended for Live Mode)');
         end
         
         % prepare for sequence type of image acquisition
         function prepareModeSequence (obj)
-               andorCam = 'Andor sCMOS Camera';
-               obj.mm.setProperty(andorCam,...
-                   'TriggerMode', 'External Exposure');
-               obj.mm.clearCircularBuffer();
-               obj.mm.initializeCircularBuffer();
-               obj.mm.prepareSequenceAcquisition(andorCam);
+            andorCam = 'Andor sCMOS Camera';
+            obj.mm.setProperty(andorCam,...
+                'TriggerMode', 'External Exposure');
+            obj.mm.clearCircularBuffer();
+            obj.mm.initializeCircularBuffer();
+            obj.mm.prepareSequenceAcquisition(andorCam);
         end
         
         % start a image sequnce
@@ -151,16 +151,38 @@ classdef CameraAndorZyla < YMicroscope.Camera
         
         % get most recent image
         function img=getLastImage(obj)
-                img=obj.mm.getLastImage();
-                width = obj.mm.getImageWidth();
-                height = obj.mm.getImageHeight();
-                img = reshape(img, [width, height]);
+            img=obj.mm.getLastImage();
+            width = obj.mm.getImageWidth();
+            height = obj.mm.getImageHeight();
+            img = reshape(img, [width, height]);
         end
         
         % object destructor
         function delete(obj)
             obj.mm.reset();
             display('Andor Zyla camera disconnected')
+        end
+        
+        % get tiff tag, for saving tiff images
+        function tagstruct = getTiffTag(obj)
+            size = obj.getSize();
+            tagstruct.Artist='Yao Zhao';
+            tagstruct.BitsPerSample = 16;
+            tagstruct.Compression = Tiff.Compression.None;
+            tagstruct.ExtraSamples = Tiff.ExtraSamples.Unspecified;
+            tagstruct.HostComputer='Regan Lab''s computer';
+            tagstruct.MaxSampleValue=2^16-1;
+            tagstruct.MinSampleValue=0;
+            tagstruct.Photometric = Tiff.Photometric.MinIsBlack;
+            tagstruct.PlanarConfiguration = Tiff.PlanarConfiguration.Chunky;
+            tagstruct.ResolutionUnit = Tiff.ResolutionUnit.Centimeter;
+            tagstruct.SampleFormat = Tiff.SampleFormat.Int;
+            tagstruct.SamplesPerPixel = 1;
+            tagstruct.Software = 'MATLAB';
+            tagstruct.XResolution = 0.000065;
+            tagstruct.YResolution = 0.000065;
+            tagstruct.ImageLength = size(1);%obj.img_width;
+            tagstruct.ImageWidth = size(2);%obj.img_height;
         end
     end
 end

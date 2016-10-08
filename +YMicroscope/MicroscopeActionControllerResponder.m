@@ -1,4 +1,4 @@
-classdef MicroscopeActionControllerResponder < MicroscopeAction
+classdef MicroscopeActionControllerResponder < YMicroscope.MicroscopeAction
     % Controller Responder
     % respond controller events
     % is used alone or embedded in other actions to process the events
@@ -13,7 +13,7 @@ classdef MicroscopeActionControllerResponder < MicroscopeAction
         % constructor
         function obj=MicroscopeActionControllerResponder...
                 (label,microscope,image_axes,controller)
-            obj@MicroscopeAction(label,microscope,image_axes);
+            obj@YMicroscope.MicroscopeAction(label,microscope,image_axes);
             obj.setControllerListeners(controller);
         end
         

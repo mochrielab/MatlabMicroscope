@@ -19,6 +19,7 @@ classdef Camera < handle
         popNextImage(obj)
         getLastImage(obj)
         printCameraProperties(obj)
+        getTiffTag(obj)
     end
     
     events

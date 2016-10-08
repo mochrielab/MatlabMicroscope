@@ -1,5 +1,5 @@
-classdef LightsourceRGB < Lightsource
-    % class for sola light, fluorescent illumination
+classdef LightsourceRGB < YMicroscope.Lightsource
+    % class for RGB light made by MVI
     %  Yao Zhao 11/7/2015
             
     properties (Constant)
@@ -8,7 +8,8 @@ classdef LightsourceRGB < Lightsource
     
     methods
         
-        function obj = LightsourceRGB(comport,label)
+        % constructor
+        function obj = LightsourceRGB(comport, label)
             % add com port control
             obj.label=label;
             obj.com = serial(comport);
@@ -20,6 +21,7 @@ classdef LightsourceRGB < Lightsource
             disp('RGB light connected')
         end
         
+        % setExposure
         function setExposure(obj,exposure)
             if exposure < 0
                 exception=MException('Lightsource:NegativeExposure','negative exposure');
@@ -30,6 +32,7 @@ classdef LightsourceRGB < Lightsource
             end
         end
         
+        % setColor
         function setColor(obj, color)
             for i=1:length(obj.color_options)
                 if strcmp(color,obj.color_options{i})
@@ -47,6 +50,7 @@ classdef LightsourceRGB < Lightsource
             throw(exception);
         end
         
+        % setIntensity
         function setIntensity(obj,intensity)
             % choose between 1-10
             for i=1:10
@@ -62,25 +66,31 @@ classdef LightsourceRGB < Lightsource
             throw(exception);
         end
         
+        % turn on the light
         function turnOn(obj)
-            code = obj.decodeColor;
+            code = obj.decodeColor();
             if ~isempty(code)
                 fprintf(obj.com,'%s\r',['*O',code]);
             end
             obj.ison=true;
+            notify(obj,'DidTurnOn');
         end
         
+        % turn off the light
         function turnOff(obj)
             fprintf(obj.com,'%s\r','*FT');
             obj.ison=false;
+            notify(obj,'DidTurnOn');
         end
         
+        % delete
         function delete(obj)
             fprintf(obj.com,'%s\r','*FA');
             fclose(obj.com);
             disp('RGB light disconnected');
         end
         
+        % decode color for com port command
         function code = decodeColor(obj)
             switch obj.color
                 case 'Red'

@@ -53,7 +53,6 @@ classdef (Abstract) MicroscopeAction < handle & matlab.mixin.Heterogeneous
                 imagesc(img);
             end
         end      
-       
         
         % test if action is running
         function bool=isRunning(obj)

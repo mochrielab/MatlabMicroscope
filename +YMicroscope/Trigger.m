@@ -1,9 +1,11 @@
 classdef (Abstract) Trigger < handle & matlab.mixin.Heterogeneous
     % trigger class for device synchronization
     %   Yao Zhao 11/10/2015
-    properties (Access = public)
-        clock
-    end
+    
+%     properties (Access = public)
+%         clock
+%     end
+
     properties (SetAccess = protected)
         
         label='trigger';
@@ -12,9 +14,10 @@ classdef (Abstract) Trigger < handle & matlab.mixin.Heterogeneous
     end
     
     methods
+        % constructor
         function obj=Trigger()
         end
-        
+        % set clock rate
         function setClockrate(obj,clockrate)
             if clockrate<0
                 throw(MException('Trigger:NegativeClockRate',...
@@ -24,7 +27,7 @@ classdef (Abstract) Trigger < handle & matlab.mixin.Heterogeneous
                 notify(obj,'ClockrateDidSet');
             end
         end
-        
+        % set frame rate
         function setFramerate(obj,framerate)
             if framerate<0
                 throw(MException('Trigger:NegativeFrameRate',...
@@ -34,7 +37,7 @@ classdef (Abstract) Trigger < handle & matlab.mixin.Heterogeneous
                 notify(obj,'FramerateDidSet');
             end
         end
-        
+        % delete obj
         function delete(obj)
         end
     end

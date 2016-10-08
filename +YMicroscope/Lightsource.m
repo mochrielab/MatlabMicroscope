@@ -15,6 +15,10 @@ classdef (Abstract) Lightsource < handle & matlab.mixin.Heterogeneous
         ison = 0;
     end
     
+    properties (Constant, Abstract)
+        color_options
+    end
+    
     properties (Access = protected)
         com % handle for comp port
     end
@@ -31,6 +35,8 @@ classdef (Abstract) Lightsource < handle & matlab.mixin.Heterogeneous
         ExposureDidSet
         IntensityDidSet
         ColorDidSet
+        DidTurnOn
+        DidTurnOff
     end
     
 end

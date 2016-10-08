@@ -1,11 +1,13 @@
-classdef TriggerNidaq < Trigger
+classdef TriggerNidaq < YMicroscope.Trigger
     % trigger class for device synchronization
+    % use ni daq board to control all equipment
     %   Yao Zhao 11/10/2015
 
     properties (SetAccess = protected)
     end
     
     properties (Access = protected)
+        niclock
         zstage
         fluorescent
         brightfield
@@ -16,37 +18,39 @@ classdef TriggerNidaq < Trigger
     
     methods
         function obj=TriggerNidaq()
-            obj@Trigger();
-            obj.clock=daq.createSession('ni');
+            obj@YMicroscope.Trigger();
+            obj.niclock=daq.createSession('ni');
             obj.clockrate=1000;
             obj.framerate=10;
-            obj.zstage = obj.clock.addAnalogOutputChannel('Dev1',0,'Voltage');
+            obj.zstage = obj.niclock.addAnalogOutputChannel('Dev1',0,'Voltage');
             obj.zstage.Name = 'zstage';
 %                 ch12 = obj.nidaq.addAnalogInputChannel('Dev1',0,'Voltage');
 %                 ch12.Name = 'Z position (input)';
-            obj.camera = obj.clock.addDigitalChannel('Dev1','Port0/Line0','OutputOnly');
+            obj.camera = obj.niclock.addDigitalChannel('Dev1','Port0/Line0','OutputOnly');
             obj.camera.Name = 'camera';
-            % fluorescence
-            obj.brightfield=obj.clock.addDigitalChannel('Dev1','Port0/Line1','OutputOnly');
+            % brightfield source
+            obj.brightfield=obj.niclock.addDigitalChannel('Dev1','Port0/Line1','OutputOnly');
             obj.brightfield.Name = 'brightfield';
-            obj.fluorescent=obj.clock.addDigitalChannel('Dev1','Port0/Line2','OutputOnly');
+            % fluorescent
+            obj.fluorescent=obj.niclock.addDigitalChannel('Dev1','Port0/Line2','OutputOnly');
             obj.fluorescent.Name = 'fluorescent';
-            obj.channel_labels={obj.clock.Channels.Name};
+            obj.channel_labels={obj.niclock.Channels.Name};
             % set output voltage zero
-            obj.clock.outputSingleScan([0 0 0 0]);
+            obj.niclock.outputSingleScan([0 0 0 0]);
             % set lightsources to none
             obj.setLightsources([]);
         end
         
         % set clock rate
         function setClockrate(obj,clockrate)
-            obj.clock.Rate=clockrate;
-            setClockrate@Trigger(clockrate);
+            % set ni clock rate
+            obj.niclock.Rate=clockrate;
+            setClockrate@YMicroscope.Trigger(obj,clockrate);
         end
         
         % set frame rate
         function setFramerate(obj,framerate)
-            setFramerate@Trigger(framerate);
+            setFramerate@YMicroscope.Trigger(obj,framerate);
         end
         
         % select light sources
@@ -74,8 +78,8 @@ classdef TriggerNidaq < Trigger
         end
     
         % get fastest image aquisition rate given exposures
-        function setHighestFramerate(obj)
-            obj.framerate = floor(1000/obj.getTotalExposure);
+        function framerate = getHighestFramerate(obj)
+            framerate = floor(1000/obj.getTotalExposure);
         end
         
         % the transfer time of the camera
@@ -124,7 +128,7 @@ classdef TriggerNidaq < Trigger
         end
         
         function numcha = getNumChannels(obj)
-            numcha = length(obj.clock.Channels);
+            numcha = length(obj.niclock.Channels);
         end
         
         function delete(obj)
@@ -134,19 +138,19 @@ classdef TriggerNidaq < Trigger
     
     methods 
         function start(obj,outputdata)
-            obj.clock.queueOutputData(outputdata)
-            obj.clock.startBackground;
+            obj.niclock.queueOutputData(outputdata)
+            obj.niclock.startBackground;
         end
         function finish(obj,zoffset)
-            obj.clock.stop;
+            obj.niclock.stop;
             resetarray=zeros(1,obj.getNumChannels);
             resetarray(strcmp(obj.channel_labels,'zstage'))=zoffset;
-            obj.clock.outputSingleScan(resetarray); % reset starting position
+            obj.niclock.outputSingleScan(resetarray); % reset starting position
         end
         
         function bool =isRunning(obj)
             pause(.001) % give it time to update
-            bool=obj.clock.IsRunning;
+            bool=obj.niclock.IsRunning;
             pause(.001)
         end
     end

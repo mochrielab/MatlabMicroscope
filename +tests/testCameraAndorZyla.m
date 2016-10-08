@@ -24,3 +24,13 @@ display('image capture successful');
 % cam.getLastImage();
 % cam.popNextImage();
 % display('image capture successful');
+%% print spect
+cam.printCameraProperties()
+display('camera spects printed');
+%% 
+cam.getTiffTag()
+display('tiff tag printed')
+
+%% test delete camera
+delete(cam)
+display('delete camera successful');

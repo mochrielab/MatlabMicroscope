@@ -1,5 +1,6 @@
 classdef EventLoop < handle
-    %user created event loop
+    % user created event loop
+    % the loop is used for detecting event
     % Yao Zhao 11/9/2015
     
     properties (Access = private)
@@ -13,6 +14,7 @@ classdef EventLoop < handle
             obj.isrunning=false;
         end
         
+        % run the loop
         function run(obj,callback)
             obj.isrunning=true;
 %             lh=addlistener(obj,'StopLoop',@(hobj,eventdata)callbackStop(hobj));
@@ -26,11 +28,13 @@ classdef EventLoop < handle
 %             end
         end
         
+        % stop loop
         function stop(obj)
 %             notify(obj,'StopLoop');
             obj.isrunning=false;
         end
         
+        % set loop rate
         function setRate(obj,rate)
             obj.rate=rate;
         end
