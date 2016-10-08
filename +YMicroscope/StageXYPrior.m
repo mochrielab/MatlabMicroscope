@@ -1,14 +1,12 @@
-classdef StageXYPrior < handle
+classdef StageXYPrior < YMicroscope.Stage
     %Prior XY stage
     
-    properties (SetAccess = private)
+    properties (SetAccess = protected)
         com
-        pos_x = 0
-        pos_y = 0
-        pos_movespeed
     end
     
     methods
+        % constructor
         function obj=StageXYPrior(com)
             try
                 obj.com = serial(com);
@@ -24,6 +22,7 @@ classdef StageXYPrior < handle
             
         end
         
+        % get current position
         function [ pos ] = getPosition( obj )
             %get the XY position of the prior stage
             try
@@ -50,10 +49,14 @@ classdef StageXYPrior < handle
             end
         end
         
-        function setSpeed(obj,vx,vy)
-            obj.sendCommand(['VS,',num2str(vx),',',num2str(vy)]);
+        % set speed of stage
+        function setSpeed(obj,vs)
+            obj.sendCommand(['VS,',num2str(vs(1)),',',num2str(vs(2))]);
+            obj.v_x = vs(1);
+            obj.v_y = vs(2);
         end
         
+        % send command to stage
         function [ out ] = sendCommand( obj, str )
         % send stage command, and get feed back
             fprintf(obj.com,'%s\r',str);
@@ -66,6 +69,7 @@ classdef StageXYPrior < handle
             % display(out);
         end
 
+        % delete object
         function delete(obj)
             fclose(obj.com);
             display('Prior XY stage disconnected');
