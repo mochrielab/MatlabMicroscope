@@ -1,6 +1,7 @@
 classdef StageZPrior < YMicroscope.Stage
     % class to control the priorZstage
     %  Yao Zhao 11/9/2015
+    
     enumeration
         finescan(3,61,1)
         coarsescan(3,11,3)
@@ -28,6 +29,7 @@ classdef StageZPrior < YMicroscope.Stage
             obj.zoffset=zoffset;
             obj.numstacks=numstacks;
             obj.stepsize=stepsize;
+            display('Z stage connected');
         end
         
         % get position
@@ -43,7 +45,7 @@ classdef StageZPrior < YMicroscope.Stage
                 throw(MException('PrioZStage:ZoffsetSize',...
                     [length(pos),' zoffset size should be 1']));
             end
-            notify('ZPDidSet');
+            notify(obj, 'ZPDidSet');
         end
         
         function setSpeed(obj,vs)
