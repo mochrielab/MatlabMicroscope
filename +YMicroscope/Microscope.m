@@ -13,13 +13,15 @@ classdef Microscope < handle
     % handles to devices
     properties (SetAccess = protected)
         camera % camera
-        lightsources % light sources
         xystage % xy stage
         zstage % z stage
-        joystick % joystick
+        controllers % all controllers
+        controller % current controller
+%         controller_options % all possible controller
         status % current status
+        lightsources % light sources
         illumination % current light source
-        illumination_options % current light source
+        illumination_options % illumination options
         trigger % trigger for synchronized aquisition
         islighton % status of the illumination;
     end
@@ -46,7 +48,8 @@ classdef Microscope < handle
             % add z stage
             obj.zstage = StageZPrior.finescan;
             % add joystick
-            obj.joystick = ControllerJoystickLogitech();
+            obj.controllers = [ControllerJoystickLogitech()];
+            obj.controller = obj.controllers(1);
             % add trigger
             obj.trigger=TriggerNidaq();
             % set status

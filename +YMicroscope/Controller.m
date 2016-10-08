@@ -15,6 +15,7 @@ classdef (Abstract) Controller < handle & matlab.mixin.Heterogeneous
     events
         MoveXYStage
         MoveZStage
+        MoveStop
         ToggleLightSelection
         ToggleLight
         Capture

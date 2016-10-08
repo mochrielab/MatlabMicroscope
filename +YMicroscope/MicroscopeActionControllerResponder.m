@@ -23,7 +23,8 @@ classdef MicroscopeActionControllerResponder < YMicroscope.MicroscopeAction
         function setControllerListeners(obj,controller)
             % create a listener for each event type of the controller
             controllerevents=events(controller);
-            obj.controllerlisteners=[];
+            obj.controllerlisteners=repmat(event.listener.empty(),...
+                length(controllerevents));
             for i=1:length(controllerevents)
                 % set call back for each listner
                 obj.controllerlisteners(i)=addlistener(controller,...
@@ -41,12 +42,12 @@ classdef MicroscopeActionControllerResponder < YMicroscope.MicroscopeAction
         % destructor
         function delete(obj)
             obj.deleteControllerListeners;
-            delete@MicroscopeAction(obj);
+            delete@YMicroscope.MicroscopeAction(obj);
         end
         
         % respond to event
         function respondEvent(obj,src,eventdata)
-            name=eventdata.Name;
+            name=eventdata.EventName;
             microscope=obj.microscope_handle;
             switch name
                 case 'MoveXYStage'
@@ -56,8 +57,8 @@ classdef MicroscopeActionControllerResponder < YMicroscope.MicroscopeAction
                     else
                         scale=obj.eventloop.rate;
                     end
-                    microscope.xystage.setSpeed...
-                        (eventdata.xspeed*scale,eventdata.yspeed*scale);
+                    vs = [eventdata.xspeed*scale, eventdata.yspeed*scale];
+                    microscope.xystage.setSpeed(vs);
                 case 'MoveZStage'
                     isadjustedtolooprate=eventdata.isadjustedtolooprate;
                     if isadjustedtolooprate
@@ -67,6 +68,8 @@ classdef MicroscopeActionControllerResponder < YMicroscope.MicroscopeAction
                     end
                     microscope.zstage.setZoffset...
                         (microscope.zstage.zoffset+eventdata.zspeed*scale);
+                case 'MoveStop'
+                    microscope.xystage.setSpeed([0,0]);
                 case 'ToggleLightSelection'
                     currentindex=find(strcmp(microscope.illumination,...
                         microscope.illumination_options));
@@ -114,7 +117,7 @@ classdef MicroscopeActionControllerResponder < YMicroscope.MicroscopeAction
         
         % get event display for ui
         function dispstr=getEventDisplay(obj,eventstr)
-            getEventDisplay@MicroscopeAction(obj);
+            getEventDisplay@YMicroscope.MicroscopeAction(obj);
         end
     end
 

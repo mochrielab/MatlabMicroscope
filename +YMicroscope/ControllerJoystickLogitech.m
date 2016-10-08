@@ -46,16 +46,24 @@ classdef ControllerJoystickLogitech < YMicroscope.Controller
             % move xy
             if (velocityX~=0 || velocityY~=0 )
                 eventdata = ...
-                    JoystickEventData(velocityX,velocityY,0,true);
+                    YMicroscope.ControllerEventData(velocityX,velocityY,0,true);
                 notify(obj,'MoveXYStage',eventdata);
             end
             
             % move z
             if (velocityZ~=0)
                 eventdata = ...
-                    JoystickEventData(0,0,velocityZ,false);
+                    YMicroscope.ControllerEventData(0,0,velocityZ,false);
                 notify(obj,'MoveZStage',eventdata);
             end
+            
+            if (velocityX ==0 && velocityY == 0 && velocityZ ==0)
+                eventdata = ...
+                    YMicroscope.ControllerEventData(0,0,0,false);
+                notify(obj,'MoveStop',eventdata);
+            end
+            
+            
         end
         
         function emitActionEvents(obj)

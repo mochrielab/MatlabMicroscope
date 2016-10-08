@@ -1,4 +1,4 @@
-classdef MicroscopeActionLive < MicroscopeActionControllerResponder
+classdef MicroscopeActionLive < YMicroscope.MicroscopeActionControllerResponder
     % live function of the microscope
     % inherited the class of action controller responder
     % will respond to events created by the joystick or keyboard
@@ -9,26 +9,39 @@ classdef MicroscopeActionLive < MicroscopeActionControllerResponder
     end
     
     methods
+        % constructor
+        function obj=MicroscopeActionLive...
+                (label,microscope,image_axes)
+            obj@YMicroscope.MicroscopeActionControllerResponder(label,...
+                microscope,image_axes,microscope.controller);
+        end
+        
+        % start live
         function start(obj)
             if ~ishandle(obj.image_axes)
                 throw(MException('MicroscopeActionLive:UINeed',...
                     'can''t run without UI'));
             end
             % call super
-            start@MicroscopeAction(obj);
+            start@YMicroscope.MicroscopeAction(obj);
             % start camera
             obj.microscope_handle.camera.prepareModeSnapshot();
             % clear image
             cla(obj.image_axes);axis equal;colormap gray;
         end
         
+        % run everything
         function run(obj)
             obj.start;
             % callback function
             function callback (obj)
                 obj.drawImage(obj.microscope_handle.camera.capture);
-                obj.microscope_handle.joystick.emitMotionEvents();
-                obj.microscope_handle.joystick.emitActionEvents();
+                obj.microscope_handle.controller.emitMotionEvents();
+                obj.microscope_handle.controller.emitActionEvents();
+                % stop if image closed
+                if ~ishandle(obj.image_axes)
+                    obj.stop();
+                end
             end
             % turn on light
             obj.microscope_handle.switchLight('On');

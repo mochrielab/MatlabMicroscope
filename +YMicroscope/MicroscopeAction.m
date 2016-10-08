@@ -17,6 +17,7 @@ classdef (Abstract) MicroscopeAction < handle & matlab.mixin.Heterogeneous
     methods
         % constructor
         function obj = MicroscopeAction(label,microscope,image_axes)
+            import YMicroscope.*
             obj.label=label;
             obj.microscope_handle=microscope;
             obj.isrunning = false;

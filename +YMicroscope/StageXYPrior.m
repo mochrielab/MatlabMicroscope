@@ -59,7 +59,7 @@ classdef StageXYPrior < YMicroscope.Stage
             obj.v_x = vs(1);
             obj.v_y = vs(2);
             notify(obj, 'XVDidSet');
-            notify(obj, 'YVdidSet');
+            notify(obj, 'YVDidSet');
         end
         
         function vs = getSpeed(obj)
