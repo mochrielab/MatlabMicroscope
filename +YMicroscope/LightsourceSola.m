@@ -1,4 +1,4 @@
-classdef LightsourceSola < Lightsource
+classdef LightsourceSola < YMicroscope.Lightsource
     % class for sola light, fluorescent illumination
     %  Yao Zhao 11/7/2015
     
@@ -55,7 +55,7 @@ classdef LightsourceSola < Lightsource
         
         
         function setColor(obj,color)
-            if strcmp(color,'All')
+            if strcmp(color,'all')
             else
                 exception=MException('Lightsource:UnsupportedColor',...
                     ['color ',color,' not supported']);
