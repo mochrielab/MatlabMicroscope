@@ -17,5 +17,14 @@ classdef (Abstract) Stage < handle & matlab.mixin.Heterogeneous
         setSpeed(obj,vs)
         [ vs ] = getSpeed(obj)
     end
+    
+    events
+        XPDidSet
+        YPDidSet
+        ZPDidSet
+        XVDidSet
+        YVDidSet
+        ZVDidSet
+    end
 end
 

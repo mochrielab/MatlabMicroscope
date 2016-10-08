@@ -58,6 +58,8 @@ classdef StageXYPrior < YMicroscope.Stage
             obj.sendCommand(['VS,',num2str(vs(1)),',',num2str(vs(2))]);
             obj.v_x = vs(1);
             obj.v_y = vs(2);
+            notify('XVDidSet');
+            notify('YVdidSet');
         end
         
         function vs = getSpeed(obj)

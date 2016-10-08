@@ -1,4 +1,4 @@
-classdef StageZPrior < handle
+classdef StageZPrior < YMicroscope.Stage
     % class to control the priorZstage
     %  Yao Zhao 11/9/2015
     enumeration
@@ -29,6 +29,30 @@ classdef StageZPrior < handle
             obj.numstacks=numstacks;
             obj.stepsize=stepsize;
         end
+        
+        % get position
+        function [ pos ] = getPosition( obj )
+            pos = obj.zoffset;
+        end
+        
+        % set position
+        function setPosition(obj, pos)
+            if length(pos)==1
+                obj.setZoffset(pos)
+            else
+                throw(MException('PrioZStage:ZoffsetSize',...
+                    [length(pos),' zoffset size should be 1']));
+            end
+            notify('ZPDidSet');
+        end
+        
+        function setSpeed(obj,vs)
+            warning('not implemented')
+        end
+        function [ vs ] = getSpeed(obj)
+            warning('not implemented')
+        end
+        
         
         % get z off set
         function setZoffset(obj,zoffset)
@@ -73,9 +97,7 @@ classdef StageZPrior < handle
             zarray=obj.zoffset+obj.stepsize*stacks*obj.volts_per_pix;
         end
         
-    end
-    
-    
+    end    
     
     events
         ZoffsetDidSet
