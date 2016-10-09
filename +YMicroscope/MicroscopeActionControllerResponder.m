@@ -112,9 +112,11 @@ classdef MicroscopeActionControllerResponder < YMicroscope.MicroscopeAction
                         newroistr=camera.roi_options{newindex};
                         camera.setRoi(newroistr);
                     end
+                case 'ObjectBeingDestroyed'
+                    display('controller responder shutdown')
                 otherwise
-                    throw(MException(['Action:InvalidEvent',...
-                        'unsupported event data type ',name], ' '));
+                    throw(MException('Action:InvalidEvent',...
+                        ['unsupported event data type ',name]));
             end
         end
         

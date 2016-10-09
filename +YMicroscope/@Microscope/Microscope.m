@@ -97,23 +97,8 @@ classdef Microscope < handle
             end
         end
         
-        % set illumination
-        function setIllumination(obj, str)
-            if isnumeric(str)
-                try
-                    obj.illumination = obj.illumination_options{str};
-                    return
-                end
-            elseif ischar(str)
-                if sum(strcmp(str, obj.illumination_options)) == 1
-                    obj.illumination = str;
-                    return
-                end
-            end
-            notify(obj, 'IlluminationDidSet');
-            throw(MException('Microscope:set.illumination',...
-                ['unrecognizable value', str]));
-        end
+        %set illuminations
+        setIllumination(obj, str)
         
         % lock the microscope with some action
         function lock(obj,action)

@@ -166,7 +166,7 @@ classdef TriggerNidaq < YMicroscope.Trigger
         end
         
         function delete(obj)
-            obj.finish(0);
+            obj.finish();
         end
     end
     

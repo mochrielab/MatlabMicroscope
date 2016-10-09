@@ -16,6 +16,11 @@ classdef MicroscopeActionLive < YMicroscope.MicroscopeActionControllerResponder
                 microscope,image_axes,microscope.controller);
         end
         
+        % destructor
+        function delete(obj)
+            delete@YMicroscope.MicroscopeActionControllerResponder(obj);
+        end
+        
         % start live
         function start(obj)
             if ~ishandle(obj.image_axes)
