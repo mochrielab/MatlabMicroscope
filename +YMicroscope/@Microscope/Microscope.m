@@ -110,6 +110,7 @@ classdef Microscope < handle
                     return
                 end
             end
+            notify(obj, 'IlluminationDidSet');
             throw(MException('Microscope:set.illumination',...
                 ['unrecognizable value', str]));
         end
@@ -123,6 +124,7 @@ classdef Microscope < handle
                     ['can''t lock the microscope while ',obj.status]);
                 throw(exception);
             end
+            notify(obj, 'DidLock');
         end
         
         % unlock the microscope
@@ -134,6 +136,7 @@ classdef Microscope < handle
                     'can''t unlock the microscope');
                 throw(exception);
             end
+            notify(obj, 'DidUnlock');
         end
         
         % grab the overall settings of the microscope
@@ -146,6 +149,12 @@ classdef Microscope < handle
         
         % select light source with index
         setLightsource(obj,str)
+        
+        % reset microscope status
+        function reset(obj)
+            obj.status = 'idle';
+            warning('only use when debugging')
+        end
         
         % destructor
         function delete(obj)
@@ -160,6 +169,8 @@ classdef Microscope < handle
     events
         IlluminationDidSet
         StatusDidSet
+        DidLock
+        DidUnlock
         %         DidStart
         %         DidFinish
     end

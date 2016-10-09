@@ -61,7 +61,8 @@ classdef MicroscopeActionLive < YMicroscope.MicroscopeActionControllerResponder
                 case 'DidFinish'
                     dispstr = 'Live';
                 otherwise
-                    dispstr=getEventDisplay@MicroscopeAction(obj,eventstr);
+                    dispstr=...
+                    getEventDisplay@Ymicroscope.MicroscopeAction(obj,eventstr);
             end
         end
         
