@@ -69,8 +69,10 @@ classdef LightsourceRGB < YMicroscope.Lightsource
         % turn on the light
         function turnOn(obj)
             code = obj.decodeColor();
-            if ~isempty(code)
-                fprintf(obj.com,'%s\r',['*O',code]);
+            for i=1
+                if ~isempty(code)
+                    fprintf(obj.com,'%s\r',['*O',code]);
+                end
             end
             obj.ison=true;
             notify(obj,'DidTurnOn');

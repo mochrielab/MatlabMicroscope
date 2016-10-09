@@ -13,7 +13,6 @@ classdef TriggerNidaq < YMicroscope.Trigger
         brightfield
         camera
         lightsources
-        channel_labels
     end
     
     methods
@@ -34,7 +33,6 @@ classdef TriggerNidaq < YMicroscope.Trigger
             % fluorescent
             obj.fluorescent=obj.niclock.addDigitalChannel('Dev1','Port0/Line2','OutputOnly');
             obj.fluorescent.Name = 'fluorescent';
-            obj.channel_labels={obj.niclock.Channels.Name};
             % set output voltage zero
             obj.niclock.outputSingleScan([0 0 0 0]);
             % set lightsources to none
@@ -88,6 +86,7 @@ classdef TriggerNidaq < YMicroscope.Trigger
         end
         
         % get output data queue of a stack
+        % at each z stack position, multiple image acquisitions
         function queue=getOutputQueueStack(obj,zarray)
             numz=length(zarray);
             single_time=ceil(1000/obj.framerate);
@@ -99,6 +98,7 @@ classdef TriggerNidaq < YMicroscope.Trigger
         end
         
         % get output data queue of a waitingtime
+        % zstack keep constant value
         function queue=getOutputQueueWait(obj,zvalue,waittime)
             numframes=waittime/(1000/obj.clockrate);
             queue=zeros(numframes,obj.getNumChannels);
@@ -106,6 +106,7 @@ classdef TriggerNidaq < YMicroscope.Trigger
         end
         
         % get output data queue
+        % a single frame queue with constant zoffset
         function queue=getOutputQueueSingle(obj,zoffset)
             if obj.isValidExposures
                 total_time=ceil(1000/obj.framerate);
@@ -127,8 +128,13 @@ classdef TriggerNidaq < YMicroscope.Trigger
             end
         end
         
+        % get number of channels
         function numcha = getNumChannels(obj)
             numcha = length(obj.niclock.Channels);
+        end
+        % get channel labels
+        function labels = getChannelLabels(obj)
+            labels={obj.niclock.Channels.Name};
         end
         
         function delete(obj)
@@ -137,22 +143,44 @@ classdef TriggerNidaq < YMicroscope.Trigger
     end
     
     methods 
+        
+        % start sequnce
         function start(obj,outputdata)
             obj.niclock.queueOutputData(outputdata)
             obj.niclock.startBackground;
         end
+        
+        % finish sequence
         function finish(obj,zoffset)
             obj.niclock.stop;
             resetarray=zeros(1,obj.getNumChannels);
-            resetarray(strcmp(obj.channel_labels,'zstage'))=zoffset;
+            resetarray(strcmp(obj.getChannelLabels,'zstage'))=zoffset;
             obj.niclock.outputSingleScan(resetarray); % reset starting position
         end
         
+        % check if is running
         function bool =isRunning(obj)
             pause(.001) % give it time to update
             bool=obj.niclock.IsRunning;
             pause(.001)
         end
+        
+        % single trigger light
+        function singleTrigger(obj, zoffset, on_or_off)
+            if on_or_off == 1 || on_or_off ==0
+                resetarray=zeros(1,obj.getNumChannels);
+                resetarray(strcmp(obj.getChannelLabels(),'zstage'))=zoffset;
+                for i=1:length(obj.lightsources)
+                    resetarray(strcmp(obj.getChannelLabels(), obj.lightsources(i).label))=on_or_off;
+                end
+                obj.niclock.outputSingleScan(resetarray);
+                display(['single scan value: ',num2str(resetarray)]);
+            else
+                throw(MException('TriggerNidaq:singleTrigger',...
+                    'only accept on_or_off [0,1]'));
+            end
+        end
+        
     end
     
     events

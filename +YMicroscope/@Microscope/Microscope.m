@@ -13,17 +13,32 @@ classdef Microscope < handle
     % handles to devices
     properties (SetAccess = protected)
         camera % camera
+        
         xystage % xy stage
         zstage % z stage
+        
         controllers % all controllers
         controller % current controller
 %         controller_options % all possible controller
+        
         status % current status
+        
+        lightsource
         lightsources % light sources
+        
         illumination % current light source
         illumination_options % illumination options
         trigger % trigger for synchronized aquisition
-        islighton % status of the illumination;
+        
+        lighton % status of the illumination;
+    end
+    
+    properties (Constant)
+        % light on options
+        % always on: light is on all the time
+        % minimal exposure: only light on when exposing
+        % off: light is off
+        lighton_options = {'always on', 'minimal exposure', 'off'}
     end
     
     % current status of the microscope
@@ -40,6 +55,8 @@ classdef Microscope < handle
             % add light sources
             obj.lightsources=[LightsourceRGB('com6','brightfield'),...
                 LightsourceSola('com3','fluorescent')];
+            obj.lightsource = obj.lightsources(1);
+            %
             obj.illumination_options={obj.lightsources.label};
             obj.illumination=obj.illumination_options{1};
             obj.camera.setExposure(obj.getLightsource.exposure);
@@ -69,19 +86,8 @@ classdef Microscope < handle
            warning('invalid status input, status not set');
         end
         
-        % switch the light on or off
-        function switchLight(obj, on_or_off)
-            if strcmpi(on_or_off,'on')
-                obj.getLightsource.turnOn;
-                obj.islighton=true;
-            elseif strcmpi(on_or_off,'off')
-                obj.getLightsource.turnOff;
-                obj.islighton=false;
-            else
-                throw(MException('Microscope:SwitchLight',...
-                    'unrecognized switch light command'));
-            end
-        end
+        % set light on with option
+        setLight(obj, option);
         
         % set property value
         function didset=setProperty(obj,name, value)
@@ -195,10 +201,12 @@ classdef Microscope < handle
         end
         
         % get current light source
-        function handle=getLightsource(obj)
-            handle=obj.lightsources(strcmp(obj.illumination,...
-                obj.illumination_options));
+        function ls=getLightsource(obj)
+            ls = obj.lightsource;
         end
+        
+        % select light source with index
+         setLightsource(obj,str)
 
         % destructor
         function delete(obj)

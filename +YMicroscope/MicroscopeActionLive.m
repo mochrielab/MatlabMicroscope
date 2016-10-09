@@ -44,11 +44,11 @@ classdef MicroscopeActionLive < YMicroscope.MicroscopeActionControllerResponder
                 end
             end
             % turn on light
-            obj.microscope_handle.switchLight('On');
+            obj.microscope_handle.setLightOn('always on');
             % run event loop
             obj.eventloop.run(@()callback(obj));
             % call call back function when finish
-            obj.microscope_handle.switchLight('Off');
+            obj.microscope_handle.setLightOn('off');
             % finish
             obj.finish;
         end
