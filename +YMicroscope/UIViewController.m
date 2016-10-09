@@ -1,4 +1,4 @@
-classdef UIViewController < UIView
+classdef UIViewController < YMicroscope.UIView
     %UIView Controller to control the UIView
     % Yao Zhao, 11/9/2015
     
@@ -9,7 +9,7 @@ classdef UIViewController < UIView
     
     methods
         function obj = UIViewController(microscope_handle)
-            obj@UIView();
+            obj@YMicroscope.UIView();
             obj.microscope_handle=microscope_handle;
             obj.actions=[ MicroscopeActionLive('live',...
                 obj.microscope_handle,obj.imageaxis_handle,...
