@@ -174,7 +174,7 @@ classdef TriggerNidaq < YMicroscope.Trigger
                     resetarray(strcmp(obj.getChannelLabels(), obj.lightsources(i).label))=on_or_off;
                 end
                 obj.niclock.outputSingleScan(resetarray);
-                display(['single scan value: ',num2str(resetarray)]);
+%                 display(['single scan value: ',num2str(resetarray)]);
             else
                 throw(MException('TriggerNidaq:singleTrigger',...
                     'only accept on_or_off [0,1]'));

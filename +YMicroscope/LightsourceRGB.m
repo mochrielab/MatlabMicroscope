@@ -17,7 +17,7 @@ classdef LightsourceRGB < YMicroscope.Lightsource
             fprintf(obj.com,'%s\r','*OA');
             obj.setColor('White');
             obj.setExposure(40);
-            obj.setIntensity(1);
+            obj.setIntensity(5);
             disp('RGB light connected')
         end
         
@@ -69,14 +69,12 @@ classdef LightsourceRGB < YMicroscope.Lightsource
         % turn on the light
         function turnOn(obj)
             code = obj.decodeColor();
-            for i=1
-                if ~isempty(code)
-                    fprintf(obj.com,'%s\r',['*O',code]);
-                end
+            if ~isempty(code)
+                fprintf(obj.com,'%s\r',['*O',code]);
             end
             obj.ison=true;
             notify(obj,'DidTurnOn');
-            pause(.2)
+            pause(.3)
         end
         
         % turn off the light
@@ -84,7 +82,7 @@ classdef LightsourceRGB < YMicroscope.Lightsource
             fprintf(obj.com,'%s\r','*FT');
             obj.ison=false;
             notify(obj,'DidTurnOn');
-            pause(.2)
+            pause(.3)
         end
         
         % delete

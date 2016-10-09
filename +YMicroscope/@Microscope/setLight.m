@@ -17,21 +17,21 @@ else
     throw(MException('Microscope:setLightOn',...
         'unrecognized LightonOption'));
 end
-% set mode
-obj.lighton=mode;
 % set trigger for light source
 obj.trigger.setLightsources([obj.getLightsource]);
 % check mode
 switch mode
     case 'always on'
-        obj.getLightsource.turnOn;
+        obj.getLightsource.turnOn();
         singleTrigger(obj.trigger, obj.zstage.zoffset, 1);
+        obj.isLightOn = true;
     case 'minimal exposure'
-        obj.getLightsource.turnOn;
-        
+        obj.getLightsource.turnOn();
         singleTrigger(obj.trigger, obj.zstage.zoffset, 0)
+        obj.isLightOn = true;
     case 'off'
-        obj.getLightsource.turnOff;
+        obj.getLightsource.turnOff();
         singleTrigger(obj.trigger, obj.zstage.zoffset, 0)
+        obj.isLightOn = false;
 end
 end

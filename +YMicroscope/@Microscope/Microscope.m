@@ -30,7 +30,7 @@ classdef Microscope < handle
         illumination_options % illumination options
         trigger % trigger for synchronized aquisition
         
-        lighton % status of the illumination;
+        isLightOn % status of the illumination;
     end
     
     properties (Constant)

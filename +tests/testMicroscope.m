@@ -21,8 +21,8 @@ display('light off')
 %%
 
 mc.setLightsource(1)
-% mc.getLightsource.setIntensity(5)
-% mc.getLightsource.setColor('Green')
+mc.getLightsource.setIntensity(5)
+mc.getLightsource.setColor('Green')
 % this fucking pause is essential
 % pause(.1)
 mc.setLight('always on')

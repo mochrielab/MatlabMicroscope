@@ -1,4 +1,4 @@
-classdef MicroscopeActionCapture < MicroscopeAction 
+classdef MicroscopeActionCapture < YMicroscope.MicroscopeAction 
     % a simple class for single image capture and saving
     %   Yao Zhao 11/9/2015
     
@@ -7,9 +7,15 @@ classdef MicroscopeActionCapture < MicroscopeAction
     
     methods
         
+                % constructor
+        function obj=MicroscopeActionCapture(label,microscope,image_axes)
+            obj@YMicroscope.MicroscopeAction(label,...
+                microscope,image_axes);
+        end
+        
         function start(obj)
             % call super
-            start@MicroscopeAction(obj);
+            start@YMicroscope.MicroscopeAction(obj);
             % create tiff
             obj.file_handle.fopen(obj.microscope_handle.camera.getSize);
             % start camera
@@ -17,12 +23,12 @@ classdef MicroscopeActionCapture < MicroscopeAction
         end
         
         function run(obj)
-            obj.start;
-            obj.microscope_handle.switchLight('on');
-            img=obj.microscope_handle.camera.capture;
+            obj.start();
+            obj.microscope_handle.setLight('always on');
+            img=obj.microscope_handle.camera.capture();
             obj.drawImage(img);
             obj.file_handle.fwrite(img);
-            obj.microscope_handle.switchLight('off');
+            obj.microscope_handle.setLight('off');
             pause(.2)
             obj.finish;
         end

@@ -78,10 +78,10 @@ classdef MicroscopeActionControllerResponder < YMicroscope.MicroscopeAction
                         {mod(currentindex-1+1,totalnum)+1};
                     microscope.setIllumination(newilluminationstr);
                 case 'ToggleLight'
-                    if microscope.islighton == true
-                        microscope.switchLight('off');
+                    if microscope.isLightOn == true
+                        microscope.setLight('off');
                     else
-                        microscope.switchLight('on');
+                        microscope.setLight('always on');
                     end
                 case 'Capture'
                     captureaction=MicroscopeActionCapture('livecapture',...
