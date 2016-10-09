@@ -5,7 +5,7 @@ classdef Microscope < handle
     % microscope states
     properties (Constant)
        % microscope status
-       status_options = {'idle','stopping','live','zstack','movie'};
+       status_options = {'idle','stopping','live','zstack','movie','capture'};
        % data path to save captures
        datapath='I:\microscope_pics';
     end
@@ -84,6 +84,11 @@ classdef Microscope < handle
                 end
            end
            warning('invalid status input, status not set');
+        end
+        
+        % get status of the microscope
+        function status = getStatus(obj)
+            status = obj.status;
         end
         
         % set light on with option

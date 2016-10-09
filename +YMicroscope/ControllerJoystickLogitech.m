@@ -22,8 +22,8 @@ classdef ControllerJoystickLogitech < YMicroscope.Controller
         function emitMotionEvents(obj)
             % emit change event
             speed=obj.getSpeed;
-            velocityX= (axis(obj.joystick,1));
-            velocityY= (axis(obj.joystick,2));
+            velocityX= -(axis(obj.joystick,2));
+            velocityY= (axis(obj.joystick,1));
             dz=0;
             if button(obj.joystick,2);
                 dz= -1;
@@ -96,7 +96,7 @@ classdef ControllerJoystickLogitech < YMicroscope.Controller
             obj.zoomin_state = new_zoom_in ;
                       
             % zoom out
-            new_zoom_out = button(obj.joystick,9);
+            new_zoom_out = button(obj.joystick,8);
             if new_zoom_out == 1 && obj.zoomout_state == 0
                 notify(obj,'ZoomOut');
             end

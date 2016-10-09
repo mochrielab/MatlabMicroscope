@@ -5,15 +5,15 @@ mc = Microscope();
 %%
 clc
 close all
-ax=axes();
-act = MicroscopeActionCapture('Capture', mc, ax);
-act.run();
+ax=axes();colormap gray; axis image;
+act = MicroscopeActionCapture(mc, ax);
+img = act.run();
 %
 try
     mc.unlock(act)
 end
 delete(act)
-close all
+% close all
 %%
 delete(mc)
 

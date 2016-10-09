@@ -11,8 +11,8 @@ classdef MicroscopeActionLive < YMicroscope.MicroscopeActionControllerResponder
     methods
         % constructor
         function obj=MicroscopeActionLive...
-                (label,microscope,image_axes)
-            obj@YMicroscope.MicroscopeActionControllerResponder(label,...
+                (microscope,image_axes)
+            obj@YMicroscope.MicroscopeActionControllerResponder('live',...
                 microscope,image_axes,microscope.controller);
         end
         

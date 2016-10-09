@@ -27,6 +27,7 @@ classdef (Abstract) MicroscopeAction < handle & matlab.mixin.Heterogeneous
         end
         
         % start action
+        % lock microscope and set is running to be true
         function start(obj)
             obj.microscope_handle.lock(obj);
             obj.isrunning = true;
@@ -49,6 +50,10 @@ classdef (Abstract) MicroscopeAction < handle & matlab.mixin.Heterogeneous
         
         % draw image to ui
         function drawImage(obj,img)
+            % there is a bad pixel in zyla camera
+            if numel(img) == 5529600
+                img(5527206)= 0;
+            end
             if ishandle(obj.image_axes)
                 cla(obj.image_axes);
                 imagesc(img);
