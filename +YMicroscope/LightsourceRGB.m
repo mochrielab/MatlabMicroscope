@@ -76,6 +76,7 @@ classdef LightsourceRGB < YMicroscope.Lightsource
             end
             obj.ison=true;
             notify(obj,'DidTurnOn');
+            pause(.2)
         end
         
         % turn off the light
@@ -83,6 +84,7 @@ classdef LightsourceRGB < YMicroscope.Lightsource
             fprintf(obj.com,'%s\r','*FT');
             obj.ison=false;
             notify(obj,'DidTurnOn');
+            pause(.2)
         end
         
         % delete

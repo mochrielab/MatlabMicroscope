@@ -28,6 +28,7 @@ switch mode
         singleTrigger(obj.trigger, obj.zstage.zoffset, 1);
     case 'minimal exposure'
         obj.getLightsource.turnOn;
+        
         singleTrigger(obj.trigger, obj.zstage.zoffset, 0)
     case 'off'
         obj.getLightsource.turnOff;
