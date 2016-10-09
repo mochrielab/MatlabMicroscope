@@ -110,8 +110,8 @@ classdef MicroscopeActionControllerResponder < YMicroscope.MicroscopeAction
                         camera.setRoi(newroistr);
                     end
                 otherwise
-                    throw(MException('Action:InvalidEvent',...
-                        'unsupported event data type'));
+                    throw(MException(['Action:InvalidEvent',...
+                        'unsupported event data type ',name]));
             end
         end
         

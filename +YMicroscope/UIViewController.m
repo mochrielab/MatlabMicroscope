@@ -33,9 +33,11 @@ classdef UIViewController < YMicroscope.UIView
 
             % add selectors
             obj.addControlSelector(0,2,'illumination','illumination',...
-                obj.microscope_handle)
+                obj.microscope_handle);
             obj.addControlSelector(1,2,'roi','Camera ROI',...
-                obj.microscope_handle.camera)
+                obj.microscope_handle.camera);
+            obj.addControlSelector(2,2,'issaving','Save Captures',...
+                obj.actions(2));
 
             % add parameters
             obj.addParamCell(0,0,'exposure','brightfield exposure(ms)',...

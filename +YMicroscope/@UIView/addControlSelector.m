@@ -4,10 +4,27 @@ function addControlSelector(obj,x,y,tag,displayname,device_handle)
 % tag is the property name
 % displayname is the name for display in UI
 
-% get property handle
+% get property value
 v=(device_handle.(tag));
 % get property options
-options=device_handle.([tag,'_options']);
+datatype = '';
+% logical type
+if islogical(v)
+    datatype = 'logical';
+    if v == true
+        v = 'Yes';
+    else
+        v = 'No';
+    end
+    options = {'No', 'Yes'};
+    % string type
+elseif ischar(v)
+    datatype = 'string';
+    options=device_handle.([tag,'_options']);
+else
+    throw(MException('UIView:addControlSelector',...
+        ['unrecognizable type', v]));
+end
 % get control position
 pos=obj.getControlPanelPosition(x,y);
 
@@ -33,8 +50,13 @@ obj.listeners(numlh+1)=...
     function callbackFunc(hobj,eventdata,device_handle,tag)
         try
             value=(hobj.get('Value'));
-            device_handle.(['set',capitalize(tag)])...
-                (device_handle.([tag,'_options']){value});
+            if strcmp(datatype, 'string')
+                device_handle.(['set',capitalize(tag)])...
+                    (device_handle.([tag,'_options']){value});
+            elseif strcmp(datatype, 'logical')
+                device_handle.(['set',capitalize(tag)])...
+                    (value-1);
+            end
         catch exception
             set(hobj,'String',device_handle.(tag));
             warning(exception.message);
@@ -44,9 +66,14 @@ obj.listeners(numlh+1)=...
 % update display choice upon change in device value
     function updateDisplay(hobj,device_handle,tag)
         if ishandle(hobj)
-            set(hobj,'Value',...
-                find(strcmp(device_handle.(tag),...
-                device_handle.([tag,'_options']))))
+            if strcmp(datatype, 'string')
+                set(hobj,'Value',...
+                    find(strcmp(device_handle.(tag),...
+                    device_handle.([tag,'_options']))));
+            elseif strcmp(datatype, 'logical')
+                set(hobj,'Value',...
+                    find(device_handle.(tag) == [false, true]));
+            end
         end
     end
 

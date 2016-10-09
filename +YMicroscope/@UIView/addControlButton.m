@@ -22,7 +22,7 @@ for i=1:length(eves)
 end
 % update display
     function updateDisplay(hobj,str)
-        if ishandle(hobj)
+        if ishandle(hobj) && ~isempty(str)
             set(hobj,'String',str);
         end
     end
@@ -31,8 +31,6 @@ end
         if action.isRunning
             action.stop;
         else
-            action.moviecycles=obj.moviecycles;
-            action.movieinterval=obj.movieinterval;
             action.run;
         end
     end

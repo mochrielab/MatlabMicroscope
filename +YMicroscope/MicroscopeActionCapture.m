@@ -3,8 +3,9 @@ classdef MicroscopeActionCapture < YMicroscope.MicroscopeAction
     %   Yao Zhao 11/9/2015
     
     properties (SetAccess = protected)
-        isSaving
+        issaving
     end
+    
     
     methods
         
@@ -12,7 +13,7 @@ classdef MicroscopeActionCapture < YMicroscope.MicroscopeAction
         function obj=MicroscopeActionCapture(microscope,image_axes)
             obj@YMicroscope.MicroscopeAction('capture',...
                 microscope,image_axes);
-            obj.isSaving = false;
+            obj.issaving = false;
         end
         
         % start action
@@ -24,8 +25,11 @@ classdef MicroscopeActionCapture < YMicroscope.MicroscopeAction
                 start@YMicroscope.MicroscopeAction(obj);
                 % start camera
                 obj.microscope_handle.camera.prepareModeSnapshot();
+                % set exposure
+                obj.microscope_handle.camera.setExposure(...
+                    obj.microscope_handle.lightsource.exposure);
             end
-            if obj.isSaving
+            if obj.issaving
                 % create tiff
                 obj.file_handle.fopen(obj.microscope_handle.camera.getTiffTag());
             end
@@ -56,7 +60,7 @@ classdef MicroscopeActionCapture < YMicroscope.MicroscopeAction
                 end
             end
             % saving
-            if obj.isSaving
+            if obj.issaving
                 obj.file_handle.fwrite(img);
             end
             % clean up
@@ -65,7 +69,7 @@ classdef MicroscopeActionCapture < YMicroscope.MicroscopeAction
         
         % end acquisition
         function finish(obj)
-            if obj.isSaving
+            if obj.issaving
                 % close tiff
                 obj.file_handle.fclose(obj.microscope_handle.getSettings);
             end
@@ -76,13 +80,10 @@ classdef MicroscopeActionCapture < YMicroscope.MicroscopeAction
             end
         end
         
-        % get is saving option
-        function iss = getIsSaving(obj)
-            iss = obj.isSaving;
-        end
         % set is saving option
-        function setIsSaving(obj, val)
-            obj.isSaving = val>0;
+        function setIssaving(obj, val)
+            obj.issaving = val>0;
+            notify(obj, 'IssavingDidSet');
         end
         
         % get event display for ui
@@ -94,6 +95,8 @@ classdef MicroscopeActionCapture < YMicroscope.MicroscopeAction
                     dispstr='Capturing';
                 case 'DidFinish'
                     dispstr='Capture';
+                case 'IssavingDidSet'
+                    dispstr=[];
                 otherwise
                     warning(['no events has been set for: ',eventstr]);
                     dispstr=[];
@@ -103,6 +106,7 @@ classdef MicroscopeActionCapture < YMicroscope.MicroscopeAction
     end
     
     events
+        IssavingDidSet
     end
     
 end
