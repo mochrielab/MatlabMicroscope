@@ -9,7 +9,7 @@ close all
 % mc.getLightsource().setColor('White')
 % mc.getLightsource().setIntensity(5);
 % pause(0.2)
-ax=axes();colormap gray; axis image;
+ax=axes();colormap gray; axis image; axis off;
 % delete(act)
 act = MicroscopeActionLive(mc, ax);
 act.run();

@@ -2,9 +2,13 @@ classdef StageZPrior < YMicroscope.Stage
     % class to control the priorZstage
     %  Yao Zhao 11/9/2015
     
-    enumeration
-        finescan(3,61,1)
-        coarsescan(3,11,3)
+%     enumeration
+%         finescan(3,61,1)
+%         coarsescan(3,11,3)
+%     end
+    
+    properties (Access = protected)
+        trigger
     end
     
     properties (SetAccess = protected)
@@ -25,10 +29,11 @@ classdef StageZPrior < YMicroscope.Stage
     
     methods
         % constructor
-        function obj=StageZPrior(zoffset,numstacks,stepsize)
-            obj.zoffset=zoffset;
-            obj.numstacks=numstacks;
-            obj.stepsize=stepsize;
+        function obj=StageZPrior(trigger,zoffset,numstacks,stepsize)
+            obj.trigger = trigger;
+            obj.setZoffset(zoffset);
+            obj.setNumstacks(numstacks);
+            obj.setStepsize(stepsize);
             display('Z stage connected');
         end
         
@@ -46,6 +51,7 @@ classdef StageZPrior < YMicroscope.Stage
                     [length(pos),' zoffset size should be 1']));
             end
             notify(obj, 'ZPDidSet');
+            
         end
         
         function setSpeed(obj,vs)
@@ -57,6 +63,7 @@ classdef StageZPrior < YMicroscope.Stage
         
         
         % get z off set
+        % only set value without moving the stage
         function setZoffset(obj,zoffset)
             if zoffset<0
                 throw(MException('PrioZStage:ZoffsetOutOfLowerBound',...
@@ -65,12 +72,16 @@ classdef StageZPrior < YMicroscope.Stage
                 throw(MException('PrioZStage:ZoffsetOutOfUpperBound',...
                     [num2str(zoffset),' zoffset out of upper bound 10']));
             else
+                % save value
                 obj.zoffset=zoffset;
+                % move the stage
+                obj.trigger.setState('zstage',obj.zoffset);
                 notify(obj,'ZoffsetDidSet');
             end
         end
         
-        % get number stacks
+        % set number stacks
+        % set number of stacks
         function setNumstacks(obj,numstacks)
             if numstacks<0
                 throw(MException('PrioZStage:NegativeNumstacks',...
@@ -81,7 +92,8 @@ classdef StageZPrior < YMicroscope.Stage
             end
         end
         
-        % get step size
+        % set step size
+        % set stepszie of zscan
         function setStepsize(obj,stepsize)
             stepsize=round(stepsize);
             if stepsize<0
@@ -93,7 +105,7 @@ classdef StageZPrior < YMicroscope.Stage
             end
         end
         
-        % get z array
+        % get z array of a scan
         function zarray = getZarray(obj)
             stacks=(1:obj.numstacks)-(obj.numstacks+1)/2;
             zarray=obj.zoffset+obj.stepsize*stacks*obj.volts_per_pix;

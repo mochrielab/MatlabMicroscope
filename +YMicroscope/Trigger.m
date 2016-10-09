@@ -7,10 +7,14 @@ classdef (Abstract) Trigger < handle & matlab.mixin.Heterogeneous
 %     end
 
     properties (SetAccess = protected)
-        
-        label='trigger';
-        clockrate=1000;
-        framerate=1;
+        % class label
+        label = 'trigger';
+        % sampling rate
+        clockrate = 1000;
+        % frame rate of acquisition
+        framerate = 1;
+        % current state of output
+        states = []
     end
     
     methods

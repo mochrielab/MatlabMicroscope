@@ -23,15 +23,15 @@ obj.trigger.setLightsources([obj.getLightsource]);
 switch mode
     case 'always on'
         obj.getLightsource.turnOn();
-        singleTrigger(obj.trigger, obj.zstage.zoffset, 1);
+        triggerLight(obj.trigger, 1);
         obj.isLightOn = true;
     case 'minimal exposure'
         obj.getLightsource.turnOn();
-        singleTrigger(obj.trigger, obj.zstage.zoffset, 0)
+        triggerLight(obj.trigger, 0)
         obj.isLightOn = true;
     case 'off'
         obj.getLightsource.turnOff();
-        singleTrigger(obj.trigger, obj.zstage.zoffset, 0)
+        triggerLight(obj.trigger, 0)
         obj.isLightOn = false;
 end
 end

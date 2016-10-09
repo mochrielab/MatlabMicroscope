@@ -34,9 +34,37 @@ classdef TriggerNidaq < YMicroscope.Trigger
             obj.fluorescent=obj.niclock.addDigitalChannel('Dev1','Port0/Line2','OutputOnly');
             obj.fluorescent.Name = 'fluorescent';
             % set output voltage zero
-            obj.niclock.outputSingleScan([0 0 0 0]);
+            obj.states = [0,0,0,0];
+            obj.niclock.outputSingleScan(obj.states);
             % set lightsources to none
             obj.setLightsources([]);
+            %
+            display('ni daq session created')
+        end        
+        
+        % get current states value
+        function states = getStates(obj)
+            states = obj.states;
+        end
+        
+        % set states with label
+        function setState(obj, label, value)
+            % check if running
+            if obj.isRunning()
+                throw(MException('TriggerNidaq:setState',...
+                    'cant set state while running'));
+            end
+            % find channel with label
+            ind = find(strcmp(label, obj.getChannelLabels));
+            if length(ind)==1
+                % update value
+                obj.states(ind) = value;
+            else
+                throw(MException('TriggerNidaq:setState',...
+                    'label cant find'));
+            end
+            % output a new single scan
+            obj.niclock.outputSingleScan(obj.states);
         end
         
         % set clock rate
@@ -146,16 +174,17 @@ classdef TriggerNidaq < YMicroscope.Trigger
         
         % start sequnce
         function start(obj,outputdata)
+            % queue data and start in background
             obj.niclock.queueOutputData(outputdata)
             obj.niclock.startBackground;
         end
         
         % finish sequence
-        function finish(obj,zoffset)
+        function finish(obj)
+            % stop acquisition
             obj.niclock.stop;
-            resetarray=zeros(1,obj.getNumChannels);
-            resetarray(strcmp(obj.getChannelLabels,'zstage'))=zoffset;
-            obj.niclock.outputSingleScan(resetarray); % reset starting position
+            % recver to previous stage
+            obj.niclock.outputSingleScan(obj.states);
         end
         
         % check if is running
@@ -164,23 +193,21 @@ classdef TriggerNidaq < YMicroscope.Trigger
             bool=obj.niclock.IsRunning;
             pause(.001)
         end
-        
-        % single trigger light
-        function singleTrigger(obj, zoffset, on_or_off)
+
+        % single trigger light always on or off
+        function triggerLight(obj, on_or_off)
             if on_or_off == 1 || on_or_off ==0
-                resetarray=zeros(1,obj.getNumChannels);
-                resetarray(strcmp(obj.getChannelLabels(),'zstage'))=zoffset;
+                % only set the triggers for current lightsources
                 for i=1:length(obj.lightsources)
-                    resetarray(strcmp(obj.getChannelLabels(), obj.lightsources(i).label))=on_or_off;
+                    obj.states(strcmp(obj.getChannelLabels(), ...
+                        obj.lightsources(i).label))=on_or_off;
                 end
-                obj.niclock.outputSingleScan(resetarray);
-%                 display(['single scan value: ',num2str(resetarray)]);
+                obj.niclock.outputSingleScan(obj.states);
             else
                 throw(MException('TriggerNidaq:singleTrigger',...
                     'only accept on_or_off [0,1]'));
             end
-        end
-        
+        end        
     end
     
     events

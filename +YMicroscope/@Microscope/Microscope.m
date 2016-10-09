@@ -52,6 +52,8 @@ classdef Microscope < handle
             display('initiallizing...')
             % add camera
             obj.camera = CameraAndorZyla ();
+            % add trigger
+            obj.trigger=TriggerNidaq();
             % add light sources
             obj.lightsources=[LightsourceRGB('com6','brightfield'),...
                 LightsourceSola('com3','fluorescent')];
@@ -63,12 +65,10 @@ classdef Microscope < handle
             % add xy stage
             obj.xystage = StageXYPrior('com5');
             % add z stage
-            obj.zstage = StageZPrior.finescan;
+            obj.zstage = StageZPrior(obj.trigger, 3, 61, 1);
             % add joystick
             obj.controllers = [ControllerJoystickLogitech()];
             obj.controller = obj.controllers(1);
-            % add trigger
-            obj.trigger=TriggerNidaq();
             % set status
             obj.setStatus('idle');
             display('done')
