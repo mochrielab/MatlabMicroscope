@@ -77,11 +77,14 @@ classdef MicroscopeActionControllerResponder < YMicroscope.MicroscopeAction
                     newilluminationstr=microscope.illumination_options...
                         {mod(currentindex-1+1,totalnum)+1};
                     microscope.setIllumination(newilluminationstr);
+                    display(['set illumination ',newilluminationstr]);
                 case 'ToggleLight'
-                    if microscope.isLightOn == true
+                    if microscope.islighton == true
                         microscope.setLight('off');
+                        display('light off');
                     else
                         microscope.setLight('always on');
+                        display('light on');
                     end
                 case 'Capture'
                     captureaction=MicroscopeActionCapture('livecapture',...
@@ -111,7 +114,7 @@ classdef MicroscopeActionControllerResponder < YMicroscope.MicroscopeAction
                     end
                 otherwise
                     throw(MException(['Action:InvalidEvent',...
-                        'unsupported event data type ',name]));
+                        'unsupported event data type ',name], ' '));
             end
         end
         

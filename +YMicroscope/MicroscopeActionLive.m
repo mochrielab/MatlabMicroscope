@@ -62,7 +62,7 @@ classdef MicroscopeActionLive < YMicroscope.MicroscopeActionControllerResponder
                     dispstr = 'Live';
                 otherwise
                     dispstr=...
-                    getEventDisplay@Ymicroscope.MicroscopeAction(obj,eventstr);
+                    getEventDisplay@YMicroscope.MicroscopeAction(obj,eventstr);
             end
         end
         

@@ -30,7 +30,7 @@ classdef Microscope < handle
         
         trigger % trigger for synchronized aquisition
         
-        isLightOn % status of the illumination;
+        islighton % status of the illumination;
     end
     
     properties (SetAccess = protected, Dependent)

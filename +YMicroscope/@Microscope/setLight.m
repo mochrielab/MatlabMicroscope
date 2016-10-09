@@ -24,14 +24,14 @@ switch mode
     case 'always on'
         obj.getLightsource.turnOn();
         triggerLight(obj.trigger, 1);
-        obj.isLightOn = true;
+        obj.islighton = true;
     case 'minimal exposure'
         obj.getLightsource.turnOn();
         triggerLight(obj.trigger, 0)
-        obj.isLightOn = true;
+        obj.islighton = true;
     case 'off'
         obj.getLightsource.turnOff();
         triggerLight(obj.trigger, 0)
-        obj.isLightOn = false;
+        obj.islighton = false;
 end
 end
