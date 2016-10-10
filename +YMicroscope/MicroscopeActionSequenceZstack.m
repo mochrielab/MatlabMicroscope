@@ -1,15 +1,25 @@
-classdef MicroscopeActionSequenceZstack < MicroscopeActionSequence
+classdef MicroscopeActionSequenceZstack < YMicroscope.MicroscopeActionSequence
     %zstack class for microscope actions
     %   Yao Zhao 11/10/2015
     
     properties (SetAccess = protected)
-
+        
+    end
+    
+    properties (Access = private)
+        display_interval = 3;
     end
     
     methods
         
+        % constructor
+        function obj=MicroscopeActionSequenceZstack...
+                (microscope,image_axes)
+            obj@YMicroscope.MicroscopeActionSequence('zstack',microscope,image_axes);
+        end
+        
         function start(obj)
-            start@MicroscopeActionSequence(obj);
+            start@YMicroscope.MicroscopeActionSequence(obj);
             % set light source
             obj.microscope_handle.trigger.setLightsources...
                 (obj.microscope_handle.getLightsource);
@@ -21,12 +31,12 @@ classdef MicroscopeActionSequenceZstack < MicroscopeActionSequence
                 obj.microscope_handle.trigger.getOutputQueueStack(zarray));
         end
         
-        function run (obj)
-            obj.start
+        function run(obj)
+            obj.start();
             % run event loop
             while obj.microscope_handle.trigger.isRunning
                 obj.drawImage(obj.microscope_handle.camera.getLastImage);
-                for i=1:3
+                for i=1:obj.display_interval
                     img=obj.microscope_handle.camera.popNextImage;
                     if ~isempty(img)
                         obj.file_handle.fwrite(img)
@@ -36,11 +46,10 @@ classdef MicroscopeActionSequenceZstack < MicroscopeActionSequence
             while ~isempty(img)
                 img=obj.microscope_handle.camera.popNextImage;
                 obj.file_handle.fwrite(img)
-            end            
+            end
             %finish
-            obj.finish
+            obj.finish();
         end
-        
         
         % get event display for UI
         function dispstr=getEventDisplay(obj,eventstr)
@@ -53,7 +62,7 @@ classdef MicroscopeActionSequenceZstack < MicroscopeActionSequence
                     dispstr=getEventDisplay@MicroscopeAction(obj,eventstr);
             end
         end
-
+        
     end
     
     events

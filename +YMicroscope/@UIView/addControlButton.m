@@ -31,7 +31,13 @@ end
         if action.isRunning
             action.stop;
         else
-            action.run;
+            try
+                action.run;
+            catch error
+                warning(error.message);
+                obj.popWarning();
+                set(uic, 'String',microscope_action.getEventDisplay('DidFinish'));
+            end
         end
     end
 end

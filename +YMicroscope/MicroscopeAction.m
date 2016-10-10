@@ -1,4 +1,4 @@
-classdef (Abstract) MicroscopeAction < handle & matlab.mixin.Heterogeneous 
+classdef (Abstract) MicroscopeAction < handle & matlab.mixin.Heterogeneous
     %basic class for microscope actions
     %   Yao Zhao 11/9/2015
     
@@ -50,15 +50,15 @@ classdef (Abstract) MicroscopeAction < handle & matlab.mixin.Heterogeneous
         
         % draw image to ui
         function drawImage(obj,img)
-            % there is a bad pixel in zyla camera
-            if numel(img) == 5529600
-                img(5527206)= 0;
-            end
             if ishandle(obj.image_axes)
+                % there is a bad pixel in zyla camera
+                if numel(img) == 5529600
+                    img(5527206)= 0;
+                end
                 cla(obj.image_axes);
                 imagesc(img);
             end
-        end      
+        end
         
         % test if action is running
         function bool=isRunning(obj)

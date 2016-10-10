@@ -50,6 +50,7 @@ classdef (Abstract) Trigger < handle & matlab.mixin.Heterogeneous
         start(obj)
         finish(obj)
         isRunning(obj)
+        bool=isValidExposures(obj)
     end
     
     events

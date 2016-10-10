@@ -1,4 +1,4 @@
-classdef (Abstract) MicroscopeActionMovie < MicroscopeActionSequence
+classdef (Abstract) MicroscopeActionMovie < YMicroscope.MicroscopeActionSequence
     %zstack class for microscope actions
     %   Yao Zhao 11/10/2015
     
@@ -16,6 +16,7 @@ classdef (Abstract) MicroscopeActionMovie < MicroscopeActionSequence
             start@MicroscopeActionSequence(obj);
         end
         
+        % set movie cycles
         function setMoviecycles(moviecycles)
             if moviecycles >=0
                 obj.moviecycles=moviecycles;
@@ -26,6 +27,7 @@ classdef (Abstract) MicroscopeActionMovie < MicroscopeActionSequence
             end
         end
         
+        % set movie intervals
         function setMovieinterval(movieinterval)
             if movieinterval >=0
                 obj.movieinterval=movieinterval;
@@ -35,7 +37,6 @@ classdef (Abstract) MicroscopeActionMovie < MicroscopeActionSequence
                     'negative movie interval'));
             end
         end
-        
         
         % run acquisition
         function run (obj)

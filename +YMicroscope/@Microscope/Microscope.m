@@ -5,6 +5,7 @@ classdef Microscope < handle
     % microscope states
     properties (Constant)
         % microscope status
+        % change status to dependent later
         status_options = {'idle','stopping','live','zstack','movie','capture'};
         % data path to save captures
         datapath='I:\microscope_pics';

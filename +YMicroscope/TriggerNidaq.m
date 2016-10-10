@@ -139,20 +139,20 @@ classdef TriggerNidaq < YMicroscope.Trigger
             if obj.isValidExposures
                 total_time=ceil(1000/obj.framerate);
                 queue=zeros(total_time,obj.getNumChannels);
-                queue(:,strcmp(obj.channel_labels,'zstage'))=zoffset;
+                queue(:,strcmp(obj.getChannelLabels(),'zstage'))=zoffset;
                 time_pointer=1;
                 for i=1:length(obj.lightsources)
                     exposure=round(obj.lightsources(i).exposure...
                         /1000*obj.clockrate);
                     queue(time_pointer:time_pointer+exposure,...
-                        strcmp(obj.channel_labels,'camera')|...
-                        strcmp(obj.channel_labels,obj.lightsources(i).label))...
+                        strcmp(obj.getChannelLabels(),'camera')|...
+                        strcmp(obj.getChannelLabels(),obj.lightsources(i).label))...
                         =1;
                     time_pointer=time_pointer+exposure+obj.getDeadTime;
                 end
             else
                 throw(MException('Trigger:InvalidExposures',...
-                    'invalid exposures'));
+                    ['invalid exposures']));
             end
         end
         
