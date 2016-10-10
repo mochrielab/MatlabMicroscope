@@ -156,6 +156,14 @@ classdef TriggerNidaq < YMicroscope.Trigger
             end
         end
         
+        % plot single output
+        function plotSingleOutput(obj)
+            figure;
+            singlescan = obj.getOutputQueueSingle(0);
+            t=1:size(singlescan,1);
+            plot(t, singlescan(:,2:end));
+        end
+        
         % get number of channels
         function numcha = getNumChannels(obj)
             numcha = length(obj.niclock.Channels);

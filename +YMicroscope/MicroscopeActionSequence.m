@@ -26,6 +26,8 @@ classdef (Abstract) MicroscopeActionSequence < YMicroscope.MicroscopeAction
             obj.file_handle.fopen(obj.microscope_handle.camera.getTiffTag());
             % prepare camera
             obj.microscope_handle.camera.prepareModeSequence();
+            % turn on the light
+            obj.microscope_handle.setLight('minimal exposure');
         end
        
         function finish(obj)
@@ -33,6 +35,10 @@ classdef (Abstract) MicroscopeActionSequence < YMicroscope.MicroscopeAction
             obj.microscope_handle.trigger.finish();
             obj.microscope_handle.camera.stopSequenceAcquisition();
             obj.file_handle.fclose(obj.microscope_handle.getSettings);
+           
+            % turn off the light
+            obj.microscope_handle.setLight('off');
+            % call super
             finish@YMicroscope.MicroscopeAction(obj);
         end
         

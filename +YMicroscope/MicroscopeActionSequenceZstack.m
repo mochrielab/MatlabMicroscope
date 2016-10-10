@@ -27,8 +27,8 @@ classdef MicroscopeActionSequenceZstack < YMicroscope.MicroscopeActionSequence
             obj.microscope_handle.camera.startSequenceAcquisition();
             % start nidaq in background
             zarray=obj.microscope_handle.zstage.getZarray();
-            obj.microscope_handle.trigger.start(...
-                obj.microscope_handle.trigger.getOutputQueueStack(zarray));
+            outputstack = obj.microscope_handle.trigger.getOutputQueueStack(zarray);
+            obj.microscope_handle.trigger.start(outputstack);
         end
         
         function run(obj)
