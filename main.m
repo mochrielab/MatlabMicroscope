@@ -4,4 +4,4 @@ m = Microscope();
 
 %%
 clc
-ui = UIViewController(mc);
+ui = UIViewController(m);

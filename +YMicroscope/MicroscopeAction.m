@@ -56,7 +56,7 @@ classdef (Abstract) MicroscopeAction < handle & matlab.mixin.Heterogeneous
                     img(5527206)= 0;
                 end
                 cla(obj.image_axes);
-                imagesc(img);
+                imagesc(img); axis off;
             end
         end
         

@@ -59,7 +59,7 @@ classdef MicroscopeActionSequenceZstack < YMicroscope.MicroscopeActionSequence
                 case 'DidFinish'
                     dispstr = 'Zstack';
                 otherwise
-                    dispstr=getEventDisplay@MicroscopeAction(obj,eventstr);
+                    dispstr=getEventDisplay@YMicroscope.MicroscopeAction(obj,eventstr);
             end
         end
         

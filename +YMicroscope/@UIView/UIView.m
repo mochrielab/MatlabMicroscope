@@ -25,7 +25,8 @@ classdef UIView < handle
             end
             % image axes
             obj.imageaxis_handle=axes('Parent',obj.figure_handle,...
-                'Unit','Pixels','Position',[20 20 910 910],'Box','on','BoxStyle','full',...
+                'Unit','Pixels','Position',[20 20 910 910],...
+                'Box','on','BoxStyle','full',...
                 'xtick',[],'ytick',[]);
             imagesc(0);colormap gray;axis image;axis off
             % control panel
@@ -84,11 +85,19 @@ classdef UIView < handle
             else
                 close(obj.figure_handle);
             end
-            delete(obj.listeners);
+            obj.deleteListeners;
         end
         
         function deleteListeners(obj)
-            delete(obj.listeners);
+            display('ui listeners deleted')
+            for i = 1:length(obj.listeners)
+                delete(obj.listeners(i));
+            end
+            obj.listeners = [];
+        end
+        
+        function listeners = getListeners(obj)
+            listeners = obj.listeners;
         end
     end
     

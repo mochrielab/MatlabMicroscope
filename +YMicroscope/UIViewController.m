@@ -65,6 +65,14 @@ classdef UIViewController < YMicroscope.UIView
 
 
         end
+        
+        function delete(obj)
+            for i = 1:length(obj.actions)
+                delete(obj.actions(i))
+            end
+            obj.delete@YMicroscope.UIView();
+        end
+        
     end
     
     events

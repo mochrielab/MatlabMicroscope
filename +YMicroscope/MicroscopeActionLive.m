@@ -5,7 +5,7 @@ classdef MicroscopeActionLive < YMicroscope.MicroscopeActionControllerResponder
     %   Yao Zhao 11/16/2015
     
     properties (SetAccess = protected)
-
+        
     end
     
     methods
@@ -32,7 +32,7 @@ classdef MicroscopeActionLive < YMicroscope.MicroscopeActionControllerResponder
             % start camera
             obj.microscope_handle.camera.prepareModeSnapshot();
             % clear image
-            cla(obj.image_axes);axis equal;colormap gray;
+            cla(obj.image_axes);axis equal;colormap gray;axis off;
         end
         
         % run everything
@@ -67,9 +67,10 @@ classdef MicroscopeActionLive < YMicroscope.MicroscopeActionControllerResponder
                     dispstr = 'Live';
                 otherwise
                     dispstr=...
-                    getEventDisplay@YMicroscope.MicroscopeAction(obj,eventstr);
+                        getEventDisplay@YMicroscope.MicroscopeAction(obj,eventstr);
             end
         end
+       
         
     end
     

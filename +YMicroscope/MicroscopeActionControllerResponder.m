@@ -36,7 +36,10 @@ classdef MicroscopeActionControllerResponder < YMicroscope.MicroscopeAction
         % delete listenrs after use of them
         % dont forget to add them to the destructer of its subclass
         function deleteControllerListeners(obj)
-            delete(obj.controllerlisteners);
+            display('controller listeners deleted')
+            for i = 1:length(obj.controllerlisteners)
+                delete(obj.controllerlisteners(i));
+            end
         end
         
         % destructor
