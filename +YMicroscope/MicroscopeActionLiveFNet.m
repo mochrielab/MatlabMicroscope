@@ -8,6 +8,8 @@ classdef MicroscopeActionLiveFNet < YMicroscope.MicroscopeActionLive
         fnet
         max
         min
+        lock_focus
+        focal_dist_ave
     end
     
     methods
@@ -17,6 +19,7 @@ classdef MicroscopeActionLiveFNet < YMicroscope.MicroscopeActionLive
             obj@YMicroscope.MicroscopeActionLive(...
                 microscope,image_axes);
             obj.label = 'livefnet';
+            obj.lock_focus = false;
             obj.fnet = YMicroscope.FocusNet(fullfile('models', 'probnet12'), 16);
         end
         
@@ -42,6 +45,9 @@ classdef MicroscopeActionLiveFNet < YMicroscope.MicroscopeActionLive
                 obj.fnet.inference();
                 obj.drawImage(img); hold on;
                 obj.fnet.plot();
+                dist = obj.fnet.getFocalDistance();
+                display(['distance to focal plane: ', num2str(dist)]);
+                obj.microscope_handle.zstage.move(dist);
                 obj.microscope_handle.controller.emitMotionEvents();
                 obj.microscope_handle.controller.emitActionEvents();
                 % stop if image closed

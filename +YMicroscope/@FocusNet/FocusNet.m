@@ -5,6 +5,7 @@ classdef FocusNet < handle
     properties
         net
         batchsize
+        labelscale
         input
         mean
         var
@@ -14,6 +15,7 @@ classdef FocusNet < handle
         % constructor
         function obj = FocusNet(model_path, batchsize)
             obj.batchsize = batchsize;
+            obj.labelscale = 60;
             switch batchsize
                 case 1
                     model_def = fullfile(model_path,'deploy_1_1.prototxt');
@@ -84,7 +86,12 @@ classdef FocusNet < handle
         function inference(obj)
             loss = obj.net.forward({obj.input});
             obj.mean = loss{1};
-            obj.var = loss{2};
+            obj.var = loss{2}+0.005;
+        end
+        
+        % get focal distance
+        function dist = getFocalDistance(obj) 
+            dist = obj.labelscale * sum(obj.mean .* exp(-obj.var)) / sum(exp(-obj.var));
         end
         
         % plot
@@ -106,7 +113,7 @@ classdef FocusNet < handle
                                 'EdgeColor', 'g');
                             text(ic*256+1+80, ir*256+161+80, ...
                                 [num2str(obj.mean(input_index), '%1.2f'), '\pm',...
-                                num2str(sqrt(obj.var(input_index)+0.01), '%1.2f')],...
+                                num2str(sqrt(obj.var(input_index)), '%1.2f')],...
                                 'Color','r');
                             input_index = input_index + 1;
                         end

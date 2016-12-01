@@ -51,7 +51,12 @@ classdef StageZPrior < YMicroscope.Stage
                     [length(pos),' zoffset size should be 1']));
             end
             notify(obj, 'ZPDidSet');
-            
+        end
+        
+        % move
+        function move(obj, pix)
+            zoffset = obj.getPosition();
+            obj.setPosition(zoffset + pix*obj.volts_per_pix);
         end
         
         function setSpeed(obj,vs)
