@@ -75,7 +75,7 @@ classdef MicroscopeActionCapture < YMicroscope.MicroscopeAction
             end
             % get status
             status = obj.microscope_handle.getStatus();
-            if strcmp(status, 'idle')
+            if strcmp(status, 'capture')
                 finish@YMicroscope.MicroscopeAction(obj);
             end
         end
