@@ -16,6 +16,6 @@ tagstruct.SamplesPerPixel = 1;
 tagstruct.Software = 'MATLAB';
 tagstruct.XResolution = 0.000065;
 tagstruct.YResolution = 0.000065;
-tagstruct.ImageLength = size(1);%obj.img_width;
-tagstruct.ImageWidth = size(2);%obj.img_height;
+tagstruct.ImageLength = size(2);%obj.img_width;
+tagstruct.ImageWidth = size(1);%obj.img_height;
 end
