@@ -6,6 +6,7 @@ classdef EventLoop < handle
     properties (Access = protected)
         rate = 10;
         isrunning
+        loopindex = 0
     end
     
     methods
@@ -14,11 +15,16 @@ classdef EventLoop < handle
             obj.isrunning=false;
         end
         
+        function index = getLoopIndex(obj)
+            index = obj.loopindex;
+        end
+        
         % run the loop
         function run(obj,callback)
             obj.isrunning=true;
 %             lh=addlistener(obj,'StopLoop',@(hobj,eventdata)callbackStop(hobj));
             while obj.isrunning
+                obj.loopindex = mod(obj.loopindex + 1, 1000000);
                 callback();
                 pause(1/obj.rate);
             end

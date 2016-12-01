@@ -33,7 +33,13 @@ classdef FocusNet < handle
         end
         
         % convert images
-        function loadImages(obj, img)
+        function loadImages(obj, img, varargin)
+            have_max_min = 0;
+            if nargin == 4
+                have_max_min = 1;
+                imgmax = varargin{1};
+                imgmin = varargin{2};
+            end
             [height, width] = size(img);
             obj.input = zeros(96, 96, 1, obj.batchsize);
             if height == 256 && width == 256 && obj.batchsize == 1
@@ -62,12 +68,14 @@ classdef FocusNet < handle
             end
             function img = preprocess(img)
                 img = single(imresize(img, [96 96]));
-                maximg = max(img(:));
-                minimg = min(img(:));
-                if maximg > minimg
-                    img = (img - minimg)/(maximg - minimg)*256-128;
+                if have_max_min
+                    img = (img - imgmin)/(imgmax - imgmin)*256-128;
                 else
-                    img = zeros(size(img))+128;
+                    if maximg > minimg
+                        img = (img - mean(img(:)))/std(img(:))*16;
+                    else
+                        img = zeros(size(img))+128;
+                    end
                 end
             end
         end
@@ -80,9 +88,10 @@ classdef FocusNet < handle
         end
         
         % plot
-        function plot(obj, img)
-            figure('Position', [50 50 800 800])
-            imagesc(img); axis image; axis off; colormap gray; hold on;
+        function plot(obj, varargin)
+            if nargin >= 2
+                imagesc(varargin{1}); axis image; axis off; colormap gray; hold on;
+            end
             switch obj.batchsize
                 case 1
                     error('not implemented')
@@ -97,7 +106,8 @@ classdef FocusNet < handle
                                 'EdgeColor', 'g');
                             text(ic*256+1+80, ir*256+161+80, ...
                                 [num2str(obj.mean(input_index), '%1.2f'), '\pm',...
-                                num2str(sqrt(obj.var(input_index)+0.01), '%1.2f')]);
+                                num2str(sqrt(obj.var(input_index)+0.01), '%1.2f')],...
+                                'Color','r');
                             input_index = input_index + 1;
                         end
                     end
