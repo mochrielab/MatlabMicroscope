@@ -8,8 +8,9 @@ classdef MicroscopeActionLiveFNet < YMicroscope.MicroscopeActionLive
         fnet
         max
         min
-        lock_focus
-        focal_dist_ave
+        lockfocus
+        focalplanecorrect
+        focaldistavg
     end
     
     methods
@@ -19,8 +20,20 @@ classdef MicroscopeActionLiveFNet < YMicroscope.MicroscopeActionLive
             obj@YMicroscope.MicroscopeActionLive(...
                 microscope,image_axes);
             obj.label = 'livefnet';
-            obj.lock_focus = false;
+            obj.lockfocus = false;
+            obj.focalplanecorrect = 0;
+            obj.focaldistavg = 0;
             obj.fnet = YMicroscope.FocusNet(fullfile('models', 'probnet12'), 16);
+        end
+        
+        function setLockfocus(obj, lock)
+            obj.lockfocus = lock;
+            notify(obj, 'LockfocusDidSet')
+        end
+        
+        function setFocalplanecorrect(obj, correct)
+            obj.focalplanecorrect = correct;
+            notify(obj, 'FocalplanecorrectDidSet')
         end
         
         % destructor
@@ -38,16 +51,19 @@ classdef MicroscopeActionLiveFNet < YMicroscope.MicroscopeActionLive
         function run(obj)
             obj.start;
             % callback function
-
+            
             function callback (obj)
                 img = (obj.microscope_handle.camera.capture);
                 obj.fnet.loadImages(img, obj.max, obj.min);
                 obj.fnet.inference();
                 obj.drawImage(img); hold on;
                 obj.fnet.plot();
-                dist = obj.fnet.getFocalDistance();
-                display(['distance to focal plane: ', num2str(dist)]);
-                obj.microscope_handle.zstage.move(dist);
+                if obj.lockfocus
+                    dist = obj.fnet.getFocalDistance();
+%                     obj.focaldistavg = obj.focaldistavg * 0.8 + dist * 0.2;
+                    display(['distance to focal plane: ', num2str(dist)]);
+                    obj.microscope_handle.zstage.move((dist - obj.focalplanecorrect)*.5);
+                end
                 obj.microscope_handle.controller.emitMotionEvents();
                 obj.microscope_handle.controller.emitActionEvents();
                 % stop if image closed
@@ -61,10 +77,10 @@ classdef MicroscopeActionLiveFNet < YMicroscope.MicroscopeActionLive
             end
             % turn on light
             obj.microscope_handle.setLight('always on');
-                        
+            
             % loop through a small stack
             zoffset = obj.microscope_handle.zstage.zoffset;
-            for idelta = linspace(-0.03, 0.03, 10)
+            for idelta = linspace(-0.06, 0.06, 21)
                 obj.microscope_handle.zstage.setZoffset(zoffset+idelta)
                 imgtmp = (obj.microscope_handle.camera.capture);
                 obj.max = max([obj.max, single(max(imgtmp(:)))]);
@@ -98,6 +114,8 @@ classdef MicroscopeActionLiveFNet < YMicroscope.MicroscopeActionLive
     end
     
     events
+        LockfocusDidSet
+        FocalplanecorrectDidSet
     end
     
 end

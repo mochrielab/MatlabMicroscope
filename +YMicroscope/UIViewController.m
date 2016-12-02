@@ -40,6 +40,8 @@ classdef UIViewController < YMicroscope.UIView
                 obj.microscope_handle.camera);
             obj.addControlSelector(2,2,'issaving','Save Captures',...
                 obj.actions(2));
+            obj.addControlSelector(2,3,'lockfocus','LiveFocus',...
+                obj.actions(4));
 
             % add parameters
             obj.addParamCell(0,0,'exposure','brightfield exposure(ms)',...
@@ -64,7 +66,8 @@ classdef UIViewController < YMicroscope.UIView
 %                 obj);
 %             obj.addParamCell(2,1,'movieinterval','movie interval (mins)',...
 %                 obj);
-
+            obj.addParamCell(3,1,'focalplanecorrect','focal plane correction (pixel)',...
+                obj.actions(4));
 
         end
         

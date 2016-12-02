@@ -91,7 +91,8 @@ classdef FocusNet < handle
         
         % get focal distance
         function dist = getFocalDistance(obj) 
-            dist = obj.labelscale * sum(obj.mean .* exp(-obj.var)) / sum(exp(-obj.var));
+%             dist = obj.labelscale * sum(obj.mean .* exp(-obj.var)) / sum(exp(-obj.var));
+            dist = obj.labelscale * sum(obj.mean ./(obj.var) )/ sum(1./obj.var);
         end
         
         % plot
