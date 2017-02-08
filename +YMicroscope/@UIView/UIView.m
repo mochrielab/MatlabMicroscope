@@ -5,6 +5,7 @@ classdef UIView < handle
     properties (Access = protected)
         figure_handle
         imageaxis_handle
+        hist_handle % 01/29/17 - SEP
         controlpanel_handle
         parampanel_handle
         listeners
@@ -28,7 +29,7 @@ classdef UIView < handle
                 'Unit','Pixels','Position',[20 20 910 910],...
                 'Box','on','BoxStyle','full',...
                 'xtick',[],'ytick',[]);
-            imagesc(0);colormap gray;axis image;axis off
+            imagesc(0); colormap gray;axis image;axis off
             % control panel
             obj.controlpanel_handle=uipanel('Parent',obj.figure_handle,...
                 'Unit','Pixels','Position',[950+20 475+20 970-50 475-30],...
@@ -39,8 +40,14 @@ classdef UIView < handle
                 'Unit','Pixels','Position',[950+20 20 970-50 475-10],...
                 'Title','Parameters','Fontsize',14,...
                 'BorderType','etchedin','HighlightColor','blue');
+            % histogram axes 01/29/17 - SEP
+            obj.hist_handle=axes('Parent',obj.controlpanel_handle,...
+                'Unit','Pixels','Position',[465 80 250 150],'Box','on',...
+                'BoxStyle','full','xtick',[],'ytick',[]);
+            histogram(0); set(gca,'yticklabel',[]); xlim([0 150000]);
             obj.listeners=event.listener.empty;
         end
+        
         
         function setMoviecycles(moviecycles)
             if moviecycles >=0
@@ -63,16 +70,20 @@ classdef UIView < handle
         end
         
         % set the value for specific tag
-        setValue(obj,tag,stringvalue)
+        setValue(obj, tag, stringvalue)
         
         % add control buttons for microscope actions
-        addControlButton(obj,x,y,microscope_action)
+        addControlButton(obj, x, y, microscope_action)
         
         % add button selector
-        addControlSelector(obj,x,y,tag,displayname,device_handle)
+        addControlSelector(obj, x, y, tag, displayname, device_handle)
         
-        % add listner and setter for specific attribute tag in device
-        addParamCell(obj,x,y,tag,displayname,device_handle)
+        % add listener and setter for specific attribute tag in device
+        addParamCell(obj, x, y, tag, displayname, device_handle)
+        
+        % add listener and setter for exposure
+        addParamCellWithExposure(obj, x, y, tag, displayname,...
+            device_handle, camera_handle)
         
         % pop out windows for warnings
         function popWarning(obj)
