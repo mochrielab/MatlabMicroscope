@@ -13,6 +13,7 @@ classdef TriggerNidaq < YMicroscope.Trigger
         brightfield
         camera
         lightsources
+        laser473 % 01/23/17 SEP
     end
     
     methods
@@ -33,8 +34,12 @@ classdef TriggerNidaq < YMicroscope.Trigger
             % fluorescent
             obj.fluorescent=obj.niclock.addDigitalChannel('Dev1','Port0/Line2','OutputOnly');
             obj.fluorescent.Name = 'fluorescent';
+            % 473nm laser - 01/23/17 SEP
+            obj.laser473=obj.niclock.addDigitalChannel('Dev1','Port0/Line3','OutputOnly');
+            obj.laser473.Name = 'laser473';
             % set output voltage zero
-            obj.states = [0,0,0,0];
+            obj.states = [0,0,0,0,0]; % 01/23/17 SEP
+%             obj.states = [0,0,0,0];
             obj.niclock.outputSingleScan(obj.states);
             % set lightsources to none
             obj.setLightsources([]);

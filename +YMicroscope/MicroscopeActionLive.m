@@ -11,9 +11,9 @@ classdef MicroscopeActionLive < YMicroscope.MicroscopeActionControllerResponder
     methods
         % constructor
         function obj=MicroscopeActionLive...
-                (microscope,image_axes)
+                (microscope,image_axes,hist_axes)
             obj@YMicroscope.MicroscopeActionControllerResponder('live',...
-                microscope,image_axes,microscope.controller);
+                microscope,image_axes,hist_axes,microscope.controller);
         end
         
         % destructor
@@ -31,8 +31,10 @@ classdef MicroscopeActionLive < YMicroscope.MicroscopeActionControllerResponder
             start@YMicroscope.MicroscopeAction(obj);
             % start camera
             obj.microscope_handle.camera.prepareModeSnapshot();
-            % clear image
-            cla(obj.image_axes);axis equal;colormap gray;axis off;
+%             % clear image
+%             cla(obj.image_axes);axis equal;colormap gray;axis off;
+%             % clear histogram
+%             cla(obj.hist_axes);
         end
         
         % run everything
@@ -43,6 +45,7 @@ classdef MicroscopeActionLive < YMicroscope.MicroscopeActionControllerResponder
                 obj.drawImage(obj.microscope_handle.camera.capture);
                 obj.microscope_handle.controller.emitMotionEvents();
                 obj.microscope_handle.controller.emitActionEvents();
+                obj.drawHist(obj.microscope_handle.camera.capture); % 01/30/17 SEP
                 % stop if image closed
                 if ~ishandle(obj.image_axes)
                     obj.stop();

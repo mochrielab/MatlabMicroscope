@@ -131,6 +131,7 @@ classdef Microscope < handle
         % get current light source
         function ls=getLightsource(obj)
             ls = obj.lightsource;
+%             labelidx1 = obj.lightsource.label
         end
         
         % select light source with index

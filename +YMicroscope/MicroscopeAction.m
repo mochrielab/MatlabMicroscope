@@ -10,20 +10,35 @@ classdef (Abstract) MicroscopeAction < handle & matlab.mixin.Heterogeneous
         isrunning
         microscope_handle
         image_axes
+        hist_axes
         eventloop
         file_handle
+        histxmin
+        histxmax
+%         illumidx
     end
+    
+%     % 02/07/17 SEP **************************************************
+%     properties (Access = public)
+%         histxmin
+%         histxmax
+%     end
+%     % ***************************************************************
     
     methods
         % constructor
-        function obj = MicroscopeAction(label,microscope,image_axes)
+        function obj = MicroscopeAction(label,microscope,image_axes,hist_axes)
             import YMicroscope.*
             obj.label=label;
             obj.microscope_handle=microscope;
             obj.isrunning = false;
             obj.image_axes=image_axes;
+            obj.hist_axes = hist_axes;
             obj.eventloop=EventLoop(10);
             obj.file_handle=TiffIO(microscope.datapath,obj.label);
+            obj.histxmin = 0;
+            obj.histxmax = 15000;
+%             obj.illumidx = zeros([1 5]);
         end
         
         % start action
@@ -56,7 +71,31 @@ classdef (Abstract) MicroscopeAction < handle & matlab.mixin.Heterogeneous
                     img(5527206)= 0;
                 end
                 cla(obj.image_axes);
+                axes(obj.image_axes); % IF I HAVE
+                % MULTIPLE AXES IN MY GUI, I NEED TO EXPLICITLY SPECIFY
+                % WHICH AXES TO USE BEFORE DRAWING AN IMAGE OR A HISTOGRAM.
+                % SIMPLY TRY TO USE: IF ISHANDLE(OBJ.IMAGE_AXES).... ISN'T
+                % SUFFICIENT. I THINK THAT THIS MAY BE BECAUSE THE HANDLE
+                % IS TRUE, BUT IT IS ALSO TRUE THAT THE OBJ.HIST_AXES IS
+                % TRUE. THIS MAKES IT NECESSARY FOR ME TO EXPLCIITLY
+                % DISTINGUISH BETWEEN THE TWO AXES PRESENT IN THE UI!
+%                 imagesc(img,[obj.histxmin obj.histxmax]); axis equal; axis off;
                 imagesc(img); axis equal; axis off;
+
+%                 labelidx2 = obj.microscope_handle.lightsource.label
+%                 coloridx = obj.microscope_handle.lightsource.color
+%                 exposureidx = obj.microscope_handle.lightsource.exposure
+%                 intensityidx = obj.microscope_handle.lightsource.intensity
+%                 poweridx = obj.microscope_handle.lightsource.power
+            end
+        end
+        % draw histogram to ui
+        function drawHist(obj,img)
+            if ishandle(obj.hist_axes)
+                cla(obj.hist_axes); 
+                axes(obj.hist_axes);
+                histogram(img); xlim([obj.histxmin obj.histxmax]);
+                set(gca,'yticklabel',[]);
             end
         end
         

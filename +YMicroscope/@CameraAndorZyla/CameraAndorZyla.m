@@ -71,9 +71,20 @@ classdef CameraAndorZyla < YMicroscope.Camera
                 exception=MException('Camera:NegativeExposure','negative exposure');
                 throw(exception);
             else
+                % if I set obj.exposure to a const. val. here, then if I
+                % change the exposure value in the GUI and then change the
+                % illumination mode, the exposure time is set to the const.
+                % val. irrespective of what was entered in the GUI -
+                % 01/26/17 SEP
                 obj.exposure = exposure_input;
-                obj.mm.setExposure(obj.exposure);
+                % nothing is outputted into the command window if the
+                % following has no semicolon at the end. Additionally, if I
+                % comment this out, then no updates are made whatsoever to
+                % the exposure time (even when switching between
+                % illumination modes). 
+                obj.mm.setExposure(obj.exposure); 
                 notify(obj,'ExposureDidSet');
+%                 return;
             end
         end
         
@@ -103,7 +114,7 @@ classdef CameraAndorZyla < YMicroscope.Camera
             width = obj.mm.getImageWidth();
             height = obj.mm.getImageHeight();
             img = reshape(img, [width, height]);
-            
+%             disp('CameraAndorZyla.m capture a single image')
         end
         
         % prepare for image snap shot type of image acquisition

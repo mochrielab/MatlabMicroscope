@@ -10,8 +10,8 @@ classdef (Abstract) MicroscopeActionSequence < YMicroscope.MicroscopeAction
     methods
         % constructor
         function obj=MicroscopeActionSequence...
-                (label,microscope,image_axes)
-            obj@YMicroscope.MicroscopeAction(label,microscope,image_axes);
+                (label,microscope,image_axes,hist_axes)
+            obj@YMicroscope.MicroscopeAction(label,microscope,image_axes,hist_axes);
         end
         
         function start(obj)

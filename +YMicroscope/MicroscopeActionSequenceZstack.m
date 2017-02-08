@@ -14,8 +14,8 @@ classdef MicroscopeActionSequenceZstack < YMicroscope.MicroscopeActionSequence
         
         % constructor
         function obj=MicroscopeActionSequenceZstack...
-                (microscope,image_axes)
-            obj@YMicroscope.MicroscopeActionSequence('zstack',microscope,image_axes);
+                (microscope,image_axes,hist_axes)
+            obj@YMicroscope.MicroscopeActionSequence('zstack',microscope,image_axes,hist_axes);
         end
         
         function start(obj)

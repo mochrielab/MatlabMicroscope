@@ -1,4 +1,4 @@
-% add listner and setter for specific attribute tag in device
+% add listener and setter for specific attribute tag in device
 function addParamCell(obj,x,y,tag,displayname,device_handle)
 % uicontrol
 pos=obj.getParamPanelPosition(x,y);
@@ -26,11 +26,14 @@ obj.listeners(numlh+1)=...
             warning(exception.message);
         end
     end
+
     function updateDisplay(hobj,device_handle,tag)
         set(hobj,'String',num2str(...
-            device_handle.(tag)))
+            device_handle.(tag)));
     end
+
     function Name=capitalize(name)
         Name=[upper(name(1)),lower(name(2:end))];
     end
+
 end

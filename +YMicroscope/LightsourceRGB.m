@@ -9,7 +9,7 @@ classdef LightsourceRGB < YMicroscope.Lightsource
     methods
         
         % constructor
-        function obj = LightsourceRGB(comport, label)
+        function obj = LightsourceRGB(comport,label)
             % add com port control
             obj.label=label;
             obj.com = serial(comport);
@@ -64,6 +64,9 @@ classdef LightsourceRGB < YMicroscope.Lightsource
             exception=MException('Lightsource:InvalidIntensity',...
                 ['intensity ',num2str(intensity),' not supported']);
             throw(exception);
+        end
+        
+        function setPower(obj,power)
         end
         
         % turn on the light

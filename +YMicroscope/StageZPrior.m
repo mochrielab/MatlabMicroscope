@@ -98,7 +98,7 @@ classdef StageZPrior < YMicroscope.Stage
         end
         
         % set step size
-        % set stepszie of zscan
+        % set stepsize of zscan
         function setStepsize(obj,stepsize)
             stepsize=round(stepsize);
             if stepsize<0
@@ -114,6 +114,12 @@ classdef StageZPrior < YMicroscope.Stage
         function zarray = getZarray(obj)
             stacks=(1:obj.numstacks)-(obj.numstacks+1)/2;
             zarray=obj.zoffset+obj.stepsize*stacks*obj.volts_per_pix;
+        end
+        
+        % delete object
+        function delete(obj)
+            obj.trigger.setState('zstage',0);
+            display('Prior Z stage 0V');
         end
         
     end    

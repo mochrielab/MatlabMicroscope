@@ -9,10 +9,10 @@ classdef MicroscopeActionCapture < YMicroscope.MicroscopeAction
     
     methods
         
-        % constructor
-        function obj=MicroscopeActionCapture(microscope,image_axes)
+        % constructor - 01/29/17 added hist_axes
+        function obj=MicroscopeActionCapture(microscope,image_axes,hist_axes)
             obj@YMicroscope.MicroscopeAction('capture',...
-                microscope,image_axes);
+                microscope,image_axes,hist_axes);
             obj.issaving = false;
         end
         
@@ -58,6 +58,11 @@ classdef MicroscopeActionCapture < YMicroscope.MicroscopeAction
                     img = obj.microscope_handle.camera.getLastImage();
                     display('capture image from last required')
                 end
+            end
+            %histogram
+            if ishandle(obj.hist_axes)
+                axes(obj.hist_axes);
+                obj.drawHist(img);
             end
             % saving
             if obj.issaving

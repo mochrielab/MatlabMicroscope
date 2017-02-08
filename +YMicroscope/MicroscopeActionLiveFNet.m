@@ -16,9 +16,9 @@ classdef MicroscopeActionLiveFNet < YMicroscope.MicroscopeActionLive
     methods
         % constructor
         function obj=MicroscopeActionLiveFNet...
-                (microscope,image_axes)
+                (microscope,image_axes,hist_axes)
             obj@YMicroscope.MicroscopeActionLive(...
-                microscope,image_axes);
+                microscope,image_axes,hist_axes);
             obj.label = 'livefnet';
             obj.lockfocus = false;
             obj.focalplanecorrect = 0;

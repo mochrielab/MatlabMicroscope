@@ -21,16 +21,23 @@ classdef LightsourceSola < YMicroscope.Lightsource
             disp('Sola connected!')
         end
         
-        function setExposure(obj,exposure)
-            if exposure < 0
-                exception=MException('Lightsource:NegativeExposure','negative exposure');
+        function setExposure(obj,exposure_input)
+            if exposure_input < 0
+               exception=MException('Lightsource:NegativeExposure','negative exposure');
                throw(exception);
             else
-                obj.exposure = exposure;
+                % what goes into the gui box - if set to constant value,
+                % then doesn't matter what you type in the GUI, will
+                % automatically replace with the exposure set to the
+                % constant value
+%                 exposure_input <-- this alone outputs the values entered
+%                 into the  GUI for the exposure time
+%               **remember that the obj here is LightsourceSola
+                obj.exposure = exposure_input;
                 notify(obj,'ExposureDidSet');
             end
         end
-        
+                
         function setIntensity(obj,intensity)
             % choose between 0-255
             if intensity<0
@@ -53,6 +60,8 @@ classdef LightsourceSola < YMicroscope.Lightsource
             notify(obj,'IntensityDidSet');
         end
         
+        function setPower(obj,power)
+        end
         
         function setColor(obj,color)
             if strcmp(color,'all')

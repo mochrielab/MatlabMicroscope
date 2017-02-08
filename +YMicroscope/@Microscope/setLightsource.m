@@ -1,4 +1,3 @@
-
 function setLightsource(obj,str)
 % select light source with index
 % can only set a single source
@@ -19,4 +18,5 @@ catch
     throw(MException('Microscope:IlluminationNotSupported',...
         ['illumination mode not supported for ',str]))
 end
+
 end

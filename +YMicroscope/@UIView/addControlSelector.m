@@ -1,4 +1,6 @@
 % add button selector
+% obj.addControlSelector(0,2,'illumination','Illumination',...
+%                 obj.microscope_handle);
 function addControlSelector(obj,x,y,tag,displayname,device_handle)
 % device handle is the name of device str
 % tag is the property name

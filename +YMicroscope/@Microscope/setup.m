@@ -3,14 +3,25 @@ function setup( obj )
 
 import YMicroscope.*
 
-display('initiallizing...')
+display('initializing...')
 % add camera
 obj.camera = CameraAndorZyla ();
 % add trigger
 obj.trigger=TriggerNidaq();
-% add light sources
-obj.lightsources=[LightsourceRGB('com6','brightfield'),...
-    LightsourceSola('com3','fluorescent')];
+
+try
+    % add light sources
+    obj.lightsources=[LightsourceRGB('com6','brightfield'),...
+        LightsourceSola('com3','fluorescent'),...
+        Lightsource473nm(obj.trigger,'laser473'),...
+        Lightsource560nm('com4','laser560')]; % 1/24/17 SEP
+    disp('Lasers=ON')
+catch % need to test this out - turn off lasers and try to restart program
+    obj.lightsources=[LightsourceRGB('com6','brightfield'),...
+        LightsourceSola('com3','fluorescent')]; % 1/24/17 SEP
+    disp('Lasers=OFF')
+end
+
 obj.lightsource = obj.lightsources(1);
 % set current illumination model
 % obj.illumination_options={obj.lightsources.label};

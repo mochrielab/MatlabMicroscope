@@ -10,14 +10,19 @@ classdef MicroscopeActionControllerResponder < YMicroscope.MicroscopeAction
     end
     
     methods
-        % constructor
+        % constructor- 01/29/17 added hist_axes
         function obj=MicroscopeActionControllerResponder...
-                (label,microscope,image_axes,controller)
-            obj@YMicroscope.MicroscopeAction(label,microscope,image_axes);
+                (label,microscope,image_axes,hist_axes,controller)
+            %if swap hist_axes and controller above, then get warning 'Bad
+            %Handle' when try to do live imaging, once this error has
+            %occurred, cannot seem to get back to usual imaging even after
+            %remedying the issue....to place hist_axes before controller,
+            %had to also make similar change in MicroscopeActionLive.m
+            obj@YMicroscope.MicroscopeAction(label,microscope,image_axes,hist_axes);
             obj.setControllerListeners(controller);
         end
         
-        % set up listners for the events
+        % set up listeners for the events
         % use it in the constructor of the subclass if it doesn't call the
         % constructer of MicroscopeActionControllerResponder
         function setControllerListeners(obj,controller)
@@ -91,7 +96,7 @@ classdef MicroscopeActionControllerResponder < YMicroscope.MicroscopeAction
                     end
                 case 'Capture'
                     captureaction=MicroscopeActionCapture('livecapture',...
-                        microscope,obj.image_axes);
+                        microscope,obj.image_axes,obj.hist_axes);
                     captureaction.run;
                     delete(captureaction);
                 case 'ZoomIn'
