@@ -28,6 +28,8 @@ classdef (Abstract) MicroscopeAction < handle & matlab.mixin.Heterogeneous
             obj.hist_axes = hist_axes;
             obj.eventloop=EventLoop(10);
             obj.file_handle=TiffIO(microscope.datapath,obj.label);
+            % construct obj.histxmin and obj.histxmax to equal the min/max
+            % values that are linked to the microscope handle
             obj.histxmin = obj.microscope_handle.histxmin;
             obj.histxmax = obj.microscope_handle.histxmax;
         end
@@ -70,7 +72,8 @@ classdef (Abstract) MicroscopeAction < handle & matlab.mixin.Heterogeneous
                 % IS TRUE, BUT IT IS ALSO TRUE THAT THE OBJ.HIST_AXES IS
                 % TRUE. THIS MAKES IT NECESSARY FOR ME TO EXPLCIITLY
                 % DISTINGUISH BETWEEN THE TWO AXES PRESENT IN THE UI!
-                imagesc(img,[obj.histxmin obj.histxmax]); 
+%                 imagesc(img,[obj.histxmin obj.histxmax]); 
+                imagesc(img,[obj.histxmin,obj.histxmax]);
                 axis equal; axis off;
             end
         end
@@ -79,7 +82,9 @@ classdef (Abstract) MicroscopeAction < handle & matlab.mixin.Heterogeneous
             if ishandle(obj.hist_axes)
                 cla(obj.hist_axes); 
                 axes(obj.hist_axes);
-                histogram(img); xlim([obj.histxmin obj.histxmax]);
+                histogram(img); 
+%                 xlim([obj.histxmin obj.histxmax]);
+                xlim([obj.histxmin,obj.histxmax]);
                 set(gca,'yticklabel',[]);
             end
         end

@@ -85,7 +85,7 @@ classdef UIView < handle
         
         % add listener and setter for exposure
         addParamCellWithExposure(obj, x, y, tag, displayname,...
-            device_handle, camera_handle)
+            device_handle, camera_handle, microscope_handle)
         
         % pop out windows for warnings
         function popWarning(obj)
@@ -127,7 +127,6 @@ classdef UIView < handle
     events
         MoviecyclesDidSet
         MovieintervalDidSet
-        UpdateHist
     end
 end
 

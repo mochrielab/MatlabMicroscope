@@ -31,6 +31,11 @@ obj.listeners(numlh+1)=...
     function updateDisplay(hobj,device_handle,tag)
         set(hobj,'String',num2str(...
             device_handle.(tag)));
+        % Determine if exposure has been changed
+        if strcmp(tag,'exposure') == 1
+            % set microscope_handle histogram index value to 1
+            obj.microscope_handle.setHistIdx(1);
+        end
     end
 
     function Name=capitalize(name)

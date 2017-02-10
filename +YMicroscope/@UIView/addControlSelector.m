@@ -1,6 +1,4 @@
 % add button selector
-% obj.addControlSelector(0,2,'illumination','Illumination',...
-%                 obj.microscope_handle);
 function addControlSelector(obj,x,y,tag,displayname,device_handle)
 % device handle is the name of device str
 % tag is the property name
@@ -63,6 +61,11 @@ obj.listeners(numlh+1)=...
             set(hobj,'String',device_handle.(tag));
             warning(exception.message);
         end
+% %         % Determine if illumination mode is being changed
+% %         if (strcmp(tag,'illumination') == 1)% || (strcmp(tag,'roi') == 1)
+% %             % set microscope_handle histogram index value to 1
+% %             device_handle.setHistIdx(1);
+% %         end
     end
 
 % update display choice upon change in device value
@@ -77,28 +80,13 @@ obj.listeners(numlh+1)=...
                     find(device_handle.(tag) == [false, true]));
             end
         end
-        % attempt at including new notify/event for listener 02/09/17 SEP
-        if strcmp(tag,'illumination') == 1
-            device_handle.setHistIdx(1);
-            
-%             notify(obj,'UpdateHist'); % 02/09/17 SEP
-%             
-%             % add hist listener 02/09/17 SEP
-%             numlh_hist = length(obj.listenersHist);
-%             obj.listenersHist(numlh_hist+1) = addlistener...
-%                 (device_handle,'UpdateHist',...
-%                 @(hobj,eventdata)updateHistLim(uic,hobj));
+        % Determine if illumination mode or ROI has been changed
+        if (strcmp(tag,'illumination') == 1) || (strcmp(tag,'roi') == 1)
+            % set microscope_handle histogram index value to 1
+            obj.microscope_handle.setHistIdx(1);
         end
     end
     
-% %     % added 02/09/17 SEP for testing
-% %     function updateHistLim(hobj,device_handle)
-% % %         histImg = obj.device_handle.camera.capture;
-% % %         obj.device_handle.histxmin = min(histImg(:))-20;
-% % %         obj.device_handle.histxmax = max(histImg(:))+20;
-% % display('nothing')
-% %     end
-
 % capitalize first letter
     function Name=capitalize(name)
         Name=[upper(name(1)),lower(name(2:end))];

@@ -30,6 +30,11 @@ obj.listeners(numlh+1)=...
     function updateDisplay(hobj,device_handle,tag)
         set(hobj,'String',num2str(...
             device_handle.(tag)));
+        % Determine if intensity or power has changed
+        if (strcmp(tag,'intensity') == 1) || (strcmp(tag,'power') == 1)
+            % set microscope_handle histogram index value to 1
+            obj.microscope_handle.setHistIdx(1);
+        end
 %         notify(obj,'UpdateHist'); % 02/09/17 SEP
     end
 

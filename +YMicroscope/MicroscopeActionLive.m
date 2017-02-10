@@ -31,10 +31,6 @@ classdef MicroscopeActionLive < YMicroscope.MicroscopeActionControllerResponder
             start@YMicroscope.MicroscopeAction(obj);
             % start camera
             obj.microscope_handle.camera.prepareModeSnapshot();
-%             % clear image
-%             cla(obj.image_axes);axis equal;colormap gray;axis off;
-%             % clear histogram
-%             cla(obj.hist_axes);
         end
         
         % run everything
@@ -42,19 +38,9 @@ classdef MicroscopeActionLive < YMicroscope.MicroscopeActionControllerResponder
             obj.start;
 %             addlistener to updateHist, callback=drawHist go to UIView
             % callback function
-%             function callback (obj)
             function callback(obj)
-%                 obj.drawImage(obj.microscope_handle.camera.capture);
-%                 obj.microscope_handle.controller.emitMotionEvents();
-%                 obj.microscope_handle.controller.emitActionEvents();
-%                 obj.drawHist(obj.microscope_handle.camera.capture); % 01/30/17 SEP
-%                 % stop if image closed
-%                 if ~ishandle(obj.image_axes)
-%                     obj.stop();
-%                 end
                 img = obj.microscope_handle.camera.capture;
                 if obj.microscope_handle.histIdx == 1
-%                     display(num2str(obj.microscope_handle.histIdx))
                     obj.histxmin = min(img(:))-20;
                     obj.histxmax = max(img(:))+20;
                     obj.microscope_handle.setHistIdx(0);
@@ -98,7 +84,7 @@ classdef MicroscopeActionLive < YMicroscope.MicroscopeActionControllerResponder
     end
     
     events
-        updateHist
+%         updateHist
     end
     
 end

@@ -25,6 +25,9 @@ end
         if ishandle(hobj) && ~isempty(str)
             set(hobj,'String',str);
         end
+        % if action (e.g.,Live) is selected for the first time, set 
+        % histogram index to 1
+        obj.microscope_handle.setHistIdx(1);
     end
 % call back actions
     function callbackFunc(obj,action)
