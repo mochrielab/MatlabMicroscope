@@ -32,6 +32,14 @@ classdef Microscope < handle
         trigger % trigger for synchronized aquisition
         
         islighton % status of the illumination;
+        
+        histxmin = 0 % min values of hist. axes and to be used as CLim in
+        % imagesc 02/09/17 SEP
+        
+        histxmax = 15000 % min values of hist. axes and to be used as CLim in
+        % imagesc 02/09/17 SEP
+        
+        histIdx = 0;
     end
     
     properties (SetAccess = protected, Dependent)
@@ -137,6 +145,13 @@ classdef Microscope < handle
         % select light source with index
         setLightsource(obj,str)
         
+        % set histIdx value
+        function setHistIdx(obj, histIdxVal)
+            obj.histIdx = histIdxVal;
+%             obj.setHistIdx(obj.histIdx);
+%             notify(obj,'HistIdxDidSet');
+        end
+        
         % reset microscope status
         function reset(obj)
             obj.status = 'idle';
@@ -158,6 +173,8 @@ classdef Microscope < handle
         StatusDidSet
         DidLock
         DidUnlock
+        UpdateHist
+        HistIdxDidSet
         %         DidStart
         %         DidFinish
     end

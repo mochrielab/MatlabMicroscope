@@ -30,6 +30,7 @@ obj.listeners(numlh+1)=...
     function updateDisplay(hobj,device_handle,tag)
         set(hobj,'String',num2str(...
             device_handle.(tag)));
+%         notify(obj,'UpdateHist'); % 02/09/17 SEP
     end
 
     function Name=capitalize(name)

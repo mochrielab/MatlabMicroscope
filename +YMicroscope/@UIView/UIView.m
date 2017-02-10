@@ -9,6 +9,7 @@ classdef UIView < handle
         controlpanel_handle
         parampanel_handle
         listeners
+%         listenersHist % 02/09/17 SEP
         
         moviecycles
         movieinterval
@@ -46,6 +47,7 @@ classdef UIView < handle
                 'BoxStyle','full','xtick',[],'ytick',[]);
             histogram(0); set(gca,'yticklabel',[]); xlim([0 150000]);
             obj.listeners=event.listener.empty;
+%             obj.listenersHist = event.listener.empty; % 02/09/17 SEP
         end
         
         
@@ -125,6 +127,7 @@ classdef UIView < handle
     events
         MoviecyclesDidSet
         MovieintervalDidSet
+        UpdateHist
     end
 end
 
