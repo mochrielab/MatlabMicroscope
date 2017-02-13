@@ -35,7 +35,6 @@ obj.listeners(numlh+1)=...
             % set microscope_handle histogram index value to 1
             obj.microscope_handle.setHistIdx(1);
         end
-%         notify(obj,'UpdateHist'); % 02/09/17 SEP
     end
 
     function Name=capitalize(name)

@@ -32,9 +32,9 @@ classdef UIViewController < YMicroscope.UIView
                 ic= mod((i-1),4);
                 obj.addControlButton(ic,ir,obj.actions(i));
             end
-
-%              addControlButton(obj,x,y,microscope_action)
-                % Need to add button to 'refresh' histogram 01/29/17 SEP
+            
+            % add refresh button for histogram
+            obj.addHistRefreshButton(3,3);
 
             % add selectors
             obj.addControlSelector(0,2,'illumination','Illumination',...
@@ -45,12 +45,6 @@ classdef UIViewController < YMicroscope.UIView
                 obj.actions(2));
             obj.addControlSelector(1,3,'lockfocus','LiveFocus',...
                 obj.actions(4));
-            
-            % 'Refresh' Button - 01/17/17 SEP
-%             histrefresh_handle=uicontrol('Parent',controlpanel_handle,'Style','pushbutton',...
-%                 'Unit','Pixels','Position',[765 110 100 40],...
-%                 'String','Refresh','Fontsize',16,...
-%                 'Callback',@(hobj,event)hist_refresh(hobj,event,obj));
             
             % add parameters
             obj.addParamCellWithExposure(0,0,'exposure','brightfield exposure(ms)',...

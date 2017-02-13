@@ -77,6 +77,9 @@ classdef UIView < handle
         % add control buttons for microscope actions
         addControlButton(obj, x, y, microscope_action)
         
+        % add histogram refresh button
+        addHistRefreshButton(obj, x, y)
+        
         % add button selector
         addControlSelector(obj, x, y, tag, displayname, device_handle)
         

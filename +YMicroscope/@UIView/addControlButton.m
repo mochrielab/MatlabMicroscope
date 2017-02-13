@@ -11,7 +11,7 @@ uic=uicontrol('Parent',obj.controlpanel_handle,...
     'Callback',@(hobj,eventdata)callbackFunc(obj,microscope_action),...
     'Tag',microscope_action.label);
 
-% set up all event listners
+% set up all event listeners
 eves=events(microscope_action);
 for i=1:length(eves)
     numlh=length(obj.listeners);
