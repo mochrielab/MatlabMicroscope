@@ -9,7 +9,7 @@ classdef MicroscopeActionCapture < YMicroscope.MicroscopeAction
     
     methods
         
-        % constructor - 01/29/17 added hist_axes
+        % constructor
         function obj=MicroscopeActionCapture(microscope,image_axes,hist_axes)
             obj@YMicroscope.MicroscopeAction('capture',...
                 microscope,image_axes,hist_axes);
@@ -35,7 +35,7 @@ classdef MicroscopeActionCapture < YMicroscope.MicroscopeAction
             end
         end
         
-        % end acquisation
+        % end acquisition
         function img = run(obj)
             % set up
             obj.start();

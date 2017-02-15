@@ -49,9 +49,6 @@ classdef MicroscopeActionLive < YMicroscope.MicroscopeActionControllerResponder
                 obj.microscope_handle.controller.emitMotionEvents();
                 obj.microscope_handle.controller.emitActionEvents();
                 obj.drawHist(img); % 01/30/17 SEP
-%                 if blabla
-%                     notify('updateHist')
-%                 end
                 % stop if image closed
                 if ~ishandle(obj.image_axes)
                     obj.stop();
@@ -84,7 +81,6 @@ classdef MicroscopeActionLive < YMicroscope.MicroscopeActionControllerResponder
     end
     
     events
-%         updateHist
     end
     
 end

@@ -18,7 +18,13 @@ obj.listeners(numlh+1)=...
     @(hobj,eventdata)updateDisplay(uic,hobj,tag));
 % call back actions
     function callbackFunc(hobj,eventdata,device_handle,tag)
-        value=str2double(hobj.get('String'));
+        %         value=str2double(hobj.get('String'));
+        if ~ischar(class(device_handle.(tag)))
+            value = str2double(hobj.get('String'));
+        else
+            value = hobj.get('String');
+        end
+        
         try
             device_handle.(['set',capitalize(tag)])(value);
         catch exception
@@ -28,17 +34,20 @@ obj.listeners(numlh+1)=...
     end
 
     function updateDisplay(hobj,device_handle,tag)
-        set(hobj,'String',num2str(...
-            device_handle.(tag)));
+        if ~ischar(class(device_handle.(tag)))
+            set(hobj,'String',num2str(...
+                device_handle.(tag)));
+        else
+            set(hobj,'String',device_handle.(tag));
+        end
+        
         % Determine if intensity or power has changed
         if (strcmp(tag,'intensity') == 1) || (strcmp(tag,'power') == 1)
             % set microscope_handle histogram index value to 1
             obj.microscope_handle.setHistIdx(1);
         end
     end
-
     function Name=capitalize(name)
         Name=[upper(name(1)),lower(name(2:end))];
     end
-
 end

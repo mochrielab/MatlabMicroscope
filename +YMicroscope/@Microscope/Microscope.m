@@ -40,6 +40,8 @@ classdef Microscope < handle
         % imagesc 02/09/17 SEP
         
         histIdx = 0;
+        
+        headername = ''; % creates empty string called headername
     end
     
     properties (SetAccess = protected, Dependent)
@@ -149,6 +151,12 @@ classdef Microscope < handle
             obj.histIdx = histIdxVal;
         end
         
+%       set beginning of file name (here, aka headername)
+        function setHeadername(obj,headername)
+             obj.headername = headername;
+             notify(obj,'HeadernameDidSet');
+        end
+        
         % reset microscope status
         function reset(obj)
             obj.status = 'idle';
@@ -170,5 +178,6 @@ classdef Microscope < handle
         StatusDidSet
         DidLock
         DidUnlock
+        HeadernameDidSet
     end
 end

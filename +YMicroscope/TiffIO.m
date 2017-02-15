@@ -8,17 +8,20 @@ classdef TiffIO < handle
         tagstruct
         filename
         tag
+        microscope_handle
     end
        
     
     methods
         % create a tiffIO with path and tag
-        function obj=TiffIO(path,tag)
+        function obj=TiffIO(path,tag,microscope_handle)
+            import YMicroscope.*
             obj.rootpath=path;
             obj.tag=tag;
+            obj.microscope_handle = microscope_handle;
         end
         
-        % get fulll saving path
+        % get full saving path
         function datepath=getDataSavePath(obj)
             t=clock;
             datepath=fullfile(obj.rootpath,...
@@ -29,19 +32,27 @@ classdef TiffIO < handle
             end
         end
         
-        % get full file name
+        % get full file name - if no name is typed into UI, then should get
+        % '_(tag)_(time).tif' for file name
         function filename=getFullFileName(obj)
             t=clock;
-            filename=fullfile(obj.getDataSavePath,[obj.tag,'_',...
-                num2str(t(4),'%02d'),'_',num2str(t(5),'%02d'),'_',...
-                num2str(round(t(6)),'%02d'),'.tif']);
+            filename=fullfile(obj.getDataSavePath,[obj.microscope_handle.headername,'_',...
+                obj.tag,'_',num2str(t(4),'%02d'),'_',num2str(t(5)...
+                ,'%02d'),'_',num2str(round(t(6)),'%02d'),'.tif']);
         end
         
+        % Tiff file is open/closed ('rewritten') each time want to save, so
+        % cannot create headername in this TiffIO class, since it won't
+        % ever be saved ... moving to Microscope.m
         % open file for write
         function fopen(obj,tagstruct)
             if strcmp(obj.tag,'capture')
+                % 'a' is for opening/creating file for writing; appending
+                % data to end of file
                 obj.handle=Tiff(obj.getFullFileName(),'a');
             else
+                % w8 is for opening file for writing a BigTIFF file;
+                % discards existing contents
                 obj.handle=Tiff(obj.getFullFileName(),'w8');
             end
             obj.tagstruct=tagstruct;
@@ -65,6 +76,8 @@ classdef TiffIO < handle
         
     end
     
+    events
+    end
     
 end
 

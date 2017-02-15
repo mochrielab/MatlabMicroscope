@@ -4,7 +4,7 @@ function didset=setProperty(obj,name, value)
 % name is space separated
 
 try
-    % name is space seperated for device and property
+    % name is space separated for device and property
     names=strsplit(name,' ');
     devicename=names{1};
     propname=names{2};

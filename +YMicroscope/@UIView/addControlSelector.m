@@ -61,11 +61,6 @@ obj.listeners(numlh+1)=...
             set(hobj,'String',device_handle.(tag));
             warning(exception.message);
         end
-% %         % Determine if illumination mode is being changed
-% %         if (strcmp(tag,'illumination') == 1)% || (strcmp(tag,'roi') == 1)
-% %             % set microscope_handle histogram index value to 1
-% %             device_handle.setHistIdx(1);
-% %         end
     end
 
 % update display choice upon change in device value
