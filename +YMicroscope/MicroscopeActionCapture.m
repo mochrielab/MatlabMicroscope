@@ -13,7 +13,8 @@ classdef MicroscopeActionCapture < YMicroscope.MicroscopeAction
         function obj=MicroscopeActionCapture(microscope,image_axes,hist_axes)
             obj@YMicroscope.MicroscopeAction('capture',...
                 microscope,image_axes,hist_axes);
-            obj.issaving = false;
+%             obj.issaving = false;
+            obj.issaving = true;
         end
         
         % start action
