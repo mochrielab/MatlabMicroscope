@@ -2,21 +2,32 @@ classdef Lightsource560nm < YMicroscope.Lightsource
     % class for 560nm laser, fluorescent illumination
     % 01/23/17 - SEP
     
+    properties (Access = protected)
+        trigger
+    end
+    
     properties (Constant)
         color_options = {'all'}
     end
     
     methods
         
-        function obj = Lightsource560nm(comport,label)
+        function obj = Lightsource560nm(comport,label,trigger)
             % add com port control
             obj.label=label;
             obj.com = serial(comport);
+            obj.trigger = trigger;
             fopen(obj.com);
             set(obj.com,'Terminator','CR');
             obj.color=obj.color_options{1};
             obj.setExposure(100);
             obj.setPower(100);
+            
+            % 04/17/17 SEP
+            fprintf(obj.com,'SETLDENABLE 1');
+            fprintf(obj.com,'POWERENABLE 1');
+            fprintf(obj.com,'SETPOWER 0 100');
+            
             disp('560nm connected!')
         end
         
@@ -63,20 +74,23 @@ classdef Lightsource560nm < YMicroscope.Lightsource
         end
         
         function turnOn(obj)
-            fprintf(obj.com,'SETLDENABLE 1');
-            fprintf(obj.com,'POWERENABLE 1'); 
-            fprintf(obj.com,'SETPOWER 0 100'); 
+            obj.trigger.setState('shutter560',1); % 04/17/17 SEP
+%             fprintf(obj.com,'SETLDENABLE 1');
+%             fprintf(obj.com,'POWERENABLE 1'); 
+%             fprintf(obj.com,'SETPOWER 0 100'); 
             obj.ison=true;
         end
         
         function turnOff(obj)
-            fprintf(obj.com,'SETLDENABLE 0'); % turn off 560nm laser (later will be controlling shutter)
+            obj.trigger.setState('shutter560',0); % 04/17/17 SEP
+%             fprintf(obj.com,'SETLDENABLE 0'); % turn off 560nm laser (later will be controlling shutter)
             obj.ison=false;
         end
         
         function delete(obj)
-            display('560nm laser disconnected')
+            fprintf(obj.com,'SETLDENABLE 0'); % turn off 560nm laser
             fclose(obj.com);
+            display('560nm laser disconnected')
         end
     end
     

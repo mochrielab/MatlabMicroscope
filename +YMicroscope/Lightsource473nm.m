@@ -16,6 +16,7 @@ classdef Lightsource473nm < YMicroscope.Lightsource
             obj.trigger = trigger;
             obj.label=label;
             obj.setExposure(100);
+            obj.trigger.setState('laser473',1);
             disp('473nm laser connected!')
         end
         
@@ -46,13 +47,19 @@ classdef Lightsource473nm < YMicroscope.Lightsource
         
         
         function turnOn(obj)
-            obj.trigger.setState('laser473',1);
+            obj.trigger.setState('shutter473',1); % 04/17/17 SEP
             obj.ison=true;
         end
         
         function turnOff(obj)
-            obj.trigger.setState('laser473',0);
+            obj.trigger.setState('shutter473',0); % 04/17/17 SEP
             obj.ison=false;
+        end
+        
+        % 04/17/17 SEP - test
+        function delete(obj)
+            obj.trigger.setState('laser473',0);
+            display('473nm laser off')
         end
         
     end

@@ -14,6 +14,8 @@ classdef TriggerNidaq < YMicroscope.Trigger
         camera
         lightsources
         laser473 % 01/23/17 SEP
+        shutter473 % 04/17/17 SEP
+        shutter560 %04/17/17 SEP
     end
     
     methods
@@ -37,8 +39,18 @@ classdef TriggerNidaq < YMicroscope.Trigger
             % 473nm laser - 01/23/17 SEP
             obj.laser473=obj.niclock.addDigitalChannel('Dev1','Port0/Line3','OutputOnly');
             obj.laser473.Name = 'laser473';
+            % 473nm shutter - 04/17/17 SEP
+            obj.shutter473=obj.niclock.addDigitalChannel('Dev1','Port0/Line8','OutputOnly');
+            obj.shutter473.Name = 'shutter473';
+            % 560nm shutter - 04/17/17 SEP
+            obj.shutter560=obj.niclock.addDigitalChannel('Dev1','Port0/Line9','OutputOnly');
+            obj.shutter560.Name = 'shutter560';
             % set output voltage zero
-            obj.states = [0,0,0,0,0]; % 01/23/17 SEP
+%             try
+                obj.states = [0,0,0,0,0,0,0]; % 04/17/17 SEP
+%             catch
+%                 obj.states = [0,0,0,0,0]; % 04/17/17 SEP
+%             end
 %             obj.states = [0,0,0,0];
             obj.niclock.outputSingleScan(obj.states);
             % set lightsources to none
@@ -196,7 +208,7 @@ classdef TriggerNidaq < YMicroscope.Trigger
         function finish(obj)
             % stop acquisition
             obj.niclock.stop;
-            % recver to previous stage
+            % recover to previous stage
             obj.niclock.outputSingleScan(obj.states);
         end
         
