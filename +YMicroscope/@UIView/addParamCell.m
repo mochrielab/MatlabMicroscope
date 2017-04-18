@@ -19,7 +19,7 @@ obj.listeners(numlh+1)=...
 % call back actions
     function callbackFunc(hobj,eventdata,device_handle,tag)
         %         value=str2double(hobj.get('String'));
-        if ~ischar(class(device_handle.(tag)))
+        if ~ischar(device_handle.(tag)) % 04/18/17 SEP
             value = str2double(hobj.get('String'));
         else
             value = hobj.get('String');
