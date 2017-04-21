@@ -12,6 +12,31 @@ classdef UIViewController < YMicroscope.UIView
             import YMicroscope.*
             obj@YMicroscope.UIView();
             obj.microscope_handle=microscope_handle;
+            
+            % 04/21/17 SEP
+            obj.figure_handle.set('WindowKeyPressFcn',@(src,eventdata)keyfun(src,obj));
+            
+            function keyfun(src,obj)
+                switch get(gcf,'CurrentKey')
+                    case 'leftarrow'
+%                         disp('move left') --> left
+                        obj.microscope_handle.xystage.moveLeft(100);
+                    case 'rightarrow'
+%                         disp('move right') --> right
+                        obj.microscope_handle.xystage.moveRight(100);     
+                    case 'uparrow'
+%                         disp('move up') --> forward
+                        obj.microscope_handle.xystage.moveFwd(100);
+                    case 'downarrow'
+%                         disp('move down') --> back
+                        obj.microscope_handle.xystage.moveBkwd(100);
+                    case 'semicolon'
+                        obj.microscope_handle.zstage.setZoffset(obj.microscope_handle.zstage.zoffset+0.01);
+                    case 'quote'
+                        obj.microscope_handle.zstage.setZoffset(obj.microscope_handle.zstage.zoffset-0.01);
+                end
+            end
+            
             obj.actions=[ MicroscopeActionLive(...
                 obj.microscope_handle,obj.imageaxis_handle,obj.hist_handle),...
                 MicroscopeActionCapture(...

@@ -24,6 +24,7 @@ classdef MicroscopeActionLiveFNet < YMicroscope.MicroscopeActionLive
             obj.focalplanecorrect = 0;
             obj.focaldistavg = 0;
             obj.fnet = YMicroscope.FocusNet(fullfile('models', 'probnet12'), 16);
+%             obj.fnet = YMicroscope.FocusNet(fullfile('models', 'probnet22'), 4);
         end
         
         function setLockfocus(obj, lock)

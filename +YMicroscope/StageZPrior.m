@@ -67,7 +67,7 @@ classdef StageZPrior < YMicroscope.Stage
         end
         
         
-        % get z off set
+        % get z offset
         % only set value without moving the stage
         function setZoffset(obj,zoffset)
             if zoffset<0
