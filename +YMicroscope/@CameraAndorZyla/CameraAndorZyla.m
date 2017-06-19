@@ -114,6 +114,10 @@ classdef CameraAndorZyla < YMicroscope.Camera
             width = obj.mm.getImageWidth();
             height = obj.mm.getImageHeight();
             img = reshape(img, [width, height]);
+            % there is a bad pixel in zyla camera
+            if numel(img) == 5529600
+                img(5527206)= 0;
+            end
 %             disp('CameraAndorZyla.m capture a single image')
         end
         

@@ -59,10 +59,6 @@ classdef (Abstract) MicroscopeAction < handle & matlab.mixin.Heterogeneous
         % draw image to ui
         function drawImage(obj,img)
             if ishandle(obj.image_axes)
-                % there is a bad pixel in zyla camera
-                if numel(img) == 5529600
-                    img(5527206)= 0;
-                end
                 cla(obj.image_axes);
                 axes(obj.image_axes); % IF I HAVE
                 % MULTIPLE AXES IN MY GUI, I NEED TO EXPLICITLY SPECIFY
