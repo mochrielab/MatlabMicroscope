@@ -10,6 +10,7 @@ obj.camera = CameraAndorZyla ();
 obj.trigger=TriggerNidaq();
 
 try
+    disp('try 4 sources -------------------------------------------------')
     % add light sources
     obj.lightsources=[LightsourceRGB('com6','brightfield'),...
         LightsourceSola('com3','fluorescent'),...
@@ -17,6 +18,7 @@ try
         Lightsource560nm('com4','laser560',obj.trigger)]; % 04/17/17 SEP
     disp('Lasers=ON')
 catch % need to test this out - turn off lasers and try to restart program
+    disp('try two sources -----------------------------------------------')
     obj.lightsources=[LightsourceRGB('com6','brightfield'),...
         LightsourceSola('com3','fluorescent')]; % 1/24/17 SEP
     disp('Lasers=OFF')

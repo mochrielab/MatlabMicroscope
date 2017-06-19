@@ -17,7 +17,13 @@ classdef Lightsource560nm < YMicroscope.Lightsource
             obj.label=label;
             obj.com = serial(comport);
             obj.trigger = trigger;
-            fopen(obj.com);
+            try
+                fopen(obj.com);
+            catch
+                exception=MException('Lightsource:NotConnectedCOM',...
+                    'com port not connected');
+                throw(exception);
+            end
             set(obj.com,'Terminator','CR');
             obj.color=obj.color_options{1};
             obj.setExposure(100);
@@ -88,9 +94,11 @@ classdef Lightsource560nm < YMicroscope.Lightsource
         end
         
         function delete(obj)
-            fprintf(obj.com,'SETLDENABLE 0'); % turn off 560nm laser
-            fclose(obj.com);
-            display('560nm laser disconnected')
+            try
+                fprintf(obj.com,'SETLDENABLE 0'); % turn off 560nm laser
+                fclose(obj.com);
+                display('560nm laser disconnected')
+            end
         end
     end
     
