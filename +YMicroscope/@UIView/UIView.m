@@ -19,32 +19,8 @@ classdef UIView < handle
         % set up ui view
         function obj=UIView()
             obj.figure_handle=figure('Position',[0 50 1920 950]);
-%             obj.figure_handle.set('WindowKeyPressFcn',...
-%                 'fprintf(''You pressed the key %c.\n'', get(gcf, ''CurrentCharacter''))'); % TEST 04/19/17 SEP
-%             obj.figure_handle.set('WindowKeyPressFcn','charout = get(gcf,''CurrentKey'')'); % TEST 04/19/17 SEP            
-%             obj.figure_handle.set('WindowKeyPressFcn',@(src,eventdata)keyfun(src,obj));
             obj.figure_handle.set('CloseRequestFcn',...
                 @(src,eventdata)callbackFunc(src,obj));
-            
-%             % 04/20/17
-%             function keyfun(src,obj)
-%                 switch get(gcf,'CurrentKey')
-%                     case 'leftarrow'
-%                        disp('move left')
-%                     case 'rightarrow'
-%                        disp('move right')
-%                     case 'uparrow'
-%                         disp('move up')
-%                     case 'downarrow'
-%                         disp('move down')
-%                     case 'j'
-% %                         disp('move in')
-% %                         obj.microscope_handle.zstage.setZoffset(obj.microscope_handle.zstage.zoffset+0.01);    
-%                     case 'k'
-%                         disp('move out')
-%                 end
-%             end
-            
             function callbackFunc (hobj,obj)
                 delete(hobj);
                 delete(obj);

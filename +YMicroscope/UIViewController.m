@@ -20,16 +20,16 @@ classdef UIViewController < YMicroscope.UIView
                 switch get(gcf,'CurrentKey')
                     case 'leftarrow'
 %                         disp('move left') --> left
-                        obj.microscope_handle.xystage.moveLeft(100);
+                        obj.microscope_handle.xystage.moveLeft(1000);
                     case 'rightarrow'
 %                         disp('move right') --> right
-                        obj.microscope_handle.xystage.moveRight(100);     
+                        obj.microscope_handle.xystage.moveRight(1000);     
                     case 'uparrow'
 %                         disp('move up') --> forward
-                        obj.microscope_handle.xystage.moveFwd(100);
+                        obj.microscope_handle.xystage.moveFwd(1000);
                     case 'downarrow'
 %                         disp('move down') --> back
-                        obj.microscope_handle.xystage.moveBkwd(100);
+                        obj.microscope_handle.xystage.moveBkwd(1000);
                     case 'semicolon'
                         obj.microscope_handle.zstage.setZoffset(obj.microscope_handle.zstage.zoffset+0.01);
                     case 'quote'
