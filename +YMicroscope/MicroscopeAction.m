@@ -78,7 +78,7 @@ classdef (Abstract) MicroscopeAction < handle & matlab.mixin.Heterogeneous
             if ishandle(obj.image_axes)
                 cla(obj.image_axes);
                 axes(obj.image_axes);
-                imagesc(double(img));
+                imagesc(img);
                 axis equal; axis off;
             end
         end

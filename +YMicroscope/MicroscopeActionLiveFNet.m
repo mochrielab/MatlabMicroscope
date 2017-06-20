@@ -11,6 +11,8 @@ classdef MicroscopeActionLiveFNet < YMicroscope.MicroscopeActionLive
         lockfocus
         focalplanecorrect
         focaldistavg
+        batchsize
+        modelname
     end
     
     methods
@@ -23,8 +25,20 @@ classdef MicroscopeActionLiveFNet < YMicroscope.MicroscopeActionLive
             obj.lockfocus = false;
             obj.focalplanecorrect = 0;
             obj.focaldistavg = 0;
-            obj.fnet = YMicroscope.FocusNet(fullfile('models', 'probnet12'), 16);
-%             obj.fnet = YMicroscope.FocusNet(fullfile('models', 'probnet22'), 4);
+            obj.modelname = 'probnet12';
+            obj.batchsize = 16;
+            obj.fnet = YMicroscope.FocusNet(...
+                fullfile('models', obj.modelname), obj.batchsize);
+        end
+        
+        function setBatchsize(obj, batchsize)
+            if batchsize ~= 1 && batchsize ~= 4 && batchsize ~= 16
+                throw(MException('MicroscopeAction:UnsupportedBatchsize',...
+                    'use batchsize of 1, 4 or 16'))
+            end
+            obj.fnet = YMicroscope.FocusNet(...
+                fullfile('models', obj.modelname), batchsize);
+            obj.batchsize = batchsize;
         end
         
         function setLockfocus(obj, lock)
@@ -46,6 +60,18 @@ classdef MicroscopeActionLiveFNet < YMicroscope.MicroscopeActionLive
         function start(obj)
             % call super
             start@YMicroscope.MicroscopeActionLive(obj);
+            roi = obj.microscope_handle.camera.roi;
+            switch roi
+                case '1024 x 1344'
+                    obj.setBatchsize(16);
+                case '512 x 512'
+                    obj.setBatchsize(4);
+                case '256 x 256'
+                    obj.setBatchsize(1);
+                otherwise
+                    throw(MException('MicroscopeAction:UnsupportedBatchsize',...
+                        ['can not find the corresponding batchsize to roi of ', roi]))
+            end
         end
         
         % run everything
@@ -117,6 +143,7 @@ classdef MicroscopeActionLiveFNet < YMicroscope.MicroscopeActionLive
     events
         LockfocusDidSet
         FocalplanecorrectDidSet
+        BatchsizeDidSet
     end
     
 end
