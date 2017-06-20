@@ -72,6 +72,17 @@ classdef (Abstract) MicroscopeAction < handle & matlab.mixin.Heterogeneous
                 axis equal; axis off;
             end
         end
+        
+        % draw image to ui
+        function drawImageNoHist(obj,img)
+            if ishandle(obj.image_axes)
+                cla(obj.image_axes);
+                axes(obj.image_axes);
+                imagesc(double(img));
+                axis equal; axis off;
+            end
+        end
+        
         % draw histogram to ui
         function drawHist(obj,img) %,histflag)
             if ishandle(obj.hist_axes)

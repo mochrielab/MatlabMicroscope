@@ -28,9 +28,13 @@ classdef FocusNet < handle
             end
             model_weights = fullfile(model_path,'stage_1_final_1.caffemodel');
             caffe.reset_all();
-            % caffe.set_mode_cpu();
-            caffe.set_mode_gpu();
-            caffe.set_device(0);
+            try
+                caffe.set_mode_gpu();
+                caffe.set_device(0);
+            catch
+                disp('FocusNet: can not find gpu 0, use cpu instead')
+                caffe.set_mode_cpu();
+            end
             obj.net = caffe.Net(model_def, model_weights, 'test');
         end
         
@@ -66,7 +70,8 @@ classdef FocusNet < handle
                 end
                 % elseif height == 256 && width ==256 && obj.batchsize = 16
             else
-                error('not matching image and batchsize')
+                throw(MException('FocusNet:NotSupported',...
+                    'not matching image and batchsize'));
             end
             function img = preprocess(img)
                 img = single(imresize(img, [96 96]));
@@ -102,9 +107,11 @@ classdef FocusNet < handle
             end
             switch obj.batchsize
                 case 1
-                    error('not implemented')
+                    throw(MException('FocusNet:NotSupported',...
+                        'batchsize not implemented'));
                 case 4
-                    error('not implemented')
+                    throw(MException('FocusNet:NotSupported',...
+                        'batchsize not implemented'));
                 case 16
                     input_index = 1;
                     for ic = 0:3
@@ -120,7 +127,8 @@ classdef FocusNet < handle
                         end
                     end
                 otherwise
-                    error('unsupported batchsize')
+                    throw(MException('FocusNet:NotSupported',...
+                        'batchsize not implemented'));
             end
         end
         

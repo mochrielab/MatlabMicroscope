@@ -57,7 +57,7 @@ classdef MicroscopeActionLiveFNet < YMicroscope.MicroscopeActionLive
                 img = (obj.microscope_handle.camera.capture);
                 obj.fnet.loadImages(img, obj.max, obj.min);
                 obj.fnet.inference();
-                obj.drawImage(img); hold on;
+                obj.drawImageNoHist(img); hold on;
                 obj.fnet.plot();
                 if obj.lockfocus
                     dist = obj.fnet.getFocalDistance();
@@ -86,7 +86,7 @@ classdef MicroscopeActionLiveFNet < YMicroscope.MicroscopeActionLive
                 imgtmp = (obj.microscope_handle.camera.capture);
                 obj.max = max([obj.max, single(max(imgtmp(:)))]);
                 obj.min = min([obj.max, single(min(imgtmp(:)))]);
-                obj.drawImage(imgtmp);
+                obj.drawImageNoHist(imgtmp);
             end
             obj.microscope_handle.zstage.setZoffset(zoffset)
             
