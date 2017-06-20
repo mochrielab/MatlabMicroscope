@@ -167,6 +167,10 @@ classdef CameraAndorZyla < YMicroscope.Camera
         % get most recent image
         function img=getLastImage(obj)
             img=obj.mm.getLastImage();
+            % there is a bad pixel in zyla camera
+            if numel(img) == 5529600
+                img(5527206)= 0;
+            end
             width = obj.mm.getImageWidth();
             height = obj.mm.getImageHeight();
             img = reshape(img, [width, height]);
