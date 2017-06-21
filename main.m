@@ -4,7 +4,8 @@ m = Microscope();
 
 %%
 clc
+ui = UIViewController(m);
 
-% ui = UIViewController(m);
-
+%%
+% temporary for taking live record
 ui = UIViewControllerRecord(m);

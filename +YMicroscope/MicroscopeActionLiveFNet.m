@@ -76,32 +76,7 @@ classdef MicroscopeActionLiveFNet < YMicroscope.MicroscopeActionLive
         
         % run everything
         function run(obj)
-            obj.start;
-            % callback function
-            
-            function callback (obj)
-                img = (obj.microscope_handle.camera.capture);
-                obj.fnet.loadImages(img, obj.max, obj.min);
-                obj.fnet.inference();
-                obj.drawImageNoHist(img); hold on;
-                obj.fnet.plot();
-                if obj.lockfocus
-                    dist = obj.fnet.getFocalDistance();
-%                     obj.focaldistavg = obj.focaldistavg * 0.8 + dist * 0.2;
-                    display(['distance to focal plane: ', num2str(dist)]);
-                    obj.microscope_handle.zstage.move((dist - obj.focalplanecorrect)*.5);
-                end
-                obj.microscope_handle.controller.emitMotionEvents();
-                obj.microscope_handle.controller.emitActionEvents();
-                % stop if image closed
-                if ~ishandle(obj.image_axes)
-                    obj.stop();
-                end
-                % once in a while do autofocusing every 20 loops
-                if mod(obj.eventloop.getLoopIndex, 20) == 0
-                    
-                end
-            end
+            obj.start;            
             % turn on light
             obj.microscope_handle.setLight('always on');
             
@@ -117,11 +92,36 @@ classdef MicroscopeActionLiveFNet < YMicroscope.MicroscopeActionLive
             obj.microscope_handle.zstage.setZoffset(zoffset)
             
             % run event loop
-            obj.eventloop.run(@()callback(obj));
+            obj.eventloop.run(@()obj.runLoopCallBackFNet());
             % call call back function when finish
             obj.microscope_handle.setLight('off');
             % finish
             obj.finish;
+        end
+        
+        
+        function img = runLoopCallBackFNet(obj)
+            img = (obj.microscope_handle.camera.capture);
+            obj.fnet.loadImages(img, obj.max, obj.min);
+            obj.fnet.inference();
+            obj.drawImageNoHist(img); hold on;
+            obj.fnet.plot();
+            if obj.lockfocus
+                dist = obj.fnet.getFocalDistance();
+%                     obj.focaldistavg = obj.focaldistavg * 0.8 + dist * 0.2;
+                display(['distance to focal plane: ', num2str(dist)]);
+                obj.microscope_handle.zstage.move((dist - obj.focalplanecorrect)*.5);
+            end
+            obj.microscope_handle.controller.emitMotionEvents();
+            obj.microscope_handle.controller.emitActionEvents();
+            % stop if image closed
+            if ~ishandle(obj.image_axes)
+                obj.stop();
+            end
+            % once in a while do autofocusing every 20 loops
+            if mod(obj.eventloop.getLoopIndex, 20) == 0
+
+            end
         end
         
         % get event display for UI
