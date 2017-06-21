@@ -3,7 +3,8 @@ classdef (Abstract) MicroscopeAction < handle & matlab.mixin.Heterogeneous
     %   Yao Zhao 11/9/2015
     
     properties (SetAccess = protected)
-        label;
+        label
+        eventloop
     end
     
     properties (Access = protected)
@@ -11,7 +12,6 @@ classdef (Abstract) MicroscopeAction < handle & matlab.mixin.Heterogeneous
         microscope_handle
         image_axes
         hist_axes
-        eventloop
         file_handle
         histxmin
         histxmax

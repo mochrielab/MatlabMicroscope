@@ -50,7 +50,7 @@ classdef MicroscopeActionSequenceZstack < YMicroscope.MicroscopeActionSequence
             %finish
             obj.finish();
         end
-        
+                
         % get event display for UI
         function dispstr=getEventDisplay(obj,eventstr)
             switch eventstr

@@ -3,8 +3,11 @@ classdef EventLoop < handle
     % the loop is used for detecting event
     % Yao Zhao 11/9/2015
     
-    properties (Access = protected)
+    properties (SetAccess = protected)
         rate = 10;
+    end
+    
+    properties (Access = protected)
         isrunning
         loopindex = 0
     end
@@ -53,6 +56,7 @@ classdef EventLoop < handle
     
     events
         StopLoop
+        RateDidSet
     end
     
 end
