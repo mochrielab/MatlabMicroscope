@@ -110,7 +110,7 @@ classdef MicroscopeActionLiveFNet < YMicroscope.MicroscopeActionLive
                 dist = obj.fnet.getFocalDistance();
 %                     obj.focaldistavg = obj.focaldistavg * 0.8 + dist * 0.2;
                 display(['distance to focal plane: ', num2str(dist)]);
-                obj.microscope_handle.zstage.move((dist - obj.focalplanecorrect)*.5);
+                obj.microscope_handle.zstage.move((dist - obj.focalplanecorrect)*0.5);
             end
             obj.microscope_handle.controller.emitMotionEvents();
             obj.microscope_handle.controller.emitActionEvents();
