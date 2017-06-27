@@ -52,7 +52,7 @@ classdef MicroscopeActionLiveFNetRecord < YMicroscope.MicroscopeActionLiveFNet
             % save image
             obj.file_handle.fwrite(img)
             % save text
-            fprintf(obj.text_handle, '5.5%f,', now);
+            fprintf(obj.text_handle, '%f,', now);
             fprintf(obj.text_handle, '%1.5f,', obj.microscope_handle.zstage.zoffset);
             for m = obj.fnet.mean
                 fprintf(obj.text_handle, '%2.5f,', m);
